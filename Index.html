@@ -5,673 +5,425 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Powerhouse</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ElliottC823/powerhouse/main/POWERHOUSE-icon.png">
+    <title>Uncle Joe's Gameshack</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --brand-default: #0066FF;
-            --accent: #0066FF;
+            --accent: #FF6B00;
             --bg: #0d0e12;
-            --bg-image: url('https://raw.githubusercontent.com/ElliottC823/powerhouse/main/background-dark.svg');
-            --header-bg: url('https://raw.githubusercontent.com/ElliottC823/powerhouse/main/topbar-dark.svg');
             --surface: #16181d;
+            --surface2: #1e2028;
             --text: #f0f2f5;
             --border: #2a2d35;
-            --radius: 24px;
-            --shadow: 0 4px 15px rgba(0,0,0,0.2);
-            --header-height: 64px;
-            /* Safe area insets for notched phones */
+            --radius: 20px;
+            --bar-height: 56px;
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
-            --safe-left: env(safe-area-inset-left, 0px);
-            --safe-right: env(safe-area-inset-right, 0px);
         }
 
-        [data-theme="light"] {
-            --bg: #f0f2f5;
-            --bg-image: url('https://raw.githubusercontent.com/ElliottC823/powerhouse/main/background-light.svg');
-            --header-bg: url('https://raw.githubusercontent.com/ElliottC823/powerhouse/main/topbar-light.svg');
-            --surface: #ffffff;
-            --text: #0a0a0a;
-            --border: #d1d9e6;
-            --shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
-        [data-corners="sharp"] { --radius: 0px !important; }
-
-        /* Reduce motion for users who prefer it or for performance */
-        @media (prefers-reduced-motion: reduce) {
-            * { transition: none !important; animation: none !important; }
-        }
-
-        /* Only animate non-layout properties for performance */
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent; /* Remove tap flash on mobile */
-        }
-
-        /* Separate transform transitions from color transitions for compositing */
-        .game-card, .shelf-item, .filter-btn {
-            transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Outfit', sans-serif;
-            background-color: var(--bg);
-            background-image: var(--bg-image);
-            /* Use scroll instead of fixed — fixed backgrounds are GPU-expensive on mobile */
-            background-attachment: scroll;
-            background-size: cover;
-            background-position: center top;
+            background: var(--bg);
             color: var(--text);
-            margin: 0;
-            overflow-x: hidden;
-            /* Smooth scrolling on iOS */
-            -webkit-overflow-scrolling: touch;
-            /* Account for notch/home bar */
-            padding-left: var(--safe-left);
-            padding-right: var(--safe-right);
-            padding-bottom: var(--safe-bottom);
-        }
-
-        /* ── HEADER ── */
-        header {
-            background-image: var(--header-bg);
-            background-size: cover;
-            padding: 0 clamp(12px, 4%, 5%);
-            padding-top: var(--safe-top);
-            height: calc(var(--header-height) + var(--safe-top));
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .logo-img {
-            height: 32px;
-            flex-shrink: 0;
-            /* Prevent logo from being too large on small screens */
-            max-width: 120px;
-            object-fit: contain;
-        }
-
-        .search-container {
-            flex-grow: 1;
-            min-width: 0; /* Allow it to shrink below intrinsic size */
-            max-width: 400px;
-        }
-
-        #searchInput {
-            width: 100%;
-            padding: 9px 16px;
-            border-radius: 30px;
-            border: 2px solid var(--border);
-            background: var(--surface);
-            color: var(--text);
-            font-family: inherit;
-            font-weight: 700;
-            font-size: 16px; /* 16px prevents iOS auto-zoom on focus */
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        #searchInput:focus { border-color: var(--accent); }
-
-        .controls { flex-shrink: 0; }
-
-        .settings-btn {
-            background: var(--surface);
-            border: 2px solid var(--border);
-            padding: 9px 12px;
-            border-radius: 20px;
-            font-weight: 900;
-            cursor: pointer;
-            color: var(--text);
-            font-size: 1rem;
-            line-height: 1;
-            /* Minimum 44×44 touch target */
-            min-width: 44px;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s, border-color 0.2s;
-        }
-
-        .settings-btn:active { opacity: 0.7; }
-
-        /* ── CONTINUE PLAYING SHELF ── */
-        .shelf-container { padding: 16px clamp(12px, 4%, 5%); display: none; }
-        .shelf-title { font-weight: 900; font-size: 1.1rem; margin-bottom: 12px; }
-
-        .shelf-scroll {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-            /* Hide scrollbar cross-browser */
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            /* Momentum scrolling on iOS */
-            -webkit-overflow-scrolling: touch;
-            scroll-snap-type: x proximity;
-        }
-        .shelf-scroll::-webkit-scrollbar { display: none; }
-
-        .shelf-item {
-            flex: 0 0 90px;
-            text-align: center;
-            text-decoration: none;
-            color: inherit;
-            position: relative;
-            scroll-snap-align: start;
-            /* Larger touch target */
-            padding: 4px;
-        }
-
-        .shelf-img {
-            width: 72px;
-            height: 72px;
-            border-radius: 18px;
-            object-fit: cover;
-            border: 2px solid var(--border);
-            margin-bottom: 6px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .shelf-label {
-            font-size: 0.72rem;
-            font-weight: 700;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
-        .shelf-verified {
-            position: absolute;
-            top: 0;
-            right: 8px;
-            width: 18px;
-            height: 18px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        }
-
-        /* ── FILTER BAR ── */
-        .filter-bar {
-            display: flex;
-            gap: 8px;
-            padding: 8px clamp(12px, 4%, 5%);
-            overflow-x: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            -webkit-overflow-scrolling: touch;
-            scroll-snap-type: x proximity;
-        }
-        .filter-bar::-webkit-scrollbar { display: none; }
-
-        .filter-btn {
-            background: var(--surface);
-            border: 2px solid var(--border);
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-weight: 900;
-            font-family: inherit;
-            cursor: pointer;
-            color: var(--text);
-            white-space: nowrap;
-            font-size: 0.85rem;
-            /* 44px minimum touch target height */
-            min-height: 44px;
-            scroll-snap-align: start;
-            flex-shrink: 0;
-        }
-        .filter-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
-        .filter-btn:active { opacity: 0.7; }
-
-        /* ── GAME GRID ── */
-        #game-grid {
-            display: grid;
-            /* 
-              Mobile: 2 columns
-              Tablet/Chromebook: 3 columns
-              Desktop: auto-fill ~280px
-            */
-            grid-template-columns: repeat(2, 1fr);
-            gap: clamp(10px, 2.5vw, 25px);
-            padding: clamp(10px, 3%, 20px) clamp(12px, 4%, 5%);
-        }
-
-        /* Tablet / Chromebook landscape */
-        @media (min-width: 600px) {
-            #game-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        /* Desktop */
-        @media (min-width: 900px) {
-            #game-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-        }
-
-        .game-card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            overflow: hidden;
-            text-decoration: none;
-            color: inherit;
-            box-shadow: var(--shadow);
-            border: 2px solid var(--border);
-            display: block;
-            transition: border-color 0.2s ease, transform 0.15s ease;
-            /* Prevent text selection on long-press */
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        /* Hover only on pointer devices (not touch) */
-        @media (hover: hover) {
-            .game-card:hover { transform: translateY(-4px); border-color: var(--accent); }
-        }
-
-        .game-card:active { transform: scale(0.97); }
-
-        .thumb-wrap { width: 100%; aspect-ratio: 16/9; overflow: hidden; }
-        .thumb {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            /* Lazy-load images for performance */
-            loading: lazy;
-            display: block;
-        }
-
-        .game-info {
-            padding: clamp(8px, 2%, 15px);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .game-title-container { display: flex; align-items: center; gap: 5px; min-width: 0; }
-
-        .game-title {
-            font-weight: 900;
-            font-size: clamp(0.75rem, 2.5vw, 1rem);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .play-btn {
-            background: var(--accent);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-weight: 900;
-            font-size: 0.7rem;
-            white-space: nowrap;
-            flex-shrink: 0;
-            /* Min touch target */
-            min-height: 32px;
-            display: flex;
-            align-items: center;
-        }
-
-        .verified-badge { width: 14px; height: 14px; cursor: help; flex-shrink: 0; }
-
-        /* ── SETTINGS MENU ── */
-        .settings-menu {
-            display: none;
-            position: fixed;
-            /* On mobile, pin to bottom like a sheet */
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--surface);
-            padding: 20px clamp(16px, 5%, 24px);
-            padding-bottom: calc(20px + var(--safe-bottom));
-            border-radius: 20px 20px 0 0;
-            border: 2px solid var(--accent);
-            border-bottom: none;
-            z-index: 2000;
-            max-height: 80vh;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.4);
-            /* Smooth slide-up animation */
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-        }
-
-        /* On tablets/desktop, show as a popover */
-        @media (min-width: 600px) {
-            .settings-menu {
-                bottom: auto;
-                left: auto;
-                top: calc(var(--header-height) + var(--safe-top) + 8px);
-                right: clamp(12px, 4%, 5%);
-                border-radius: 15px;
-                border-bottom: 2px solid var(--accent);
-                width: min(300px, 90vw);
-                max-height: 80vh;
-                transform: translateY(-10px);
-                opacity: 0;
-                transition: transform 0.2s ease, opacity 0.2s ease;
-            }
-            .settings-menu.show {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .settings-menu.show {
-            display: block;
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        /* Drag handle for bottom sheet on mobile */
-        .sheet-handle {
-            width: 40px;
-            height: 4px;
-            background: var(--border);
-            border-radius: 4px;
-            margin: 0 auto 16px;
-            display: block;
-        }
-
-        @media (min-width: 600px) {
-            .sheet-handle { display: none; }
-        }
-
-        /* Backdrop for mobile settings sheet */
-        .settings-backdrop {
+        /* ══════════════════════════════════════
+           OVERLAY — covers the whole viewport
+        ══════════════════════════════════════ */
+        #launcher-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1999;
-            opacity: 0;
-            transition: opacity 0.3s;
+            z-index: 9999;
+            flex-direction: column;
+            background: var(--bg);
+            /* Slide up animation */
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
         }
-        .settings-backdrop.show { display: block; opacity: 1; }
 
-        .row {
+        #launcher-overlay.open {
             display: flex;
-            justify-content: space-between;
+            transform: translateY(0);
+        }
+
+        /* ── TOP BAR ── */
+        #launcher-bar {
+            height: calc(var(--bar-height) + var(--safe-top));
+            padding-top: var(--safe-top);
+            background: var(--surface);
+            border-bottom: 2px solid var(--border);
+            display: flex;
             align-items: center;
-            margin-bottom: 14px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            gap: 10px;
-        }
-
-        /* Larger touch targets for toggles */
-        input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
+            gap: 12px;
+            padding-left: 14px;
+            padding-right: 14px;
             flex-shrink: 0;
         }
 
-        input[type="color"] {
-            width: 44px;
-            height: 32px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            padding: 2px;
-            background: transparent;
-            flex-shrink: 0;
-        }
-
-        .divider { border-top: 1px solid var(--border); margin: 14px 0; padding-top: 14px; }
-        h4 { margin: 0 0 8px 0; font-size: 0.85rem; text-transform: uppercase; color: var(--accent); }
-        .small-text { font-size: 0.8rem; line-height: 1.5; opacity: 0.8; }
-        .contributor-list { display: flex; flex-direction: column; gap: 5px; font-size: 0.8rem; font-weight: 700; }
-        .mirror-link { color: var(--accent); text-decoration: none; font-weight: 700; display: block; margin-bottom: 5px; padding: 4px 0; }
-
-        .reset-btn {
-            background: #ff4444;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.75rem;
+        #launcher-bar .uj-logo {
+            font-family: 'Outfit', sans-serif;
             font-weight: 900;
-            font-family: inherit;
-            /* Minimum touch target */
-            min-height: 36px;
-        }
-        .reset-btn:active { opacity: 0.7; }
-
-        /* ── EMPTY STATE ── */
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px 20px;
-            opacity: 0.5;
-            font-weight: 700;
             font-size: 1rem;
+            color: var(--accent);
+            white-space: nowrap;
+            flex-shrink: 0;
+            letter-spacing: -0.02em;
+        }
+
+        #launcher-bar .uj-logo span {
+            color: var(--text);
+            opacity: 0.5;
+        }
+
+        .bar-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+
+        #game-thumb-bar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid var(--border);
+            flex-shrink: 0;
+            display: none;
+        }
+
+        #game-title-bar {
+            font-weight: 900;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .bar-btn {
+            background: var(--surface2);
+            border: 2px solid var(--border);
+            color: var(--text);
+            border-radius: 12px;
+            padding: 6px 14px;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 0.75rem;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 36px;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .bar-btn:hover { border-color: var(--accent); background: #2a1a0a; }
+        .bar-btn:active { opacity: 0.7; }
+
+        .bar-btn.close-btn {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        .bar-btn.close-btn:hover { background: #e05e00; border-color: #e05e00; }
+
+        /* ── FRAME AREA ── */
+        #launcher-frame-wrap {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #launcher-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* ── LOADING SCREEN ── */
+        #launcher-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            background: var(--bg);
+            z-index: 10;
+        }
+
+        .loading-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            object-fit: cover;
+            border: 3px solid var(--border);
+            display: none;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #loading-title {
+            font-weight: 900;
+            font-size: 1rem;
+            opacity: 0.6;
+            max-width: 260px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ── BLOCKED SCREEN ── */
+        #launcher-blocked {
+            display: none;
+            position: absolute;
+            inset: 0;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            text-align: center;
+            padding: 30px;
+            background: var(--bg);
+            z-index: 10;
+        }
+
+        .blocked-icon { font-size: 3.5rem; line-height: 1; }
+
+        #launcher-blocked h2 {
+            font-size: 1.3rem;
+            font-weight: 900;
+        }
+
+        #launcher-blocked p {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            max-width: 320px;
+            line-height: 1.6;
+        }
+
+        .open-direct-btn {
+            margin-top: 4px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            padding: 13px 32px;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.15s;
+        }
+        .open-direct-btn:hover { background: #e05e00; }
+
+        .blocked-url {
+            font-size: 0.65rem;
+            opacity: 0.3;
+            word-break: break-all;
+            max-width: 380px;
         }
     </style>
 </head>
-<body data-theme="dark">
+<body>
 
-<!-- Settings backdrop (mobile only) -->
-<div class="settings-backdrop" id="settingsBackdrop" onclick="closeSettings()"></div>
+<!-- ══════════════════════════════════════
+     This is the launcher overlay.
+     It auto-opens when ?play= is in the URL.
+     You can also embed this file's contents
+     into your Base44 app's HTML page.
+══════════════════════════════════════ -->
 
-<header>
-    <img id="mainLogo" src="https://raw.githubusercontent.com/ElliottC823/powerhouse/main/POWERHOUSE-dark.png" alt="Powerhouse" class="logo-img">
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search games..." oninput="renderGames()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-    </div>
-    <div class="controls">
-        <button class="settings-btn" onclick="toggleSettings()" aria-label="Settings">⚙</button>
-    </div>
-</header>
+<div id="launcher-overlay">
 
-<div class="shelf-container" id="historyShelf">
-    <div class="shelf-title">Continue playing</div>
-    <div class="shelf-scroll" id="historyGrid"></div>
-</div>
-
-<nav class="filter-bar" id="filterBar"></nav>
-
-<main id="game-grid"></main>
-
-<!-- Settings Panel -->
-<div id="settingsMenu" class="settings-menu" role="dialog" aria-label="Settings">
-    <span class="sheet-handle"></span>
-    <div class="row"><span>DARK MODE</span><input type="checkbox" id="themeToggle" checked onclick="updateUI()"></div>
-    <div class="row"><span>ROUNDED UI</span><input type="checkbox" id="cornerToggle" checked onclick="updateUI()"></div>
-    <div class="row"><span>ACCENT</span><input type="color" id="accentPicker" value="#0066FF" oninput="updateUI()"></div>
-    <div class="row"><span>HISTORY</span><button class="reset-btn" onclick="clearHistory()">CLEAR</button></div>
-
-    <div class="divider">
-        <h4>About Powerhouse</h4>
-        <p id="aboutText" class="small-text">Loading hub information...</p>
+    <!-- Top bar -->
+    <div id="launcher-bar">
+        <div class="uj-logo">Uncle Joe's <span>Gameshack</span></div>
+        <div class="bar-divider"></div>
+        <img id="game-thumb-bar" src="" alt="">
+        <div id="game-title-bar">Loading...</div>
+        <button class="bar-btn" id="open-direct-btn" onclick="openDirect()">⬡ OPEN DIRECT</button>
+        <button class="bar-btn close-btn" onclick="closeLauncher()">✕ CLOSE</button>
     </div>
 
-    <div class="divider">
-        <h4>Contributors</h4>
-        <div class="contributor-list">
-            <span>C823 (Lead Dev)</span>
-            <span>Grandpa Joey</span>
-            <span>Stein</span>
-            <span>KC</span>
+    <!-- Frame area -->
+    <div id="launcher-frame-wrap">
+
+        <!-- Loading state -->
+        <div id="launcher-loading">
+            <img class="loading-thumb" id="loading-thumb-img" src="" alt="">
+            <div class="spinner"></div>
+            <div id="loading-title">Loading game...</div>
         </div>
-    </div>
 
-    <div class="divider">
-        <h4>Mirrors</h4>
-        <a href="https://powerhouse.elliottc1120.workers.dev/" class="mirror-link">Cloudflare (Main)</a>
-        <a href="https://sites.google.com/view/powerhousehub/" class="mirror-link">Google Sites</a>
-    </div>
+        <!-- Blocked state -->
+        <div id="launcher-blocked">
+            <div class="blocked-icon">⚠️</div>
+            <h2>Site Blocked Embedding</h2>
+            <p>This game refused to load inside Uncle Joe's. You can still open it directly.</p>
+            <a class="open-direct-btn" id="blocked-open-btn" href="#" target="_blank">Open Game →</a>
+            <div class="blocked-url" id="blocked-url-label"></div>
+        </div>
 
-    <div style="font-size: 0.6rem; opacity: 0.5; margin-top: 15px; text-align: right;">V1.5.09</div>
+        <!-- Game iframe -->
+        <iframe id="launcher-frame" src="" allowfullscreen allow="fullscreen; autoplay"></iframe>
+
+    </div>
 </div>
 
 <script>
-    let games = [];
-    let currentFilter = 'ALL';
+    let currentGameUrl = '';
 
-    async function fetchData() {
-        try {
-            const res = await fetch('https://raw.githubusercontent.com/ElliottC823/powerhouse/main/games.txt');
-            games = await res.json();
+    function openLauncher(url, title, thumb) {
+        currentGameUrl = url;
 
-            const aboutRes = await fetch('https://raw.githubusercontent.com/ElliottC823/powerhouse/main/about.txt');
-            if (aboutRes.ok) document.getElementById('aboutText').innerText = await aboutRes.text();
-
-            renderFilters();
-            renderGames();
-        } catch (e) { console.error("Load failed", e); }
-    }
-
-    function renderFilters() {
-        const bar = document.getElementById('filterBar');
-        const cats = ['ALL', 'UNBLOCKED', ...new Set(games.map(g => g.category.toUpperCase()))];
-        bar.innerHTML = cats.map(c => `
-            <button class="filter-btn ${currentFilter === c ? 'active' : ''}" 
-                    onclick="setFilter('${c}')">${c}</button>
-        `).join('');
-    }
-
-    function setFilter(cat) {
-        currentFilter = cat;
-        renderFilters();
-        renderGames();
-    }
-
-    function trackPlay(game) {
-        let history = JSON.parse(localStorage.getItem('power_history') || '[]');
-        history = history.filter(g => g.title !== game.title);
-        history.unshift(game);
-        localStorage.setItem('power_history', JSON.stringify(history.slice(0, 8)));
-    }
-
-    function clearHistory() {
-        localStorage.removeItem('power_history');
-        renderGames();
-    }
-
-    function renderGames() {
-        const grid = document.getElementById('game-grid');
-        const search = document.getElementById('searchInput').value.toLowerCase();
-
-        // Render History Shelf
-        const history = JSON.parse(localStorage.getItem('power_history') || '[]');
-        const shelf = document.getElementById('historyShelf');
-        if (history.length > 0) {
-            shelf.style.display = 'block';
-            document.getElementById('historyGrid').innerHTML = history.map(g => `
-                <a href="${g.link}" class="shelf-item" onclick="trackPlay(${JSON.stringify(g).replace(/"/g, '&quot;')})">
-                    <img src="${g.thumb}" class="shelf-img" loading="lazy">
-                    ${g.verified ? `<img src="https://raw.githubusercontent.com/ElliottC823/powerhouse/main/verified.svg" class="shelf-verified">` : ''}
-                    <div class="shelf-label">${g.title}</div>
-                </a>
-            `).join('');
+        // Set bar info
+        document.getElementById('game-title-bar').textContent = title || 'Game';
+        const thumbBar = document.getElementById('game-thumb-bar');
+        if (thumb) {
+            thumbBar.src   = thumb;
+            thumbBar.style.display = 'block';
         } else {
-            shelf.style.display = 'none';
+            thumbBar.style.display = 'none';
         }
 
-        const filtered = games.filter(g => {
-            const matchesSearch = g.title.toLowerCase().includes(search);
-            let matchesFilter = false;
-            if (currentFilter === 'ALL') {
-                matchesFilter = true;
-            } else if (currentFilter === 'UNBLOCKED') {
-                matchesFilter = g.verified === true;
-            } else {
-                matchesFilter = g.category.toUpperCase() === currentFilter;
+        // Set loading screen
+        const loadThumb = document.getElementById('loading-thumb-img');
+        if (thumb) {
+            loadThumb.src   = thumb;
+            loadThumb.style.display = 'block';
+        }
+        document.getElementById('loading-title').textContent = 'Loading ' + (title || 'game') + '…';
+
+        // Reset states
+        document.getElementById('launcher-loading').style.display  = 'flex';
+        document.getElementById('launcher-blocked').style.display  = 'none';
+        document.getElementById('launcher-frame').style.display    = 'block';
+        document.getElementById('launcher-frame').src = '';
+
+        // Open overlay
+        const overlay = document.getElementById('launcher-overlay');
+        overlay.style.display = 'flex';
+        // Force reflow so transition fires
+        overlay.offsetHeight;
+        overlay.classList.add('open');
+
+        // Lock body scroll
+        document.body.style.overflow = 'hidden';
+
+        // Load the game
+        loadGame(url, title);
+    }
+
+    function loadGame(url, title) {
+        const frame    = document.getElementById('launcher-frame');
+        const loading  = document.getElementById('launcher-loading');
+        const blocked  = document.getElementById('launcher-blocked');
+        let settled    = false;
+
+        function showFrame() {
+            if (settled) return;
+            settled = true;
+            loading.style.display = 'none';
+        }
+
+        function showBlocked() {
+            if (settled) return;
+            settled = true;
+            loading.style.display = 'none';
+            blocked.style.display = 'flex';
+            frame.style.display   = 'none';
+
+            // Set direct-open links
+            document.getElementById('blocked-open-btn').href  = url;
+            document.getElementById('blocked-url-label').textContent = url;
+        }
+
+        frame.onload = function () {
+            try {
+                const doc = frame.contentDocument || frame.contentWindow.document;
+                if (!doc || doc.URL === 'about:blank' || (doc.body && doc.body.innerHTML.trim() === '')) {
+                    showBlocked();
+                } else {
+                    showFrame();
+                }
+            } catch (e) {
+                // Cross-origin = loaded fine
+                showFrame();
             }
-            return matchesSearch && matchesFilter;
-        });
+        };
 
-        if (filtered.length === 0) {
-            grid.innerHTML = `<div class="empty-state">No games found 🎮</div>`;
-            return;
+        frame.onerror = () => showBlocked();
+
+        // Check at 2s — catches "refused to connect" which fires onload with blank doc
+        setTimeout(() => {
+            if (settled) return;
+            try {
+                const doc = frame.contentDocument || frame.contentWindow.document;
+                if (!doc || doc.URL === 'about:blank' || !doc.body || doc.body.innerHTML.trim() === '') showBlocked();
+                else showFrame();
+            } catch (e) { showFrame(); }
+        }, 2000);
+
+        // Hard timeout at 5s
+        setTimeout(() => { if (!settled) showBlocked(); }, 5000);
+
+        // Set src last so onload is already attached
+        frame.src = url;
+    }
+
+    function closeLauncher() {
+        const overlay = document.getElementById('launcher-overlay');
+        overlay.classList.remove('open');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.getElementById('launcher-frame').src = ''; // stop the game
+            document.body.style.overflow = '';
+        }, 350);
+    }
+
+    function openDirect() {
+        if (currentGameUrl) window.open(currentGameUrl, '_blank');
+    }
+
+    // ── Auto-launch from URL params ──
+    // Reads ?play=URL&title=Name&thumb=imgURL
+    // Works whether this is a standalone page or embedded in Base44
+    (function () {
+        const params = new URLSearchParams(window.location.search);
+        const play   = params.get('play');
+        const title  = params.get('title') || 'Game';
+        const thumb  = params.get('thumb') || '';
+
+        if (play) {
+            // Small delay so the page/Base44 app has time to render first
+            setTimeout(() => openLauncher(decodeURIComponent(play), title, thumb), 300);
         }
+    })();
 
-        grid.innerHTML = filtered.map(g => `
-            <a href="${g.link}" class="game-card" onclick="trackPlay(${JSON.stringify(g).replace(/"/g, '&quot;')})">
-                <div class="thumb-wrap"><img src="${g.thumb}" class="thumb" loading="lazy" alt="${g.title}"></div>
-                <div class="game-info">
-                    <div class="game-title-container">
-                        <div class="game-title">${g.title}</div>
-                        ${g.verified ? `<img src="https://raw.githubusercontent.com/ElliottC823/powerhouse/main/verified.svg" class="verified-badge" title="Verified Unblocked">` : ''}
-                    </div>
-                    <div class="play-btn">PLAY</div>
-                </div>
-            </a>
-        `).join('');
-    }
-
-    function toggleSettings() {
-        const menu = document.getElementById('settingsMenu');
-        const backdrop = document.getElementById('settingsBackdrop');
-        const isOpen = menu.classList.contains('show');
-        if (isOpen) {
-            closeSettings();
-        } else {
-            menu.classList.add('show');
-            backdrop.classList.add('show');
-        }
-    }
-
-    function closeSettings() {
-        document.getElementById('settingsMenu').classList.remove('show');
-        document.getElementById('settingsBackdrop').classList.remove('show');
-    }
-
-    function updateUI() {
-        const isDark = document.getElementById('themeToggle').checked;
-        const isRounded = document.getElementById('cornerToggle').checked;
-        const accent = document.getElementById('accentPicker').value;
-
-        document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
-        document.body.setAttribute('data-corners', isRounded ? 'rounded' : 'sharp');
-        document.documentElement.style.setProperty('--accent', accent);
-
-        const logo = document.getElementById('mainLogo');
-        logo.src = isDark
-            ? "https://raw.githubusercontent.com/ElliottC823/powerhouse/main/POWERHOUSE-dark.png"
-            : "https://raw.githubusercontent.com/ElliottC823/powerhouse/main/POWERHOUSE-light.png";
-
-        localStorage.setItem('power_theme', isDark ? 'dark' : 'light');
-    }
-
-    // Close settings on outside click (desktop only — backdrop handles mobile)
-    window.onclick = (e) => {
-        const menu = document.getElementById('settingsMenu');
-        if (
-            menu.classList.contains('show') &&
-            !e.target.closest('.settings-menu') &&
-            !e.target.closest('.settings-btn') &&
-            window.innerWidth >= 600
-        ) {
-            closeSettings();
-        }
-    };
-
-    // Keyboard: close settings on Escape
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeSettings();
-    });
-
-    window.onload = () => {
-        fetchData();
-        updateUI();
-    };
+    // ── Allow other scripts on the page to trigger the launcher ──
+    // e.g. window.ujLaunch('https://game.com', 'Bloons', 'thumb.jpg')
+    window.ujLaunch = openLauncher;
 </script>
 </body>
 </html>
