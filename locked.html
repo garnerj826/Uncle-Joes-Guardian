@@ -63,22 +63,11 @@ h1 {
 
 <h1>Browsing Is Disabled!</h1>
 
-<div id="messageArea"></div>
+<div class="no-message">Your teacher has disabled browsing.</div>
 
 <script>
 const params = new URLSearchParams(location.search);
 const message = params.get('msg') || '';
-const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-if (message) {
-  document.getElementById('messageArea').innerHTML = `
-    <div class="message-box">
-      <div class="message-time">${time}</div>
-      <div class="message-label">Message from your teacher</div>
-      <div class="message-quote">${message.replace(/</g,'&lt;')}</div>
-    </div>`;
-} else {
-  document.getElementById('messageArea').innerHTML = '<div class="no-message">Your teacher has disabled browsing.</div>';
-}
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey||e.metaKey) && ['w','t','n','r'].includes(e.key.toLowerCase())) {
     e.preventDefault(); e.stopPropagation(); return false;
