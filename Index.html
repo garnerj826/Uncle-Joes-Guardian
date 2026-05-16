@@ -1,10 +1,10 @@
-
-
-
-  
-  Uncle Joe's Guardian — Teacher Dashboard
-  
-  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Uncle Joe's Guardian — Teacher Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
     :root {
       --bg: #0a0a14; --surface: #111122; --surface2: #1a1a2e;
       --border: rgba(99,102,241,0.15); --accent: #6366f1; --accent2: #818cf8;
@@ -135,99 +135,99 @@
 
     ::-webkit-scrollbar { width:4px; }
     ::-webkit-scrollbar-thumb { background:rgba(99,102,241,0.3); border-radius:2px; }
-  
+  </style>
+</head>
+<body>
 
+<div class="topbar">
+  <div class="logo">🛡️ Uncle <span>Joe's Guardian</span></div>
+  <div class="server-input">
+    <input type="text" id="serverUrl" placeholder="auto-detected"/>
+    <button class="btn-sm" onclick="connectWS()">Connect</button>
+  </div>
+  <div class="conn-badge" id="connBadge"><div class="dot"></div><span id="connText">Disconnected</span></div>
+  <div class="topbar-right">
+    <div class="count-badge"><span id="studentCount">0</span> students</div>
+    <div class="view-toggle">
+      <button class="view-btn" id="btnTabView" onclick="setView('tabs')">📋 Tabs</button>
+      <button class="view-btn active" id="btnScreenView" onclick="setView('screens')">🖥️ Screens</button>
+    </div>
+  </div>
+</div>
 
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Target</div>
+      <select class="target-select" id="targetSelect">
+        <option value="all">🌐 All Students</option>
+      </select>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Screen Control</div>
+      <button class="big-btn danger" onclick="cmd('LOCK_SCREEN')"><span>🔒</span> Lock Screen</button>
+      <button class="big-btn success" onclick="cmd('UNLOCK_SCREEN')"><span>🔓</span> Unlock Screen</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Tab Control</div>
+      <button class="big-btn warn" onclick="cmd('CLOSE_ALL_TABS')"><span>✕</span> Close All Tabs</button>
+      <div class="range-row">
+        <span style="font-size:11px;color:var(--muted)">Tab limit</span>
+        <input type="range" id="tabLimitSlider" min="0" max="10" value="0" oninput="updateTabLimit(this.value)"/>
+        <span class="range-val" id="tabLimitVal">Off</span>
+      </div>
+      <button class="big-btn primary" onclick="applyTabLimit()"><span>📌</span> Apply Tab Limit</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Block Websites</div>
+      <div class="site-input-row">
+        <input class="site-input" id="siteInput" placeholder="youtube.com" onkeydown="if(event.key==='Enter')addSite()"/>
+        <button class="btn-sm" onclick="addSite()">Add</button>
+      </div>
+      <div id="siteList"></div>
+      <button class="big-btn danger" onclick="applyBlockList()" style="margin-top:7px"><span>🚫</span> Apply Block List</button>
+      <button class="big-btn neutral" onclick="clearBlockList()"><span>↩</span> Clear Blocks</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Navigate To</div>
+      <div class="site-input-row">
+        <input class="site-input" id="navInput" placeholder="https://..."/>
+      </div>
+      <button class="big-btn primary" onclick="applyNavigate()"><span>→</span> Go To URL</button>
+    </div>
+  </div>
 
+  <div class="content" id="content">
+    <div id="emptyState" class="empty-state">
+      <div class="ei">👩‍💻</div>
+      <h2>No students connected</h2>
+      <p>Students appear here once they open Chrome with the extension.</p>
+    </div>
+    <div class="students-grid" id="tabsGrid" style="display:none"></div>
+    <div class="screens-grid" id="screensGrid"></div>
+  </div>
+</div>
 
-  🛡️ Uncle Joe's Guardian
-  
-    
-    Connect
-  
-  Disconnected
-  
-    0 students
-    
-      📋 Tabs
-      🖥️ Screens
-    
-  
+<!-- Fullscreen modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Student Screen</div>
+      <div id="modalTabTitle" style="font-size:11px;color:var(--muted);flex:1"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <img class="modal-img" id="modalImg" src="" alt="Student screen"/>
+    <div class="modal-footer">
+      <button class="modal-btn lock" id="modalLock" onclick="modalCmd('LOCK_SCREEN')">🔒 Lock</button>
+      <button class="modal-btn unlock" id="modalUnlock" onclick="modalCmd('UNLOCK_SCREEN')" style="display:none">🔓 Unlock</button>
+      <button class="modal-btn closetabs" onclick="modalCmd('CLOSE_ALL_TABS')">✕ Close All Tabs</button>
+    </div>
+  </div>
+</div>
 
+<div id="toast"></div>
 
-
-  
-    
-      Target
-      
-        🌐 All Students
-      
-    
-    
-      Screen Control
-      🔒 Lock Screen
-      🔓 Unlock Screen
-    
-    
-      Tab Control
-      ✕ Close All Tabs
-      
-        Tab limit
-        
-        Off
-      
-      📌 Apply Tab Limit
-    
-    
-      Block Websites
-      
-        
-        Add
-      
-      
-      🚫 Apply Block List
-      ↩ Clear Blocks
-    
-    
-      Navigate To
-      
-        
-      
-      → Go To URL
-    
-  
-
-  
-    
-      👩‍💻
-      No students connected
-      Students appear here once they open Chrome with the extension.
-    
-    
-    
-  
-
-
-
-
-  
-    
-      Student Screen
-      
-      ✕
-    
-    
-    
-      🔒 Lock
-      🔓 Unlock
-      ✕ Close All Tabs
-    
-  
-
-
-
-
-
+<script>
 let ws = null;
 let students = {};
 let screenshots = {};
@@ -239,7 +239,13 @@ let modalStudentId = null;
 // ── WebSocket ──────────────────────────────────────────────────────────────
 
 function connectWS() {
-  const url = document.getElementById('serverUrl').value.trim();
+  // Auto-detect the right WebSocket URL
+  const inputVal = document.getElementById('serverUrl').value.trim();
+  const autoUrl = window.location.protocol === 'https:'
+    ? 'wss://' + window.location.host
+    : 'ws://' + window.location.host;
+  const url = inputVal || autoUrl;
+  document.getElementById('serverUrl').value = url;
   if (ws) { ws.onclose = null; ws.close(); }
   try { ws = new WebSocket(url); } catch(e) { toast('Invalid URL'); return; }
 
@@ -250,9 +256,13 @@ function connectWS() {
   };
   ws.onmessage = (e) => {
     let msg; try { msg = JSON.parse(e.data); } catch(er) { return; }
+    console.log('[Dashboard] Message received:', msg.type, msg.studentId || '');
     if (msg.type === 'STUDENT_LIST') updateStudents(msg.students);
     if (msg.type === 'STUDENT_UPDATE' && msg.student) updateStudent(msg.student);
-    if (msg.type === 'SCREENSHOT') handleScreenshot(msg);
+    if (msg.type === 'SCREENSHOT') {
+      console.log('[Dashboard] Screenshot received for:', msg.studentId, 'image length:', msg.image ? msg.image.length : 0);
+      handleScreenshot(msg);
+    }
   };
   ws.onclose = () => { setConn(false); setTimeout(connectWS, 5000); };
   ws.onerror = () => setConn(false);
@@ -271,11 +281,23 @@ function sendWS(msg) {
 // ── Screenshots ────────────────────────────────────────────────────────────
 
 function handleScreenshot(msg) {
-  const isFirst = !screenshots[msg.studentId];
+  console.log('[Dashboard] handleScreenshot called, studentId:', msg.studentId);
+  console.log('[Dashboard] students known:', Object.keys(students));
+  console.log('[Dashboard] currentView:', currentView);
+
   screenshots[msg.studentId] = { image: msg.image, tabTitle: msg.tabTitle, tabUrl: msg.tabUrl, name: msg.studentName };
+
+  // If we don't know this student yet, add them
+  if (!students[msg.studentId]) {
+    console.log('[Dashboard] Student not in list yet, adding placeholder');
+    students[msg.studentId] = { id: msg.studentId, name: msg.studentName || 'Student', isLocked: false, tabs: [], tabCount: 0, online: true };
+    renderAll();
+    return;
+  }
 
   // Try fast in-place update
   const img = document.getElementById('simg_' + msg.studentId);
+  console.log('[Dashboard] img element found:', !!img);
   if (img) {
     img.src = msg.image;
     img.style.display = 'block';
@@ -283,8 +305,9 @@ function handleScreenshot(msg) {
     if (ph) ph.style.display = 'none';
     const tabEl = document.getElementById('stab_' + msg.studentId);
     if (tabEl) tabEl.textContent = msg.tabTitle || shortUrl(msg.tabUrl);
-  } else if (currentView === 'screens' && students[msg.studentId]) {
-    renderScreensGrid(Object.keys(students));
+  } else {
+    console.log('[Dashboard] No img element, re-rendering grid');
+    renderAll();
   }
 
   // Update modal if open
@@ -499,6 +522,6 @@ function toast(msg) {
 }
 
 connectWS();
-
-
-
+</script>
+</body>
+</html>
