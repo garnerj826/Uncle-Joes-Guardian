@@ -12,19 +12,33 @@ const wss = new WebSocket.Server({ server, maxPayload: 5 * 1024 * 1024 });
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from same directory
-app.use(express.static(__dirname));
+// Figure out where the HTML files are
+// They should be in the same directory as this server.js file
+const BASE_DIR = __dirname;
+
+console.log('Base directory:', BASE_DIR);
+console.log('Files found:', fs.readdirSync(BASE_DIR).join(', '));
 
 app.get('/', function(req, res) {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  var indexPath = path.join(BASE_DIR, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.send('<h1>index.html not found in ' + BASE_DIR + '</h1><p>Files: ' + fs.readdirSync(BASE_DIR).join(', ') + '</p>');
+  }
 });
 
 app.get('/locked', function(req, res) {
-  res.sendFile(path.join(__dirname, 'locked.html'));
+  var lockedPath = path.join(BASE_DIR, 'locked.html');
+  if (fs.existsSync(lockedPath)) {
+    res.sendFile(lockedPath);
+  } else {
+    res.status(404).send('locked.html not found');
+  }
 });
 
 app.get('/health', function(req, res) {
-  res.send('OK');
+  res.send('OK - files: ' + fs.readdirSync(BASE_DIR).join(', '));
 });
 
 const students = new Map();
@@ -77,12 +91,9 @@ wss.on('connection', function(ws) {
     } else if (msg.type === 'SCREENSHOT' && ws.role === 'student') {
       screenshots.set(msg.studentId, msg.image);
       var payload = JSON.stringify({
-        type: 'SCREENSHOT',
-        studentId: msg.studentId,
-        studentName: msg.studentName,
-        image: msg.image,
-        tabTitle: msg.tabTitle,
-        tabUrl: msg.tabUrl
+        type: 'SCREENSHOT', studentId: msg.studentId,
+        studentName: msg.studentName, image: msg.image,
+        tabTitle: msg.tabTitle, tabUrl: msg.tabUrl
       });
       teachers.forEach(function(t) {
         if (t.readyState === WebSocket.OPEN) t.send(payload);
@@ -108,18 +119,12 @@ function handleTeacherCommand(msg) {
   var command = msg.command;
   var targetId = msg.targetId;
   var payload = msg.payload || {};
-
   var targets = targetId === 'all'
     ? Array.from(students.values()).map(function(s) { return s.ws; })
     : (students.has(targetId) ? [students.get(targetId).ws] : []);
-
   targets.forEach(function(w) {
-    if (w.readyState === WebSocket.OPEN) {
-      var toSend = Object.assign({ type: command }, payload);
-      w.send(JSON.stringify(toSend));
-    }
+    if (w.readyState === WebSocket.OPEN) w.send(JSON.stringify(Object.assign({ type: command }, payload)));
   });
-
   var ids = targetId === 'all' ? Array.from(students.keys()) : [targetId];
   ids.forEach(function(id) {
     var s = students.get(id);
@@ -129,41 +134,30 @@ function handleTeacherCommand(msg) {
     if (command === 'SET_TAB_LIMIT') s.tabLimit = payload.limit || 0;
     if (command === 'BLOCK_SITES') s.blockedSites = payload.sites || [];
   });
-
   broadcastToTeachers({ type: 'STUDENT_LIST', students: getStudentList() });
 }
 
 function getStudentList() {
   return Array.from(students.values()).map(function(s) { return getStudentData(s.id); });
 }
-
 function getStudentData(id) {
-  var s = students.get(id);
-  if (!s) return null;
-  return {
-    id: s.id, name: s.name, isLocked: s.isLocked,
-    tabs: s.tabs, tabCount: s.tabCount,
-    blockedSites: s.blockedSites, tabLimit: s.tabLimit,
-    lastSeen: s.lastSeen, online: (Date.now() - s.lastSeen) < 30000
-  };
+  var s = students.get(id); if (!s) return null;
+  return { id: s.id, name: s.name, isLocked: s.isLocked, tabs: s.tabs, tabCount: s.tabCount, blockedSites: s.blockedSites, tabLimit: s.tabLimit, lastSeen: s.lastSeen, online: (Date.now() - s.lastSeen) < 30000 };
 }
-
 function broadcastToTeachers(msg) {
   var str = JSON.stringify(msg);
-  teachers.forEach(function(ws) {
-    if (ws.readyState === WebSocket.OPEN) ws.send(str);
-  });
+  teachers.forEach(function(ws) { if (ws.readyState === WebSocket.OPEN) ws.send(str); });
 }
 
 setInterval(function() {
   wss.clients.forEach(function(ws) {
     if (!ws.isAlive) { ws.terminate(); return; }
-    ws.isAlive = false;
-    ws.ping();
+    ws.isAlive = false; ws.ping();
   });
 }, 15000);
 
 var PORT = process.env.PORT || 3000;
 server.listen(PORT, function() {
   console.log('Uncle Joes Guardian running on port ' + PORT);
+  console.log('Serving files from: ' + BASE_DIR);
 });

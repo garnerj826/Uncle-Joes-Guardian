@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uncle Joe's Guardian</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue: #1a73e8;
+  --blue-dark: #1557b0;
+  --blue-light: #e8f0fe;
+  --green: #1e8e3e;
+  --red: #d93025;
+  --orange: #f29900;
+  --gray-50: #f8f9fa;
+  --gray-100: #f1f3f4;
+  --gray-200: #e8eaed;
+  --gray-300: #dadce0;
+  --gray-500: #9aa0a6;
+  --gray-700: #5f6368;
+  --gray-900: #202124;
+  --white: #fff;
+  --sidebar-w: 220px;
+  --header-h: 56px;
+  --font: 'Inter', sans-serif;
+  --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:var(--font); background:var(--gray-50); color:var(--gray-900); height:100vh; overflow:hidden; }
+
+/* ── LOGIN PAGE ─────────────────────────────────────────────── */
+#loginPage {
+  position:fixed; inset:0; background:var(--white);
+  display:flex; align-items:center; justify-content:center;
+  z-index:1000;
+}
+.login-wrap {
+  width:100%; max-width:420px; padding:40px 32px;
+  background:var(--white); border-radius:12px;
+  box-shadow:0 2px 16px rgba(0,0,0,0.12);
+}
+.login-logo {
+  display:flex; flex-direction:column; align-items:center; margin-bottom:28px;
+}
+.login-logo-icon {
+  width:56px; height:56px; background:var(--blue);
+  border-radius:12px; display:flex; align-items:center; justify-content:center;
+  font-size:28px; margin-bottom:12px;
+  box-shadow:0 2px 8px rgba(26,115,232,0.3);
+}
+.login-logo h1 { font-size:22px; font-weight:700; color:var(--gray-900); text-align:center; }
+.login-logo p { font-size:13px; color:var(--gray-700); margin-top:4px; }
+.login-tabs {
+  display:flex; background:var(--gray-100); border-radius:8px;
+  padding:3px; margin-bottom:24px;
+}
+.login-tab {
+  flex:1; padding:8px; border:none; background:none; border-radius:6px;
+  font-size:13px; font-weight:500; color:var(--gray-700); cursor:pointer;
+}
+.login-tab.active { background:var(--white); color:var(--blue); box-shadow:var(--shadow); }
+.login-field { margin-bottom:14px; }
+.login-field label { display:block; font-size:12px; font-weight:500; color:var(--gray-700); margin-bottom:5px; }
+.login-field input {
+  width:100%; padding:10px 13px; border:1px solid var(--gray-300); border-radius:6px;
+  font-size:14px; font-family:var(--font); outline:none; transition:border 0.15s;
+}
+.login-field input:focus { border-color:var(--blue); box-shadow:0 0 0 2px rgba(26,115,232,0.15); }
+.login-btn {
+  width:100%; padding:11px; background:var(--blue); color:var(--white);
+  border:none; border-radius:6px; font-size:14px; font-weight:600;
+  cursor:pointer; margin-top:4px; transition:background 0.15s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.login-btn:hover { background:var(--blue-dark); }
+.login-btn:disabled { background:#93b8f0; cursor:not-allowed; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.spinner {
+  width:16px; height:16px; border:2px solid rgba(255,255,255,0.4);
+  border-top-color:#fff; border-radius:50%;
+  animation:spin 0.7s linear infinite; display:none;
+}
+.login-signing-in { font-size:13px; display:none; color:var(--gray-700); text-align:center; margin-top:10px; }
+.login-error { color:var(--red); font-size:12px; margin-top:8px; text-align:center; display:none; }
+.login-bg {
+  position:fixed; inset:0; z-index:-1;
+  background:linear-gradient(135deg, #e8f0fe 0%, #f0f4ff 50%, #e8f5e9 100%);
+}
+
+/* ── APP SHELL ─────────────────────────────────────────────── */
+#app { display:none; height:100vh; flex-direction:column; }
+#app.visible { display:flex; }
+
+/* Header */
+.header {
+  height:var(--header-h); background:var(--white); border-bottom:1px solid var(--gray-200);
+  display:flex; align-items:center; padding:0 20px; gap:16px; flex-shrink:0;
+  box-shadow:0 1px 3px rgba(0,0,0,0.08); z-index:100;
+}
+.header-logo { display:flex; align-items:center; gap:10px; }
+.header-logo-icon {
+  width:32px; height:32px; background:var(--blue); border-radius:7px;
+  display:flex; align-items:center; justify-content:center; font-size:16px;
+}
+.header-logo-text { font-size:15px; font-weight:700; color:var(--gray-900); }
+.header-logo-text span { color:var(--blue); }
+.header-session {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 14px; background:var(--blue); color:var(--white);
+  border-radius:20px; font-size:12px; font-weight:600; cursor:pointer;
+  margin-left:16px;
+}
+.header-session .dot { width:7px; height:7px; border-radius:50%; background:#4ade80; flex-shrink:0; }
+.header-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+.conn-indicator {
+  display:flex; align-items:center; gap:5px; font-size:12px;
+  padding:4px 10px; border-radius:20px; border:1px solid var(--gray-300);
+  color:var(--gray-700);
+}
+.conn-indicator .dot { width:7px; height:7px; border-radius:50%; background:var(--gray-300); }
+.conn-indicator.connected .dot { background:var(--green); }
+.conn-indicator.connected { color:var(--green); border-color:#a8d5b5; }
+.user-avatar {
+  width:32px; height:32px; border-radius:50%; background:var(--blue);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--white); font-size:13px; font-weight:700; cursor:pointer;
+}
+.logout-btn {
+  padding:5px 12px; border:1px solid var(--gray-300); border-radius:6px;
+  background:none; font-size:12px; color:var(--gray-700); cursor:pointer;
+}
+.logout-btn:hover { background:var(--gray-100); }
+
+/* Main layout */
+.main { display:flex; flex:1; overflow:hidden; }
+
+/* Sidebar */
+.sidebar {
+  width:var(--sidebar-w); background:var(--white); border-right:1px solid var(--gray-200);
+  display:flex; flex-direction:column; flex-shrink:0; overflow-y:auto;
+}
+.sidebar-nav { padding:12px 8px; flex:1; }
+.nav-item {
+  display:flex; align-items:center; gap:10px; padding:9px 12px;
+  border-radius:8px; font-size:13px; color:var(--gray-700); cursor:pointer;
+  margin-bottom:2px; transition:background 0.1s;
+}
+.nav-item:hover { background:var(--gray-100); }
+.nav-item.active { background:var(--blue-light); color:var(--blue); font-weight:600; }
+.nav-item .nav-icon { font-size:16px; width:20px; text-align:center; }
+.sidebar-section-label {
+  font-size:10px; font-weight:700; letter-spacing:1.5px; color:var(--gray-500);
+  text-transform:uppercase; padding:12px 12px 6px;
+}
+
+/* Content */
+.content { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+/* Toolbar */
+.toolbar {
+  background:var(--white); border-bottom:1px solid var(--gray-200);
+  padding:0 20px; display:flex; align-items:center; gap:0; flex-shrink:0;
+}
+.toolbar-tab {
+  padding:14px 16px; font-size:13px; font-weight:500; color:var(--gray-700);
+  border-bottom:2px solid transparent; cursor:pointer; white-space:nowrap;
+}
+.toolbar-tab.active { color:var(--blue); border-bottom-color:var(--blue); font-weight:600; }
+.toolbar-tab:hover:not(.active) { color:var(--gray-900); }
+.toolbar-right { margin-left:auto; display:flex; align-items:center; gap:8px; padding:8px 0; }
+.toolbar-btn {
+  display:flex; align-items:center; gap:5px; padding:6px 12px;
+  border:1px solid var(--gray-300); border-radius:6px; font-size:12px;
+  font-weight:500; color:var(--gray-700); background:var(--white); cursor:pointer;
+}
+.toolbar-btn:hover { background:var(--gray-100); }
+.toolbar-btn.primary { background:var(--blue); color:var(--white); border-color:var(--blue); }
+.toolbar-btn.primary:hover { background:var(--blue-dark); }
+.toolbar-btn.danger { background:var(--red); color:var(--white); border-color:var(--red); }
+
+/* Action bar (when students selected) */
+.action-bar {
+  background:#1a73e8; color:var(--white); padding:10px 20px;
+  display:none; align-items:center; gap:12px; flex-shrink:0;
+}
+.action-bar.visible { display:flex; }
+.action-bar-text { font-size:13px; font-weight:500; flex:1; }
+.action-bar-btn {
+  padding:6px 16px; border:1px solid rgba(255,255,255,0.5); border-radius:6px;
+  background:none; color:var(--white); font-size:12px; font-weight:600; cursor:pointer;
+}
+.action-bar-btn:hover { background:rgba(255,255,255,0.15); }
+.action-bar-btn.danger { border-color:rgba(255,255,255,0.7); background:rgba(255,255,255,0.15); }
+
+/* Filter bar */
+.filter-bar {
+  padding:10px 20px; background:var(--white); border-bottom:1px solid var(--gray-200);
+  display:flex; align-items:center; gap:10px; flex-shrink:0;
+}
+.filter-select {
+  padding:6px 10px; border:1px solid var(--gray-300); border-radius:6px;
+  font-size:12px; font-family:var(--font); background:var(--white); color:var(--gray-900);
+  outline:none; cursor:pointer;
+}
+.tile-size-ctrl { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gray-700); }
+.tile-size-ctrl input { width:80px; accent-color:var(--blue); }
+.student-count-badge {
+  font-size:12px; color:var(--gray-700);
+  background:var(--gray-100); padding:4px 10px; border-radius:20px;
+}
+.select-all-btn {
+  display:flex; align-items:center; gap:5px; padding:5px 10px;
+  border:1px solid var(--gray-300); border-radius:6px; font-size:12px;
+  background:var(--white); cursor:pointer; color:var(--gray-700);
+}
+
+/* Screens grid */
+.screens-wrap { flex:1; overflow-y:auto; padding:16px 20px; }
+.screens-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+  gap:14px;
+}
+
+/* Student tile */
+.student-tile {
+  background:var(--white); border:1px solid var(--gray-200); border-radius:8px;
+  overflow:hidden; cursor:pointer; transition:box-shadow 0.15s, border-color 0.15s;
+  user-select:none; position:relative;
+}
+.student-tile:hover { box-shadow:var(--shadow-lg); border-color:var(--blue); }
+.student-tile.selected { border-color:var(--blue); box-shadow:0 0 0 2px rgba(26,115,232,0.3); }
+.student-tile.locked { border-color:var(--red); }
+.tile-checkbox {
+  position:absolute; top:8px; left:8px; z-index:2;
+  width:18px; height:18px; cursor:pointer; accent-color:var(--blue);
+}
+.tile-menu-btn {
+  position:absolute; top:6px; right:6px; z-index:2;
+  background:rgba(255,255,255,0.9); border:none; border-radius:4px;
+  width:24px; height:24px; font-size:14px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; transition:opacity 0.15s;
+}
+.student-tile:hover .tile-menu-btn { opacity:1; }
+.online-dot {
+  position:absolute; top:10px; left:30px; z-index:2;
+  width:9px; height:9px; border-radius:50%; background:var(--green);
+  border:1.5px solid var(--white);
+}
+.tile-screen {
+  aspect-ratio:16/9; background:var(--gray-100); overflow:hidden;
+  position:relative; display:flex; align-items:center; justify-content:center;
+}
+.tile-screen img { width:100%; height:100%; object-fit:cover; display:none; }
+.tile-screen-placeholder {
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  color:var(--gray-500); font-size:12px; text-align:center; padding:10px;
+}
+.tile-screen-placeholder .ph-icon { font-size:28px; opacity:0.5; }
+.tile-screen-lock {
+  position:absolute; inset:0; background:rgba(217,48,37,0.88);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  color:var(--white); font-size:13px; font-weight:600; gap:4px;
+}
+.tile-screen-lock .lock-icon { font-size:24px; }
+.tile-footer {
+  padding:8px 10px; border-top:1px solid var(--gray-100);
+  display:flex; flex-direction:column; gap:2px;
+}
+.tile-name { font-size:12px; font-weight:600; color:var(--gray-900); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tile-url { font-size:11px; color:var(--blue); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tile-tab-icons { display:flex; gap:3px; margin-top:3px; flex-wrap:wrap; }
+.tab-icon-dot {
+  width:14px; height:14px; border-radius:2px; background:var(--gray-200);
+  display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;
+}
+.tab-icon-dot img { width:100%; height:100%; object-fit:cover; }
+
+/* Empty state */
+.empty-state {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  flex:1; padding:60px 20px; color:var(--gray-500);
+}
+.empty-state-icon { font-size:64px; margin-bottom:16px; opacity:0.4; }
+.empty-state h3 { font-size:18px; font-weight:600; color:var(--gray-700); margin-bottom:8px; }
+.empty-state p { font-size:14px; text-align:center; max-width:320px; line-height:1.5; }
+
+/* ── STUDENT MODAL ──────────────────────────────────────────── */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500;
+  display:none; align-items:center; justify-content:center; padding:20px;
+}
+.modal-overlay.open { display:flex; }
+.student-modal {
+  background:var(--white); border-radius:10px; overflow:hidden;
+  width:100%; max-width:1080px; max-height:92vh; display:flex; flex-direction:column;
+  box-shadow:0 8px 40px rgba(0,0,0,0.25);
+}
+.modal-topbar {
+  display:flex; align-items:center; gap:10px; padding:13px 18px;
+  border-bottom:1px solid var(--gray-200); flex-shrink:0; background:var(--white);
+}
+.modal-online-dot { width:10px; height:10px; border-radius:50%; background:var(--green); flex-shrink:0; box-shadow:0 0 0 2px rgba(30,142,62,0.2); }
+.modal-student-name { font-size:16px; font-weight:700; flex:1; color:var(--gray-900); }
+.modal-close { background:none; border:none; font-size:22px; cursor:pointer; color:var(--gray-500); padding:2px 8px; border-radius:4px; line-height:1; }
+.modal-close:hover { background:var(--gray-100); color:var(--gray-900); }
+.modal-body { display:flex; flex:1; overflow:hidden; min-height:0; }
+.modal-screen { flex:1; background:#111; overflow:hidden; position:relative; display:flex; align-items:center; justify-content:center; }
+.modal-screen-empty {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  color:var(--gray-500); gap:8px; padding:40px;
+}
+.modal-panel {
+  width:320px; flex-shrink:0; border-left:1px solid var(--gray-200);
+  display:flex; flex-direction:column; overflow:hidden; background:var(--white);
+}
+.modal-panel-tabs { display:flex; border-bottom:1px solid var(--gray-200); flex-shrink:0; }
+.modal-panel-tab {
+  flex:1; padding:11px 8px; text-align:center; font-size:13px; font-weight:500;
+  color:var(--gray-700); border-bottom:2px solid transparent; cursor:pointer; transition:color 0.1s;
+}
+.modal-panel-tab:hover { color:var(--gray-900); }
+.modal-panel-tab.active { color:var(--blue); border-bottom-color:var(--blue); font-weight:600; }
+.modal-active-tab-label { font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--gray-500); padding:10px 12px 4px; }
+.modal-tab-item {
+  display:flex; align-items:center; gap:10px; padding:9px 12px;
+  border-bottom:1px solid var(--gray-100); cursor:pointer; transition:background 0.1s;
+}
+.modal-tab-item:hover { background:var(--gray-50); }
+.modal-tab-item.active-tab { background:var(--blue-light); }
+.modal-tab-favicon { width:18px; height:18px; flex-shrink:0; border-radius:2px; }
+.modal-tab-info { flex:1; overflow:hidden; }
+.modal-tab-title { font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--gray-900); }
+.modal-tab-url { font-size:11px; color:var(--blue); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:1px; }
+.modal-tab-close {
+  background:var(--white); border:1px solid var(--red); color:var(--red);
+  border-radius:4px; font-size:11px; padding:3px 10px; cursor:pointer; flex-shrink:0;
+  font-weight:600; transition:background 0.1s;
+}
+.modal-tab-close:hover { background:var(--red); color:var(--white); }
+.modal-actions {
+  display:flex; justify-content:space-around; padding:12px 8px;
+  border-top:1px solid var(--gray-200); flex-wrap:wrap; flex-shrink:0; gap:4px;
+  background:var(--gray-50);
+}
+.modal-action-btn {
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  padding:10px 14px; border-radius:8px; border:1px solid var(--gray-200);
+  background:var(--white); cursor:pointer; font-size:11px; color:var(--gray-700);
+  min-width:70px; transition:all 0.1s; font-weight:500;
+}
+.modal-action-btn:hover { background:var(--gray-100); border-color:var(--gray-300); }
+.modal-action-btn.danger:hover { background:#fce8e6; border-color:var(--red); color:var(--red); }
+.modal-action-btn .btn-icon { font-size:20px; }
+
+/* ── TOAST ──────────────────────────────────────────────────── */
+#toast {
+  position:fixed; bottom:20px; right:20px; z-index:9999;
+  background:var(--gray-900); color:var(--white); padding:10px 16px;
+  border-radius:8px; font-size:13px; opacity:0; transform:translateY(8px);
+  transition:all 0.2s; pointer-events:none; max-width:280px;
+}
+#toast.show { opacity:1; transform:translateY(0); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--gray-300); border-radius:3px; }
+
+/* Block sites panel */
+.side-panel {
+  position:fixed; right:0; top:var(--header-h); bottom:0; width:360px;
+  background:var(--white); border-left:1px solid var(--gray-200);
+  box-shadow:-4px 0 20px rgba(0,0,0,0.1);
+  display:none; flex-direction:column; z-index:200;
+  transform:translateX(100%); transition:transform 0.25s ease;
+}
+.side-panel.open { display:flex; transform:translateX(0); }
+.side-panel-header {
+  display:flex; align-items:center; gap:10px; padding:14px 16px;
+  border-bottom:1px solid var(--gray-200); flex-shrink:0;
+}
+.side-panel-title { font-size:14px; font-weight:700; flex:1; }
+.side-panel-close { background:none; border:none; font-size:18px; cursor:pointer; color:var(--gray-500); }
+.side-panel-body { flex:1; overflow-y:auto; padding:16px; }
+.panel-section { margin-bottom:20px; }
+.panel-section-title { font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--gray-500); margin-bottom:10px; }
+.site-input-row { display:flex; gap:6px; margin-bottom:8px; }
+.site-input-row input { flex:1; padding:8px 10px; border:1px solid var(--gray-300); border-radius:6px; font-size:13px; font-family:var(--font); outline:none; }
+.site-input-row input:focus { border-color:var(--blue); }
+.site-tag {
+  display:inline-flex; align-items:center; gap:5px;
+  background:#fce8e6; border:1px solid #f5c6c2; color:var(--red);
+  border-radius:4px; padding:3px 8px; font-size:12px; margin:2px;
+}
+.site-tag button { background:none; border:none; cursor:pointer; color:var(--red); font-size:12px; line-height:1; }
+.apply-btn {
+  width:100%; padding:9px; background:var(--blue); color:var(--white);
+  border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; margin-top:6px;
+}
+.apply-btn:hover { background:var(--blue-dark); }
+.apply-btn.danger { background:var(--red); }
+
+/* YouTube category checkboxes */
+.yt-category-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.yt-cat-item {
+  display:flex; align-items:center; gap:7px; padding:7px 9px;
+  border:1px solid var(--gray-200); border-radius:6px; cursor:pointer;
+  transition:background 0.1s; font-size:12px;
+}
+.yt-cat-item:hover { background:var(--gray-50); }
+.yt-cat-item.checked { background:var(--blue-light); border-color:var(--blue); color:var(--blue); }
+.yt-cat-item input { accent-color:var(--blue); margin:0; }
+.yt-cat-icon { font-size:14px; }
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN BG -->
+<div class="login-bg"></div>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <img src="data:image/png;base64,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" style="width:56px;height:56px;border-radius:12px;display:block;box-shadow:0 2px 8px rgba(26,115,232,0.3)">
+      <h1>Uncle Joe's Guardian</h1>
+      <p>Classroom Management Platform</p>
+    </div>
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="switchLoginTab('signin')">Sign In</button>
+      <button class="login-tab" onclick="switchLoginTab('signup')">Create Account</button>
+    </div>
+    <!-- Sign In -->
+    <div id="signinForm">
+      <div class="login-field">
+        <label>Email or Username</label>
+        <input type="text" id="loginUser" placeholder="Enter your username" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="login-btn" id="loginBtn" onclick="doLogin()">
+  <div class="spinner" id="loginSpinner"></div>
+  <span id="loginBtnText">Log In</span>
+</button>
+<div class="login-signing-in" id="signingInText">Signing in, Please Wait!</div>
+      <div class="login-error" id="loginError">Incorrect username or password.</div>
+    </div>
+    <!-- Sign Up -->
+    <div id="signupForm" style="display:none">
+      <div class="login-field">
+        <label>Full Name</label>
+        <input type="text" id="signupName" placeholder="Your name"/>
+      </div>
+      <div class="login-field">
+        <label>Username</label>
+        <input type="text" id="signupUser" placeholder="Choose a username"/>
+      </div>
+      <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="signupPass" placeholder="Choose a password"/>
+      </div>
+      <button class="login-btn" id="signupBtn" onclick="doSignup()">
+  <div class="spinner" id="signupSpinner"></div>
+  <span id="signupBtnText">Create Account</span>
+</button>
+      <div class="login-error" id="signupError"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-logo">
+      <img src="data:image/png;base64,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" style="width:32px;height:32px;border-radius:7px;display:block">
+      <div class="header-logo-text">Uncle <span>Joe's</span> Guardian</div>
+    </div>
+    <div class="header-session">
+      <div class="dot"></div>
+      <span>Live Session</span>
+    </div>
+    <div class="header-right">
+      <div class="conn-indicator" id="connIndicator">
+        <div class="dot"></div>
+        <span id="connText">Disconnected</span>
+      </div>
+      <div class="user-avatar" id="userAvatar">J</div>
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-nav">
+        <div class="sidebar-section-label">Classroom</div>
+        <div class="nav-item active" onclick="setNav(this)">
+          <span class="nav-icon">🖥️</span> Screens
+        </div>
+        <div class="nav-item" onclick="setNav(this)">
+          <span class="nav-icon">📊</span> Timelines
+        </div>
+        <div class="nav-item" onclick="setNav(this)">
+          <span class="nav-icon">📷</span> Screenshots
+        </div>
+        <div class="sidebar-section-label">Tools</div>
+        <div class="nav-item" onclick="setNav(this);openSidePanel()">
+          <span class="nav-icon">🚫</span> Block Sites
+        </div>
+        <div class="nav-item" onclick="setNav(this);openSidePanel()">
+          <span class="nav-icon">📌</span> Tab Limits
+        </div>
+        <div class="nav-item" onclick="setNav(this)">
+          <span class="nav-icon">→</span> Open URL
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Toolbar tabs -->
+      <div class="toolbar">
+        <div class="toolbar-tab active">Screens</div>
+        <div class="toolbar-tab">Timelines</div>
+        <div class="toolbar-tab">Screenshots</div>
+        <div class="toolbar-tab">Present to Class</div>
+        <div class="toolbar-right">
+          <input type="text" id="lockMessageInput" placeholder="Message to students... (optional)" style="padding:5px 10px;border:1px solid var(--gray-300);border-radius:6px;font-size:12px;width:220px;font-family:var(--font);outline:none">
+          <button class="toolbar-btn danger" onclick="lockAllWithMessage()">🔒 Lock All</button>
+          <button class="toolbar-btn" onclick="cmd('UNLOCK_SCREEN')">🔓 Unlock All</button>
+          <button class="toolbar-btn" onclick="cmd('CLOSE_ALL_TABS')">✕ Close All Tabs</button>
+        </div>
+      </div>
+
+      <!-- Action bar (shown when students selected) -->
+      <div class="action-bar" id="actionBar">
+        <span class="action-bar-text" id="actionBarText">0 students selected</span>
+        <button class="action-bar-btn" onclick="openUrlModal()">Open Tab</button>
+        <button class="action-bar-btn danger" onclick="cmdSelected('LOCK_SCREEN')">🔒 Lock/Unlock</button>
+        <button class="action-bar-btn" onclick="clearSelection()">✕ Cancel</button>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="selectAllChk" onchange="toggleSelectAll(this.checked)" style="accent-color:var(--blue)">
+          <span style="font-size:12px;color:var(--gray-700)">Select students</span>
+        </label>
+        <select class="filter-select" onchange="sortStudents(this.value)">
+          <option value="online">Sort By: Online</option>
+          <option value="name">Sort By: Name</option>
+        </select>
+        <div class="tile-size-ctrl">
+          <span>Tile size:</span>
+          <input type="range" min="160" max="320" value="220" oninput="setTileSize(this.value)">
+        </div>
+        <div class="student-count-badge"><span id="onlineCount">0</span> Online</div>
+      </div>
+
+      <!-- Screens grid or empty -->
+      <div id="emptyState" class="empty-state">
+        <div class="empty-state-icon">👩‍💻</div>
+        <h3>No Students Connected</h3>
+        <p>Students will appear here once they open Chrome with the Uncle Joe's Guardian extension installed.</p>
+      </div>
+      <div class="screens-wrap" id="screensWrap" style="display:none">
+        <div class="screens-grid" id="screensGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Student Detail Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="student-modal" onclick="event.stopPropagation()">
+
+    <!-- Top bar: name + close -->
+    <div class="modal-topbar">
+      <div class="modal-online-dot"></div>
+      <div class="modal-student-name" id="modalName">Student</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <!-- Lock message bar (shown when locking) -->
+    <div id="modalLockBar" style="display:none;padding:10px 16px;background:#fff3cd;border-bottom:1px solid #ffc107;flex-shrink:0">
+      <div style="font-size:12px;font-weight:600;color:#856404;margin-bottom:6px">Lock this student's screen</div>
+      <div style="font-size:11px;color:#856404;margin-bottom:8px">Enter a lock screen message (optional):</div>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="modalLockMsgInput" placeholder='e.g. "Eyes up front"'
+          style="flex:1;padding:7px 10px;border:1px solid #ffc107;border-radius:6px;font-size:13px;font-family:var(--font);outline:none;background:#fff"
+          onkeydown="if(event.key==='Enter')confirmModalLock()">
+        <button onclick="confirmModalLock()" style="padding:7px 16px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">Lock Screen</button>
+        <button onclick="cancelModalLock()" style="padding:7px 12px;border:1px solid var(--gray-300);background:#fff;border-radius:6px;font-size:13px;cursor:pointer">Cancel</button>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <!-- Screen preview -->
+      <div class="modal-screen" id="modalScreen">
+        <img id="modalImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:contain">
+        <div class="modal-screen-empty" id="modalScreenEmpty">
+          <span style="font-size:48px;opacity:0.3">🖥️</span>
+          <div style="font-size:13px;color:var(--gray-500);margin-top:8px">No screenshot yet</div>
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div class="modal-panel">
+        <div class="modal-panel-tabs">
+          <div class="modal-panel-tab active" onclick="switchModalTab('activity',this)">Student Activity</div>
+          <div class="modal-panel-tab" onclick="switchModalTab('chat',this)">Chat</div>
+        </div>
+
+        <!-- Activity tab -->
+        <div id="modalActivityTab" style="flex:1;overflow-y:auto">
+          <div id="modalTabsList"></div>
+        </div>
+
+        <!-- Chat tab (placeholder) -->
+        <div id="modalChatTab" style="display:none;flex:1;padding:16px;color:var(--gray-500);font-size:13px;text-align:center">
+          <div style="margin-top:40px">💬 Chat coming soon</div>
+        </div>
+
+        <!-- Bottom action buttons -->
+        <div class="modal-actions">
+          <button class="modal-action-btn danger" id="modalLockBtn" onclick="startModalLock()">
+            <span class="btn-icon" id="modalLockIcon">⊘</span>
+            <span id="modalLockLabel">Lock device</span>
+          </button>
+          <button class="modal-action-btn" onclick="modalOpenTab()">
+            <span class="btn-icon">⊞</span>
+            <span>Open new tab...</span>
+          </button>
+          <button class="modal-action-btn danger" onclick="modalCmd('CLOSE_ALL_TABS')">
+            <span class="btn-icon">✕</span>
+            <span>Close tabs</span>
+          </button>
+          <button class="modal-action-btn" onclick="modalCmd('REQUEST_SCREENSHOT')">
+            <span class="btn-icon">📷</span>
+            <span>Screenshot</span>
+          </button>
+        </div>
+
+        <!-- Thumbs feedback -->
+        <div style="display:flex;justify-content:flex-end;padding:6px 12px;border-top:1px solid var(--gray-100)">
+          <button style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px 6px" title="Helpful">👍</button>
+          <button style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px 6px" title="Not helpful">👎</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- URL Modal -->
+<div class="modal-overlay" id="urlModal" onclick="closeUrlModal(event)">
+  <div style="background:var(--white);border-radius:10px;padding:24px;width:400px;box-shadow:var(--shadow-lg)" onclick="event.stopPropagation()">
+    <h3 style="font-size:15px;margin-bottom:16px">Open URL for Students</h3>
+    <input type="text" id="urlInput" placeholder="https://..." style="width:100%;padding:9px 12px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;outline:none;margin-bottom:12px">
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="closeUrlModal()" style="padding:7px 16px;border:1px solid var(--gray-300);border-radius:6px;background:none;cursor:pointer;font-size:13px">Cancel</button>
+      <button onclick="submitUrl()" style="padding:7px 16px;background:var(--blue);color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600">Open Tab</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Block Sites Side Panel -->
+<div class="side-panel" id="blockSitesPanel">
+  <div class="side-panel-header">
+    <span style="font-size:18px">🚫</span>
+    <div class="side-panel-title">Block Websites</div>
+    <button class="side-panel-close" onclick="closeSidePanel()">✕</button>
+  </div>
+  <div class="side-panel-body">
+
+    <div class="panel-section">
+      <div class="panel-section-title">Block Specific Sites</div>
+      <div class="site-input-row">
+        <input type="text" id="blockSiteInput" placeholder="e.g. youtube.com" onkeydown="if(event.key==='Enter')addBlockSite()"/>
+        <button class="apply-btn" style="width:auto;padding:8px 14px" onclick="addBlockSite()">Add</button>
+      </div>
+      <div id="blockSitesList" style="margin-bottom:8px"></div>
+      <button class="apply-btn" onclick="applyBlockSites()">🚫 Apply Block List</button>
+      <button class="apply-btn danger" onclick="clearBlockSites()" style="margin-top:6px">↩ Clear All Blocks</button>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-section-title">Block YouTube Categories</div>
+      <p style="font-size:12px;color:var(--gray-700);margin-bottom:10px;line-height:1.5">
+        Select categories to block on YouTube. Students will see a "blocked" message on those videos.
+      </p>
+      <div class="yt-category-grid" id="ytCategoryGrid">
+        <!-- Populated by JS -->
+      </div>
+      <button class="apply-btn" onclick="applyYouTubeBlocks()" style="margin-top:10px">🎬 Apply YouTube Blocks</button>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-section-title">Tab Limit</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-size:12px;color:var(--gray-700)">Max tabs open:</span>
+        <input type="range" id="tabLimitRange" min="0" max="10" value="0" oninput="document.getElementById('tabLimitVal').textContent=this.value==0?'Off':this.value" style="flex:1;accent-color:var(--blue)">
+        <span id="tabLimitVal" style="font-size:12px;font-weight:600;color:var(--blue);min-width:24px">Off</span>
+      </div>
+      <button class="apply-btn" onclick="applyTabLimit()">📌 Apply Tab Limit</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── AUTH ──────────────────────────────────────────────────────
+
+// Simple localStorage-based accounts
+function getAccounts() {
+  return JSON.parse(localStorage.getItem('ujg_accounts') || '{}');
+}
+function saveAccounts(a) {
+  localStorage.setItem('ujg_accounts', JSON.stringify(a));
+}
+
+// Create default admin if none exist
+if (Object.keys(getAccounts()).length === 0) {
+  const a = getAccounts();
+  a['admin'] = { password: 'admin123', name: 'Admin' };
+  saveAccounts(a);
+}
+
+let currentUser = null;
+
+function switchLoginTab(tab) {
+  document.querySelectorAll('.login-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='signin')||(i===1&&tab==='signup')));
+  document.getElementById('signinForm').style.display = tab==='signin' ? '' : 'none';
+  document.getElementById('signupForm').style.display = tab==='signup' ? '' : 'none';
+}
+
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const accounts = getAccounts();
+  if (accounts[user] && accounts[user].password === pass) {
+    // Show spinner
+    const btn = document.getElementById('loginBtn');
+    const spinner = document.getElementById('loginSpinner');
+    const btnText = document.getElementById('loginBtnText');
+    const signingIn = document.getElementById('signingInText');
+    if (btn) btn.disabled = true;
+    if (spinner) spinner.style.display = 'block';
+    if (btnText) btnText.textContent = 'Signing in...';
+    if (signingIn) signingIn.style.display = 'block';
+
+    setTimeout(() => {
+      currentUser = { username: user, name: accounts[user].name || user };
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('app').classList.add('visible');
+      document.getElementById('userAvatar').textContent = currentUser.name[0].toUpperCase();
+      // Reset button
+      if (btn) btn.disabled = false;
+      if (spinner) spinner.style.display = 'none';
+      if (btnText) btnText.textContent = 'Log In';
+      if (signingIn) signingIn.style.display = 'none';
+      connectWS();
+    }, 1200);
+  } else {
+    const err = document.getElementById('loginError');
+    err.style.display = 'block';
+    err.textContent = 'Incorrect username or password.';
+  }
+}
+
+function doSignup() {
+  const name = document.getElementById('signupName').value.trim();
+  const user = document.getElementById('signupUser').value.trim().toLowerCase();
+  const pass = document.getElementById('signupPass').value;
+  const err = document.getElementById('signupError');
+  if (!name || !user || !pass) { err.style.display='block'; err.textContent='Please fill in all fields.'; return; }
+  if (pass.length < 4) { err.style.display='block'; err.textContent='Password must be at least 4 characters.'; return; }
+  const accounts = getAccounts();
+  if (accounts[user]) { err.style.display='block'; err.textContent='That username is already taken.'; return; }
+  accounts[user] = { password: pass, name };
+  saveAccounts(accounts);
+  // Auto login
+  document.getElementById('loginUser').value = user;
+  document.getElementById('loginPass').value = pass;
+  switchLoginTab('signin');
+  doLogin();
+}
+
+function doLogout() {
+  currentUser = null;
+  if (ws) { try { ws.onclose = null; ws.close(); } catch(e){} ws = null; }
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('loginPage').style.display = 'flex';
+  students = {}; screenshots = {}; selected = new Set();
+  // Clear inputs
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+  setConn(false);
+}
+
+// ── WEBSOCKET ─────────────────────────────────────────────────
+
+let ws = null;
+let students = {};
+let screenshots = {};
+let selected = new Set();
+let modalStudentId = null;
+let tileSize = 220;
+
+function connectWS() {
+  const url = window.location.protocol === 'https:'
+    ? 'wss://' + window.location.host
+    : 'ws://' + window.location.host;
+  if (ws) { ws.onclose = null; ws.close(); }
+  try { ws = new WebSocket(url); } catch(e) { setTimeout(connectWS, 5000); return; }
+  ws.onopen = () => {
+    setConn(true);
+    ws.send(JSON.stringify({ type: 'TEACHER_CONNECT' }));
+  };
+  ws.onmessage = (e) => {
+    let msg; try { msg = JSON.parse(e.data); } catch(er) { return; }
+    if (msg.type === 'STUDENT_LIST') updateStudents(msg.students);
+    if (msg.type === 'STUDENT_UPDATE' && msg.student) updateOneStudent(msg.student);
+    if (msg.type === 'SCREENSHOT') handleScreenshot(msg);
+  };
+  ws.onclose = () => { setConn(false); setTimeout(connectWS, 5000); };
+  ws.onerror = () => setConn(false);
+}
+
+function setConn(yes) {
+  const el = document.getElementById('connIndicator');
+  const txt = document.getElementById('connText');
+  el.classList.toggle('connected', yes);
+  txt.textContent = yes ? 'Connected' : 'Disconnected';
+}
+
+function sendWS(msg) {
+  if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
+  else toast('Not connected to server');
+}
+
+// ── STUDENTS ──────────────────────────────────────────────────
+
+function updateStudents(list) {
+  students = {};
+  (list||[]).forEach(s => { if (s) students[s.id] = s; });
+  renderGrid();
+}
+
+function updateOneStudent(s) {
+  if (!s) return;
+  const existing = students[s.id];
+  students[s.id] = s;
+  // Preserve screenshot
+  if (existing && screenshots[s.id]) {
+    updateTile(s.id);
+  } else {
+    renderGrid();
+  }
+}
+
+function handleScreenshot(msg) {
+  screenshots[msg.studentId] = { image: msg.image, tabTitle: msg.tabTitle, tabUrl: msg.tabUrl };
+  if (!students[msg.studentId]) {
+    students[msg.studentId] = { id: msg.studentId, name: msg.studentName||'Student', isLocked:false, tabs:[], tabCount:0, online:true };
+    renderGrid();
+    return;
+  }
+  updateTile(msg.studentId);
+  if (modalStudentId === msg.studentId) {
+    const img = document.getElementById('modalImg');
+    img.src = msg.image;
+    img.style.display = 'block';
+    document.getElementById('modalScreenEmpty').style.display = 'none';
+  }
+}
+
+// ── RENDER GRID ───────────────────────────────────────────────
+
+function renderGrid() {
+  const ids = Object.keys(students);
+  document.getElementById('onlineCount').textContent = ids.length;
+  document.getElementById('emptyState').style.display = ids.length ? 'none' : 'flex';
+  document.getElementById('screensWrap').style.display = ids.length ? '' : 'none';
+  const grid = document.getElementById('screensGrid');
+  grid.innerHTML = '';
+  ids.forEach(id => grid.appendChild(makeTile(students[id])));
+  updateActionBar();
+}
+
+function makeTile(s) {
+  const sc = screenshots[s.id];
+  const div = document.createElement('div');
+  div.className = 'student-tile' + (s.isLocked?' locked':'') + (selected.has(s.id)?' selected':'');
+  div.dataset.id = s.id;
+  div.style.width = tileSize + 'px';
+
+  // Determine display URL
+  const activeTab = (s.tabs||[]).find(t=>t.active);
+  const urlDisplay = sc?.tabUrl ? shortUrl(sc.tabUrl) : (activeTab?.url ? shortUrl(activeTab.url) : '');
+  const isInactive = !sc && (!activeTab || !activeTab.url || activeTab.url === 'chrome://newtab/');
+
+  div.innerHTML = `
+    <input type="checkbox" class="tile-checkbox" ${selected.has(s.id)?'checked':''} onclick="event.stopPropagation();toggleSelect('${s.id}',this.checked)">
+    <div class="online-dot"></div>
+    <button class="tile-menu-btn" onclick="event.stopPropagation();openModal('${s.id}')">⋮</button>
+    <div class="tile-screen">
+      <img id="timg_${s.id}" src="${sc?.image||''}" style="display:${sc?'block':'none'}">
+      <div class="tile-screen-placeholder" id="tph_${s.id}" style="display:${sc?'none':'flex'}">
+        <div class="ph-icon">${isInactive ? '💤' : '🖥️'}</div>
+        <div>${isInactive ? 'Inactive Tab' : 'Waiting...'}</div>
+      </div>
+      <div class="tile-screen-lock" id="tlk_${s.id}" style="display:${s.isLocked?'flex':'none'}">
+        <div style="font-size:32px;margin-bottom:6px;opacity:0.7">🔒</div>
+        <div style="font-size:12px;margin-bottom:10px;color:rgba(255,255,255,0.8)">You have locked this student</div>
+        <button onclick="event.stopPropagation();unlockStudent('${s.id}')" style="padding:6px 16px;background:var(--white);color:var(--red);border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer">Unlock Device</button>
+      </div>
+    </div>
+    <div class="tile-footer">
+      <div class="tile-name">${esc(s.name)}</div>
+      <div class="tile-url">${urlDisplay ? esc(urlDisplay) : '<span style="color:var(--gray-500)">No active tab</span>'}</div>
+      <div class="tile-tab-icons" id="ttabs_${s.id}">
+        ${(s.tabs||[]).slice(0,6).map(t => `
+          <div class="tab-icon-dot" title="${esc(t.title||'')}">
+            ${t.favIconUrl ? `<img src="${t.favIconUrl}" onerror="this.style.display='none'">` : ''}
+          </div>`).join('')}
+        ${(s.tabs||[]).length > 6 ? `<div style="font-size:9px;color:var(--gray-500);align-self:center">+${(s.tabs||[]).length-6}</div>` : ''}
+      </div>
+    </div>`;
+
+  div.addEventListener('click', () => openModal(s.id));
+  return div;
+}
+
+function updateTile(id) {
+  const s = students[id];
+  if (!s) return;
+  const sc = screenshots[id];
+
+  const img = document.getElementById('timg_' + id);
+  const ph = document.getElementById('tph_' + id);
+  const lk = document.getElementById('tlk_' + id);
+
+  if (img) {
+    if (sc) { img.src = sc.image; img.style.display = 'block'; if(ph) ph.style.display='none'; }
+  }
+  if (lk) lk.style.display = s.isLocked ? 'flex' : 'none';
+
+  // Update tile URL
+  const tile = document.querySelector(`.student-tile[data-id="${id}"]`);
+  if (tile) {
+    const urlEl = tile.querySelector('.tile-url');
+    if (urlEl && sc?.tabUrl) urlEl.innerHTML = esc(shortUrl(sc.tabUrl));
+    const locked = tile.querySelector('.tile-screen-lock');
+    if (locked) locked.style.display = s.isLocked ? 'flex' : 'none';
+    tile.classList.toggle('locked', s.isLocked);
+  }
+}
+
+// ── SELECTION ─────────────────────────────────────────────────
+
+function toggleSelect(id, checked) {
+  if (checked) selected.add(id); else selected.delete(id);
+  const tile = document.querySelector(`.student-tile[data-id="${id}"]`);
+  if (tile) tile.classList.toggle('selected', checked);
+  updateActionBar();
+}
+
+function toggleSelectAll(checked) {
+  selected = checked ? new Set(Object.keys(students)) : new Set();
+  document.querySelectorAll('.student-tile').forEach(t => {
+    const id = t.dataset.id;
+    t.classList.toggle('selected', checked);
+    const chk = t.querySelector('.tile-checkbox');
+    if (chk) chk.checked = checked;
+  });
+  updateActionBar();
+}
+
+function clearSelection() {
+  selected.clear();
+  document.getElementById('selectAllChk').checked = false;
+  document.querySelectorAll('.student-tile').forEach(t => {
+    t.classList.remove('selected');
+    const chk = t.querySelector('.tile-checkbox');
+    if (chk) chk.checked = false;
+  });
+  updateActionBar();
+}
+
+function updateActionBar() {
+  const bar = document.getElementById('actionBar');
+  const txt = document.getElementById('actionBarText');
+  if (selected.size > 0) {
+    bar.classList.add('visible');
+    txt.textContent = `${selected.size} student${selected.size>1?'s':''} selected`;
+  } else {
+    bar.classList.remove('visible');
+  }
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+
+function openModal(id) {
+  modalStudentId = id;
+  const s = students[id];
+  const sc = screenshots[id];
+  document.getElementById('modalName').textContent = s?.name || 'Student';
+  const img = document.getElementById('modalImg');
+  if (sc?.image) { img.src = sc.image; img.style.display='block'; document.getElementById('modalScreenEmpty').style.display='none'; }
+  else { img.style.display='none'; document.getElementById('modalScreenEmpty').style.display='flex'; }
+  renderModalTabs(id);
+  document.getElementById('modalOverlay').classList.add('open');
+  // Reset lock bar
+  const bar = document.getElementById('modalLockBar');
+  if (bar) bar.style.display = 'none';
+  const inp = document.getElementById('modalLockMsgInput');
+  if (inp) inp.value = '';
+  // Set lock button state
+  const s2 = students[id];
+  const lockIcon = document.getElementById('modalLockIcon');
+  const lockLabel = document.getElementById('modalLockLabel');
+  const lockBtn = document.getElementById('modalLockBtn');
+  if (s2?.isLocked) {
+    if (lockIcon) lockIcon.textContent = '🔓';
+    if (lockLabel) lockLabel.textContent = 'Unlock device';
+    if (lockBtn) lockBtn.classList.add('danger');
+  } else {
+    if (lockIcon) lockIcon.textContent = '⊘';
+    if (lockLabel) lockLabel.textContent = 'Lock device';
+    if (lockBtn) lockBtn.classList.remove('danger');
+  }
+}
+
+function renderModalTabs(id) {
+  const s = students[id];
+  const tabs = s?.tabs || [];
+  const list = document.getElementById('modalTabsList');
+  if (tabs.length === 0) {
+    list.innerHTML = '<div style="padding:16px;text-align:center;font-size:12px;color:var(--gray-500)">No tabs open</div>';
+    return;
+  }
+  const activeTab = tabs.find(t=>t.active);
+  let html = '';
+  if (activeTab) {
+    html += `<div class="modal-active-tab-label">Active Tab</div>
+    <div class="modal-tab-item active-tab">
+      ${activeTab.favIconUrl ? `<img class="modal-tab-favicon" src="${activeTab.favIconUrl}" onerror="this.style.display='none'">` : '<span class="modal-tab-favicon">📄</span>'}
+      <div class="modal-tab-info">
+        <div class="modal-tab-title">${esc(activeTab.title||'Loading...')}</div>
+        <div class="modal-tab-url">${esc(shortUrl(activeTab.url))}</div>
+      </div>
+      <button class="modal-tab-close" onclick="closeStudentTab('${id}',${activeTab.id})">Close</button>
+    </div>`;
+  }
+  const otherTabs = tabs.filter(t=>!t.active);
+  if (otherTabs.length > 0) {
+    html += `<div class="modal-active-tab-label">${otherTabs.length} Other Tab${otherTabs.length>1?'s':''}</div>`;
+    otherTabs.forEach(t => {
+      html += `<div class="modal-tab-item">
+        ${t.favIconUrl ? `<img class="modal-tab-favicon" src="${t.favIconUrl}" onerror="this.style.display='none'">` : '<span class="modal-tab-favicon">📄</span>'}
+        <div class="modal-tab-info">
+          <div class="modal-tab-title">${esc(t.title||'Loading...')}</div>
+          <div class="modal-tab-url">${esc(shortUrl(t.url))}</div>
+        </div>
+        <button class="modal-tab-close" onclick="closeStudentTab('${id}',${t.id})">Close</button>
+      </div>`;
+    });
+  }
+  list.innerHTML = html;
+}
+
+function closeStudentTab(studentId, tabId) {
+  sendWS({ type:'TEACHER_COMMAND', command:'CLOSE_TAB', targetId:studentId, payload:{tabId} });
+  toast('Tab closed');
+  // Remove from local state
+  if (students[studentId]) {
+    students[studentId].tabs = (students[studentId].tabs||[]).filter(t=>t.id!==tabId);
+    renderModalTabs(studentId);
+  }
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modalOverlay')) {
+    document.getElementById('modalOverlay').classList.remove('open');
+    modalStudentId = null;
+  }
+}
+
+function startModalLock() {
+  if (!modalStudentId) return;
+  const s = students[modalStudentId];
+  if (s && s.isLocked) {
+    // Already locked — unlock directly
+    unlockStudent(modalStudentId);
+    document.getElementById('modalLockIcon').textContent = '⊘';
+    document.getElementById('modalLockLabel').textContent = 'Lock device';
+    document.getElementById('modalLockBar').style.display = 'none';
+    const btn = document.getElementById('modalLockBtn');
+    if (btn) { btn.classList.remove('danger'); }
+    return;
+  }
+  // Show inline lock message bar
+  const bar = document.getElementById('modalLockBar');
+  if (bar) {
+    bar.style.display = 'block';
+    document.getElementById('modalLockMsgInput').focus();
+  }
+}
+
+function confirmModalLock() {
+  if (!modalStudentId) return;
+  const message = document.getElementById('modalLockMsgInput').value.trim();
+  sendWS({ type:'TEACHER_COMMAND', command:'LOCK_SCREEN', targetId:modalStudentId, payload:{ message } });
+  const s = students[modalStudentId];
+  if (s) { s.isLocked=true; updateTile(modalStudentId); }
+  document.getElementById('modalLockIcon').textContent = '🔓';
+  document.getElementById('modalLockLabel').textContent = 'Unlock device';
+  document.getElementById('modalLockBtn').classList.add('danger');
+  document.getElementById('modalLockBar').style.display = 'none';
+  document.getElementById('modalLockMsgInput').value = '';
+  toast('Screen locked' + (message ? ': "' + message + '"' : ''));
+}
+
+function cancelModalLock() {
+  document.getElementById('modalLockBar').style.display = 'none';
+  document.getElementById('modalLockMsgInput').value = '';
+}
+
+function switchModalTab(tab, el) {
+  document.querySelectorAll('.modal-panel-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('modalActivityTab').style.display = tab === 'activity' ? '' : 'none';
+  document.getElementById('modalChatTab').style.display = tab === 'chat' ? '' : 'none';
+}
+
+function modalCmd(command) {
+  if (!modalStudentId) return;
+  sendWS({ type:'TEACHER_COMMAND', command, targetId:modalStudentId, payload:{} });
+  toast('Done: ' + command.replace(/_/g,' '));
+  if (command==='LOCK_SCREEN' && students[modalStudentId]) { students[modalStudentId].isLocked=true; updateTile(modalStudentId); }
+  if (command==='UNLOCK_SCREEN' && students[modalStudentId]) { students[modalStudentId].isLocked=false; updateTile(modalStudentId); }
+}
+
+function modalOpenTab() {
+  const url = prompt('Enter URL to open:');
+  if (!url || !modalStudentId) return;
+  sendWS({ type:'TEACHER_COMMAND', command:'NAVIGATE_TO', targetId:modalStudentId, payload:{ url: url.startsWith('http')?url:'https://'+url } });
+  toast('Opening URL...');
+}
+
+// ── COMMANDS ──────────────────────────────────────────────────
+
+function lockAllWithMessage() {
+  const message = document.getElementById('lockMessageInput').value.trim();
+  sendWS({ type:'TEACHER_COMMAND', command:'LOCK_SCREEN', targetId:'all', payload:{ message } });
+  toast('Screens locked' + (message ? ': "' + message + '"' : ''));
+}
+
+function lockStudentWithMessage(id) {
+  const message = document.getElementById('lockMessageInput').value.trim();
+  sendWS({ type:'TEACHER_COMMAND', command:'LOCK_SCREEN', targetId:id, payload:{ message } });
+  if (students[id]) { students[id].isLocked=true; updateTile(id); }
+  toast('Screen locked');
+}
+
+function unlockStudent(id) {
+  sendWS({ type:'TEACHER_COMMAND', command:'UNLOCK_SCREEN', targetId:id, payload:{} });
+  if (students[id]) { students[id].isLocked=false; updateTile(id); }
+  toast('Screen unlocked');
+}
+
+function cmd(command, payload={}) {
+  sendWS({ type:'TEACHER_COMMAND', command, targetId:'all', payload });
+  toast('Sent to all: ' + command.replace(/_/g,' '));
+}
+
+function cmdSelected(command) {
+  const message = command === 'LOCK_SCREEN' ? (document.getElementById('lockMessageInput')?.value?.trim()||'') : '';
+  selected.forEach(id => {
+    sendWS({ type:'TEACHER_COMMAND', command, targetId:id, payload:{ message } });
+    if (command==='LOCK_SCREEN' && students[id]) { students[id].isLocked=true; updateTile(id); }
+    if (command==='UNLOCK_SCREEN' && students[id]) { students[id].isLocked=false; updateTile(id); }
+  });
+  toast(`${command.replace(/_/g,' ')} → ${selected.size} students`);
+}
+
+function openUrlModal() {
+  document.getElementById('urlModal').classList.add('open');
+}
+function closeUrlModal(e) {
+  if (!e || e.target === document.getElementById('urlModal'))
+    document.getElementById('urlModal').classList.remove('open');
+}
+function submitUrl() {
+  let url = document.getElementById('urlInput').value.trim();
+  if (!url) return;
+  if (!url.startsWith('http')) url = 'https://' + url;
+  const targets = selected.size > 0 ? [...selected] : ['all'];
+  targets.forEach(id => sendWS({ type:'TEACHER_COMMAND', command:'NAVIGATE_TO', targetId:id, payload:{url} }));
+  toast('Opening URL for ' + (selected.size>0?`${selected.size} students`:'all students'));
+  closeUrlModal();
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────
+
+function setNav(el) {
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setTileSize(v) {
+  tileSize = parseInt(v);
+  document.getElementById('screensGrid').style.gridTemplateColumns = `repeat(auto-fill, minmax(${tileSize}px, 1fr))`;
+  document.querySelectorAll('.student-tile').forEach(t => t.style.width = tileSize + 'px');
+}
+
+function sortStudents(by) {
+  const ids = Object.keys(students);
+  if (by === 'name') ids.sort((a,b) => (students[a].name||'').localeCompare(students[b].name||''));
+  const grid = document.getElementById('screensGrid');
+  grid.innerHTML = '';
+  ids.forEach(id => grid.appendChild(makeTile(students[id])));
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function shortUrl(url) { try { const u = new URL(url); return u.hostname; } catch(e) { return url||''; } }
+
+let toastT;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=>el.classList.remove('show'), 2500);
+}
+
+// ── BLOCK SITES PANEL ─────────────────────────────────────────
+
+let blockedSitesList = [];
+let blockedYtCategories = new Set();
+
+const YT_CATEGORIES = [
+  { id:'gaming', label:'Gaming', icon:'🎮' },
+  { id:'sports', label:'Sports', icon:'⚽' },
+  { id:'music', label:'Music', icon:'🎵' },
+  { id:'entertainment', label:'Entertainment', icon:'🎭' },
+  { id:'news', label:'News', icon:'📰' },
+  { id:'comedy', label:'Comedy', icon:'😂' },
+  { id:'howto', label:'How-to & Style', icon:'✂️' },
+  { id:'film', label:'Film & TV', icon:'🎬' },
+  { id:'autos', label:'Autos', icon:'🚗' },
+  { id:'travel', label:'Travel', icon:'✈️' },
+];
+
+function openSidePanel() {
+  document.getElementById('blockSitesPanel').classList.add('open');
+  renderYtCategories();
+  renderBlockSitesList();
+}
+
+function closeSidePanel() {
+  document.getElementById('blockSitesPanel').classList.remove('open');
+}
+
+function renderYtCategories() {
+  const grid = document.getElementById('ytCategoryGrid');
+  if (!grid) return;
+  grid.innerHTML = YT_CATEGORIES.map(cat => `
+    <div class="yt-cat-item ${blockedYtCategories.has(cat.id)?'checked':''}" id="ytcat_${cat.id}" onclick="toggleYtCat('${cat.id}')">
+      <span class="yt-cat-icon">${cat.icon}</span>
+      <span>${cat.label}</span>
+      ${blockedYtCategories.has(cat.id) ? '<span style="margin-left:auto;color:var(--blue)">✓</span>' : ''}
+    </div>`).join('');
+}
+
+function toggleYtCat(id) {
+  const el = document.getElementById('ytcat_' + id);
+  if (!el) return;
+  if (blockedYtCategories.has(id)) {
+    blockedYtCategories.delete(id);
+    el.classList.remove('checked');
+    const check = el.querySelector('.yt-check');
+    if (check) check.remove();
+  } else {
+    blockedYtCategories.add(id);
+    el.classList.add('checked');
+    if (!el.querySelector('.yt-check')) {
+      const check = document.createElement('span');
+      check.className = 'yt-check';
+      check.style.cssText = 'margin-left:auto;color:var(--blue)';
+      check.textContent = '✓';
+      el.appendChild(check);
+    }
+  }
+}
+
+function applyYouTubeBlocks() {
+  const cats = [...blockedYtCategories];
+  // Build blocked sites list: youtube.com + category keywords via content script
+  sendWS({ type:'TEACHER_COMMAND', command:'BLOCK_YT_CATEGORIES', targetId:getTarget(), payload:{ categories: cats } });
+  // Also add youtube.com to blocked sites if "all" categories selected
+  const catLabels = cats.map(c => YT_CATEGORIES.find(y=>y.id===c)?.label || c);
+  toast(cats.length ? ('Blocked: ' + catLabels.join(', ')) : 'YouTube blocks cleared');
+  closeSidePanel();
+}
+
+function addBlockSite() {
+  const input = document.getElementById('blockSiteInput');
+  let val = input.value.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/$/, '');
+  if (!val) return;
+  if (!blockedSitesList.includes(val)) { blockedSitesList.push(val); renderBlockSitesList(); }
+  input.value = '';
+}
+
+function removeBlockSite(site) {
+  blockedSitesList = blockedSitesList.filter(s => s !== site);
+  renderBlockSitesList();
+}
+
+function renderBlockSitesList() {
+  const el = document.getElementById('blockSitesList');
+  if (!el) return;
+  el.innerHTML = blockedSitesList.map(s =>
+    `<span class="site-tag">${esc(s)}<button onclick="removeBlockSite('${s}')">✕</button></span>`
+  ).join('');
+}
+
+function applyBlockSites() {
+  if (blockedSitesList.length === 0) { toast('Add at least one site first'); return; }
+  sendWS({ type:'TEACHER_COMMAND', command:'BLOCK_SITES', targetId:getTarget(), payload:{ sites: blockedSitesList } });
+  toast('Blocked ' + blockedSitesList.length + ' site(s) for ' + (getTarget()==='all'?'all students':getStudentName(getTarget())));
+}
+
+function clearBlockSites() {
+  blockedSitesList = [];
+  renderBlockSitesList();
+  sendWS({ type:'TEACHER_COMMAND', command:'BLOCK_SITES', targetId:getTarget(), payload:{ sites: [] } });
+  toast('All blocks cleared');
+}
+
+function applyTabLimit() {
+  const limit = parseInt(document.getElementById('tabLimitRange').value) || 0;
+  sendWS({ type:'TEACHER_COMMAND', command:'SET_TAB_LIMIT', targetId:getTarget(), payload:{ limit } });
+  toast('Tab limit set to: ' + (limit === 0 ? 'Off' : limit));
+}
+
+function getTarget() {
+  // Use selected students if any, otherwise all
+  if (selected.size === 1) return [...selected][0];
+  return 'all';
+}
+
+function getStudentName(id) {
+  return students[id]?.name || id;
+}
+
+</script>
+</body>
+</html>
