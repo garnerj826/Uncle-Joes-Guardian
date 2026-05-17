@@ -846,39 +846,51 @@ async function doSignup() {
   const pass = document.getElementById('signupPass').value;
   const err = document.getElementById('signupError');
   err.style.display = 'none';
-  if (!name || !user || !pass) { err.style.display='block'; err.textContent='Please fill in all fields.'; return; }
+
+  if (!name) { err.style.display='block'; err.textContent='Please enter your name.'; return; }
+  if (!user) { err.style.display='block'; err.textContent='Please enter a username.'; return; }
+  if (!pass) { err.style.display='block'; err.textContent='Please enter a password.'; return; }
   if (pass.length < 4) { err.style.display='block'; err.textContent='Password must be at least 4 characters.'; return; }
-  try {
-    const res = await fetch('/api/register', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: user, password: pass, name })
-    });
-    const data = await res.json();
-    if (data.ok) {
-      document.getElementById('loginUser').value = user;
-      document.getElementById('loginPass').value = pass;
-      switchLoginTab('signin');
-      doLogin();
-    } else {
-      err.style.display = 'block';
-      err.textContent = data.error || 'Could not create account.';
-    }
-  } catch(e) {
+
+  // Save locally always
+  const accounts = getAccounts();
+  if (accounts[user]) {
     err.style.display = 'block';
-    err.textContent = 'Cannot connect to server.';
+    err.textContent = 'That username is already taken. Try a different one.';
+    return;
   }
+  accounts[user] = { password: pass, name, students: [] };
+  saveAccounts(accounts);
+
+  // Also register on server (best effort)
+  try {
+    await fetch('/api/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user, password: pass, name }),
+      signal: AbortSignal.timeout(3000)
+    });
+  } catch(e) {}
+
+  // Auto login
+  document.getElementById('loginUser').value = user;
+  document.getElementById('loginPass').value = pass;
+  switchLoginTab('signin');
+  doLogin();
 }
 
 function doLogout() {
   currentUser = null;
+  myStudentIds = [];
   if (ws) { try { ws.onclose = null; ws.close(); } catch(e){} ws = null; }
   document.getElementById('app').classList.remove('visible');
   document.getElementById('loginPage').style.display = 'flex';
   students = {}; screenshots = {}; selected = new Set();
-  // Clear inputs
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
   document.getElementById('loginError').style.display = 'none';
+  document.getElementById('screensGrid').innerHTML = '';
+  document.getElementById('emptyState').style.display = 'flex';
+  document.getElementById('screensWrap').style.display = 'none';
   setConn(false);
 }
 
@@ -1472,26 +1484,36 @@ async function submitStudentCode() {
   try {
     const res = await fetch('/api/add-student', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: currentUser.username, code })
+      body: JSON.stringify({ username: currentUser.username, code }),
+      signal: AbortSignal.timeout(5000)
     });
     const data = await res.json();
     if (data.ok) {
       resultEl.style.color = 'var(--green)';
       resultEl.textContent = '✓ Student added to your classroom!';
       document.getElementById('studentCodeInput').value = '';
-      myStudentIds.push(data.studentId);
-      // Reconnect WS to get updated student list
+      if (!myStudentIds.includes(data.studentId)) myStudentIds.push(data.studentId);
+      // Save locally too
+      const accounts = getAccounts();
+      if (accounts[currentUser.username]) {
+        if (!accounts[currentUser.username].students) accounts[currentUser.username].students = [];
+        if (!accounts[currentUser.username].students.includes(data.studentId)) {
+          accounts[currentUser.username].students.push(data.studentId);
+          saveAccounts(accounts);
+        }
+      }
+      // Refresh student list
       if (ws && ws.readyState === 1) {
         ws.send(JSON.stringify({ type: 'TEACHER_CONNECT', username: currentUser.username }));
       }
       toast('Student added! ✓');
     } else {
       resultEl.style.color = 'var(--red)';
-      resultEl.textContent = data.error || 'Could not add student.';
+      resultEl.textContent = data.error || 'Could not add student. Make sure the student has Chrome open with the extension.';
     }
   } catch(e) {
     resultEl.style.color = 'var(--red)';
-    resultEl.textContent = 'Connection error. Try again.';
+    resultEl.textContent = 'Connection error. Make sure the server is running.';
   }
 }
 
