@@ -50,18 +50,77 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .main{display:flex;flex:1;overflow:hidden}
 
 /* SIDEBAR */
-.sidebar{width:220px;background:#fff;border-right:1px solid #e8eaed;flex-shrink:0;overflow-y:auto;padding:8px}
-.nav-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#9aa0a6;padding:10px 10px 5px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:7px;font-size:13px;color:#5f6368;cursor:pointer;margin-bottom:2px}
-.nav-item:hover{background:#f1f3f4}
-.nav-item.active{background:#e8f0fe;color:var(--blue);font-weight:600}
-.nav-icon{font-size:15px;width:18px;text-align:center}
+.sidebar{width:88px;background:#1a1f36;border-right:none;flex-shrink:0;overflow-y:auto;display:flex;flex-direction:column;padding:8px 0}
+.nav-section{margin-bottom:4px}
+.nav-group-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35);padding:12px 8px 4px;text-align:center}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:8px;font-size:10px;font-weight:500;color:rgba(255,255,255,0.6);cursor:pointer;margin:2px 6px;transition:.15s;text-align:center;line-height:1.2}
+.nav-item:hover{background:rgba(255,255,255,0.1);color:#fff}
+.nav-item.active{background:rgba(99,132,255,0.25);color:#fff}
+.nav-item.open{background:rgba(255,255,255,0.08);color:#fff}
+.nav-icon{font-size:20px;line-height:1}
+.nav-icon svg{display:block}
+/* Slanted GoGuardian-style tab bar */
+.content-tabs{background:#f1f3f4;border-bottom:2px solid #d0d3d8;display:flex;align-items:flex-end;flex-shrink:0;padding:0 0 0 8px;overflow:hidden}
+.content-tab{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  padding:11px 16px;
+  font-size:13px;font-weight:500;
+  color:#5f6368;cursor:pointer;white-space:nowrap;
+  /* No background on the element itself */
+  background:transparent;
+  margin-right:4px;
+  transition:color .1s;
+  z-index:1;
+}
+/* The actual tab shape — stops exactly at text width, slant overhangs right */
+.content-tab::before{
+  content:'';
+  position:absolute;
+  top:0; left:0; bottom:0;
+  /* Width = text area + slant overhang */
+  right:-18px;
+  background:#e2e5e9;
+  border-top:1px solid #c8ccd0;
+  border-left:1px solid #c8ccd0;
+  border-bottom:none;
+  /* Slant: top-right corner cuts in, bottom-right is full width */
+  clip-path:polygon(0 0, calc(100% - 20px) 0, 100% 100%, 0 100%);
+  z-index:-1;
+  transition:background .1s;
+}
+/* Thin black border line along the slant edge */
+.content-tab::after{
+  content:'';
+  position:absolute;
+  top:0; bottom:0;
+  right:-18px; width:22px;
+  background:linear-gradient(to bottom right, #c8ccd0 0%, #c8ccd0 100%);
+  clip-path:polygon(0 0, 1.5px 0, 100% 100%, calc(100% - 1.5px) 100%);
+  z-index:0;
+  pointer-events:none;
+}
+.content-tab:nth-child(1){z-index:8}
+.content-tab:nth-child(2){z-index:7}
+.content-tab:nth-child(3){z-index:6}
+.content-tab:nth-child(4){z-index:5}
+.content-tab:nth-child(5){z-index:4}
+.content-tab:nth-child(6){z-index:3}
+.content-tab:hover::before{background:#ebedf0}
+.content-tab:hover{color:#202124}
+.content-tab.active::before{background:#fff;border-color:#d0d3d8}
+.content-tab.active::after{background:linear-gradient(to bottom right,#d0d3d8 0%,#d0d3d8 100%)}
+.content-tab.active{color:#202124;font-weight:600}
+.content-tab.disabled{color:#adb5bd;cursor:default;pointer-events:none}
+.content-tab-right{margin-left:auto;display:flex;gap:7px;align-items:center;padding:6px 16px 0 12px;flex-shrink:0;position:relative;z-index:20}
+
+/* Sign-in spinner */
+@keyframes spin{to{transform:rotate(360deg)}}
+.signin-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:7px}
 
 /* CONTENT */
 .content{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .toolbar{background:#fff;border-bottom:1px solid #e8eaed;padding:0 20px;display:flex;align-items:center;flex-shrink:0}
-.tool-tab{padding:14px 14px;font-size:13px;font-weight:500;color:#5f6368;border-bottom:2px solid transparent;cursor:pointer}
-.tool-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
 .toolbar-actions{margin-left:auto;display:flex;gap:7px;padding:8px 0}
 .tbtn{display:flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid #dadce0;border-radius:6px;font-size:12px;font-weight:500;color:#5f6368;background:#fff;cursor:pointer}
 .tbtn:hover{background:#f1f3f4}
@@ -87,27 +146,36 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .empty p{font-size:13px;text-align:center;max-width:320px;line-height:1.6}
 
 /* STUDENT TILE */
-.tile{background:#fff;border:1.5px solid #e8eaed;border-radius:9px;overflow:hidden;cursor:pointer;transition:.15s;position:relative}
-.tile:hover{box-shadow:0 4px 14px rgba(0,0,0,.12);border-color:var(--blue)}
+.tile{background:#fff;border:1px solid #e8eaed;border-radius:8px;overflow:hidden;cursor:pointer;transition:.15s;position:relative;display:flex;flex-direction:column}
+.tile:hover{box-shadow:0 2px 10px rgba(0,0,0,.1);border-color:#bdc1c6}
 .tile.locked{border-color:#d93025}
-.tile.selected{border-color:var(--blue);box-shadow:0 0 0 2px rgba(26,115,232,.25)}
-.tile-chk{position:absolute;top:8px;left:8px;z-index:2;width:17px;height:17px;accent-color:var(--blue);cursor:pointer}
-.tile-online{position:absolute;top:10px;left:30px;z-index:2;width:9px;height:9px;border-radius:50%;background:var(--green);border:1.5px solid #fff}
-.tile-menu{position:absolute;top:6px;right:6px;z-index:2;background:rgba(255,255,255,.9);border:none;border-radius:4px;width:24px;height:24px;cursor:pointer;font-size:14px;opacity:0;transition:.15s}
-.tile:hover .tile-menu{opacity:1}
-.tile-screen{aspect-ratio:16/9;background:#f1f3f4;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+.tile.selected{border-color:var(--blue);box-shadow:0 0 0 2px rgba(26,115,232,.2)}
+.tile-header{display:flex;align-items:center;gap:6px;padding:7px 8px;border-bottom:1px solid #f1f3f4;flex-shrink:0}
+.tile-chk{width:14px;height:14px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
+.tile-header-icon{position:relative;display:flex;align-items:center;flex-shrink:0}
+.tile-status-dot{position:absolute;bottom:-1px;right:-2px;width:7px;height:7px;border-radius:50%;border:1.5px solid #fff}
+.tile-status-dot.online{background:#1e8e3e}
+.tile-status-dot.offline{background:#d93025}
+.tile-student-name{font-size:12px;font-weight:600;color:#202124;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile-header-right{display:flex;align-items:center;gap:2px;flex-shrink:0}
+.tile-icon-btn{background:none;border:none;cursor:pointer;padding:3px;border-radius:3px;display:flex;align-items:center;opacity:0.6}
+.tile-icon-btn:hover{background:#f1f3f4;opacity:1}
+.tile-screen{aspect-ratio:16/9;background:#f1f3f4;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .tile-screen img{width:100%;height:100%;object-fit:cover;display:none}
-.tile-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;color:#9aa0a6;font-size:11px;position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden}
-.tile-ph .phi{font-size:26px;opacity:.5}
+.tile-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#9aa0a6;font-size:11px;position:absolute;top:0;left:0;right:0;bottom:0}
 .tile-lock-overlay{position:absolute;inset:0;background:rgba(217,48,37,.88);display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:8px;font-size:12px;font-weight:600}
 .tile-lock-overlay .li{font-size:28px}
 .unlock-tile-btn{padding:5px 14px;background:#fff;color:#d93025;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer}
-.tile-foot{padding:8px 10px;border-top:1px solid #f1f3f4}
-.tile-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tile-url{font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
-.tile-tabs{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap}
-.tab-dot{width:14px;height:14px;border-radius:2px;background:#e8eaed;overflow:hidden;flex-shrink:0}
-.tab-dot img{width:100%;height:100%;object-fit:cover}
+.tile-foot{padding:7px 9px 6px;border-top:1px solid #f1f3f4;flex-shrink:0}
+.tile-active-tab{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.tile-active-fav{width:14px;height:14px;border-radius:2px;flex-shrink:0}
+.tile-active-info{flex:1;overflow:hidden}
+.tile-active-title{font-size:12px;font-weight:500;color:#202124;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile-active-url{font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile-tabs{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
+.tab-dot{width:16px;height:16px;border-radius:3px;background:#f1f3f4;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.tab-dot img{width:14px;height:14px;object-fit:contain}
+.tile-extra-tabs{font-size:10px;font-weight:600;color:#5f6368;background:#e8eaed;border-radius:3px;padding:1px 4px;flex-shrink:0}
 
 /* ACTION BAR */
 .action-bar{background:var(--blue);color:#fff;padding:9px 20px;display:none;align-items:center;gap:10px;flex-shrink:0}
@@ -232,7 +300,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
     <div id="signinForm">
       <div class="field"><label>Username</label><input type="text" id="li-user" placeholder="Enter username" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <div class="field"><label>Password</label><input type="password" id="li-pass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <button class="login-btn" onclick="doLogin()">Log In</button>
+      <button class="login-btn" id="loginSubmitBtn" onclick="doLogin()">Log In</button>
       <div class="err-msg" id="li-err"></div>
     </div>
     <div id="signupForm" style="display:none">
@@ -261,23 +329,76 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
   </div>
   <div class="main">
     <div class="sidebar">
-      <div class="nav-label">Classroom</div>
-      <div class="nav-item active" id="nav-screens" onclick="navClick(this)"><span class="nav-icon">🖥️</span>Screens</div>
-      <div class="nav-label">Tools</div>
-      <div class="nav-item" id="nav-block" onclick="navClick(this);openPanel('blockPanel')"><span class="nav-icon">🚫</span>Block Sites</div>
-      <div class="nav-item" id="nav-yt" onclick="navClick(this);openPanel('blockPanel')"><span class="nav-icon">🎬</span>YouTube Filter</div>
-      <div class="nav-item" id="nav-tabs" onclick="navClick(this);openPanel('blockPanel')"><span class="nav-icon">📌</span>Tab Limit</div>
-      <div class="nav-label">Students</div>
-      <div class="nav-item" id="nav-add" onclick="navClick(this);openPanel('addPanel')"><span class="nav-icon">➕</span>Add Student</div>
-      <div class="nav-item" id="nav-manage" onclick="navClick(this);openPanel('managePanel')"><span class="nav-icon">👥</span>My Students</div>
+
+      <!-- Teacher avatar -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:14px 0 10px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:8px">
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;margin-bottom:6px" id="sidebarAvatar">J</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:500">Teacher</div>
+      </div>
+
+      <!-- Classrooms -->
+      <div class="nav-item active" id="navClassrooms" onclick="setSection('classrooms',this)">
+        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+        <span>Classrooms</span>
+      </div>
+
+      <!-- Scenes -->
+      <div class="nav-item" id="navScenes" onclick="setSection('scenes',this)">
+        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></span>
+        <span>Scenes</span>
+      </div>
+
+      <!-- Students -->
+      <div class="nav-item" id="navStudents" onclick="setSection('students',this)">
+        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        <span>Students</span>
+      </div>
+
+      <!-- Calendar -->
+      <div class="nav-item" id="navCalendar" onclick="setSection('calendar',this)">
+        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+        <span>Calendar</span>
+      </div>
+
+      <!-- Reports -->
+      <div class="nav-item" id="navReports" onclick="setSection('reports',this)">
+        <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        <span>Reports</span>
+      </div>
+
+      <!-- Help at bottom -->
+      <div style="margin-top:auto;padding-bottom:8px">
+        <div class="nav-item" onclick="setSection('help',this)">
+          <span class="nav-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+          <span>Help</span>
+        </div>
+      </div>
+
     </div>
     <div class="content">
-      <div class="toolbar">
-        <div class="tool-tab active" id="screensTab" onclick="switchToScreens()">Screens</div>
-        <div class="tool-tab" style="opacity:.5">Timelines</div>
-        <div class="tool-tab" id="ssTab" onclick="switchToScreenshots()">Screenshots<span class="ss-count" id="ssCount">0</span></div>
-        <div class="toolbar-actions">
-          <input type="text" id="lockMsgInput" placeholder="Lock message (optional)">
+      <!-- Content tabs (change based on section) -->
+      <div id="contentTabBar" class="content-tabs">
+        <!-- Classrooms tabs -->
+        <div id="tabsClassrooms" style="display:flex;align-items:flex-end;flex:1">
+          <div class="content-tab active" id="screensTab" onclick="switchToScreens()">Screens</div>
+          <div class="content-tab disabled">Timelines</div>
+          <div class="content-tab" id="ssTab" onclick="switchToScreenshots()">Screenshots <span class="ss-count" id="ssCount" style="background:rgba(26,115,232,0.12);color:var(--blue);padding:1px 6px;border-radius:10px;font-size:11px;font-weight:700">0</span></div>
+          <div class="content-tab disabled">Call Students</div>
+        </div>
+        <!-- Scenes tabs -->
+        <div id="tabsScenes" style="display:none;align-items:flex-end;flex:1">
+          <div class="content-tab active">Block Sites</div>
+          <div class="content-tab disabled">YouTube Filter</div>
+          <div class="content-tab disabled">Tab Limit</div>
+        </div>
+        <!-- Students tabs -->
+        <div id="tabsStudents" style="display:none;align-items:flex-end;flex:1">
+          <div class="content-tab active" onclick="openPanel('addPanel')">Add Student</div>
+          <div class="content-tab" onclick="openPanel('managePanel')">My Students</div>
+        </div>
+        <!-- Action buttons on right -->
+        <div class="content-tab-right" id="classroomsActions">
+          <input type="text" id="lockMsgInput" placeholder="Lock message..." style="padding:5px 10px;border:1px solid #dadce0;border-radius:6px;font-size:12px;width:180px;font-family:inherit;outline:none">
           <button class="tbtn danger" onclick="cmdAll('LOCK_SCREEN')">🔒 Lock All</button>
           <button class="tbtn" onclick="cmdAll('UNLOCK_SCREEN')">🔓 Unlock All</button>
           <button class="tbtn" onclick="cmdAll('CLOSE_ALL_TABS')">✕ Close Tabs</button>
@@ -464,19 +585,30 @@ function doLogin() {
 
   if (!user || !pass) { errEl.textContent = 'Please enter your username and password.'; return; }
 
-  var accounts = getAccounts();
-  var acc = accounts[user];
+  var accounts = {};
+  try { accounts = JSON.parse(localStorage.getItem('ujg_accounts_v1') || '{}'); } catch(e) {}
+  if (!accounts['admin']) accounts['admin'] = { password: 'admin123', name: 'Admin', students: [] };
 
-  if (!acc) { errEl.textContent = 'No account found with that username.'; return; }
-  if (acc.password !== pass) { errEl.textContent = 'Incorrect password.'; return; }
+  if (accounts[user] && accounts[user].password === pass) {
+    var btn = document.getElementById('loginSubmitBtn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="signin-spinner"></span>Signing in...'; }
 
-  // Success!
-  currentUser = { username: user, name: acc.name || user };
-  myStudentIds = acc.students || [];
-  document.getElementById('loginPage').style.display = 'none';
-  document.getElementById('app').classList.add('show');
-  document.getElementById('userAvatar').textContent = (currentUser.name || 'U')[0].toUpperCase();
-  connectWS();
+    currentUser = { username: user, name: accounts[user].name || user };
+    myStudentIds = accounts[user].students || [];
+
+    setTimeout(function() {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('app').classList.add('show');
+      document.getElementById('userAvatar').textContent = (currentUser.name || 'U')[0].toUpperCase();
+      var sa = document.getElementById('sidebarAvatar');
+      if (sa) sa.textContent = (currentUser.name || 'U')[0].toUpperCase();
+      setSection('classrooms', document.getElementById('navClassrooms'));
+      if (btn) { btn.disabled = false; btn.innerHTML = 'Log In'; }
+      connectWS();
+    }, 3000);
+  } else {
+    errEl.textContent = 'Incorrect username or password.';
+  }
 }
 
 function doSignup() {
@@ -662,25 +794,55 @@ function renderGrid() {
 
 function makeTile(s) {
   var sc = screenshots[s.id];
-  console.log('[tile] student:', s.name, 'online:', s.online, 'lastSeen:', s.lastSeen, 'sc:', !!sc, 'tabs:', (s.tabs||[]).length);
   var div = document.createElement('div');
   div.className = 'tile'+(s.isLocked?' locked':'')+(selected.has(s.id)?' selected':'');
   div.dataset.id = s.id;
+
   var activeTab = (s.tabs||[]).find(function(t){return t.active;});
-  var urlTxt = sc&&sc.tabUrl ? shortUrl(sc.tabUrl) : (activeTab&&activeTab.url ? shortUrl(activeTab.url) : '');
-  var isOffline = (s.online === false) || (!s.lastSeen && !s.tabs.length);
+  var isOnline = s.online !== false && s.lastSeen && (Date.now() - s.lastSeen) < 60000;
+  var isOffline = !isOnline;
   var showSc = !isOffline && !!sc;
   var isInactive = !isOffline && !showSc && (!activeTab || !activeTab.url || activeTab.url.includes('newtab') || activeTab.url === '' || activeTab.url.startsWith('chrome'));
-  console.log('[tile2]', s.name, 'isOffline:', isOffline, 'showSc:', showSc, 'isInactive:', isInactive);
-  var tabDots = (s.tabs||[]).slice(0,6).map(function(t){
-    return '<div class="tab-dot">'+(t.favIconUrl?'<img src="'+t.favIconUrl+'" onerror="this.style.display=\'none\'">':'')+'</div>';
-  }).join('');
+
+  // Active tab info
+  var activeTitle = sc&&sc.tabTitle ? sc.tabTitle : (activeTab ? activeTab.title||'' : '');
+  var activeUrl = sc&&sc.tabUrl ? sc.tabUrl : (activeTab ? activeTab.url||'' : '');
+  var activeFav = activeTab&&activeTab.favIconUrl ? activeTab.favIconUrl : '';
+
+  // Tab icons - up to 8, then +N
+  var tabs = s.tabs || [];
+  var MAX_ICONS = 8;
+  var shownTabs = tabs.slice(0, MAX_ICONS);
+  var extraTabs = tabs.length > MAX_ICONS ? tabs.length - MAX_ICONS : 0;
+  var tabIconsHtml = shownTabs.map(function(t) {
+    return '<div class="tab-dot" title="'+esc(t.title||'')+'">'+(t.favIconUrl?'<img src="'+t.favIconUrl+'" onerror="this.style.display=\'none\'">':'')+'</div>';
+  }).join('') + (extraTabs > 0 ? '<div class="tile-extra-tabs">+'+extraTabs+'</div>' : '');
+
   div.innerHTML =
-    '<input type="checkbox" class="tile-chk"'+(selected.has(s.id)?' checked':'')+' onclick="event.stopPropagation();toggleSel(\''+s.id+'\',this.checked)">'+
-    '<div class="tile-online"></div>'+
-    '<button class="tile-menu" onclick="event.stopPropagation();openModal(\''+s.id+'\')">⋮</button>'+
+    // ── HEADER ──
+    '<div class="tile-header">'+
+      '<input type="checkbox" class="tile-chk"'+(selected.has(s.id)?' checked':'')+' onclick="event.stopPropagation();toggleSel(\''+s.id+'\',this.checked)">'+
+      // Computer icon + online dot
+      '<div class="tile-header-icon">'+
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#5f6368"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>'+
+        '<div class="tile-status-dot '+(isOffline?'offline':'online')+'"></div>'+
+      '</div>'+
+      // Student name
+      '<div class="tile-student-name">'+esc(s.name)+'</div>'+
+      // Right icons
+      '<div class="tile-header-right">'+
+        '<button class="tile-icon-btn" title="Message" onclick="event.stopPropagation()" style="color:#9aa0a6">'+
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="3" y1="3" x2="21" y2="21" stroke-width="1.5"/></svg>'+
+        '</button>'+
+        '<button class="tile-icon-btn" title="More options" onclick="event.stopPropagation();openModal(\''+s.id+'\')" style="color:#9aa0a6">'+
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>'+
+        '</button>'+
+      '</div>'+
+    '</div>'+
+
+    // ── SCREEN PREVIEW ──
     '<div class="tile-screen">'+
-      '<img id="timg_'+s.id+'" src="'+(showSc?sc.image:'')+'" style="display:'+(showSc?'block':'none')+'">'+
+      '<img id="timg_'+s.id+'" src="'+(showSc?sc.image:'')+'" style="display:'+(showSc?'block':'none')+';width:100%;height:100%;object-fit:cover">'+
       '<div class="tile-ph" id="tph_'+s.id+'" style="display:'+(showSc?'none':'flex')+';flex-direction:column;align-items:center;justify-content:center;position:absolute;inset:0">'+
         (isOffline
           ? '<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:8px"><g stroke="#9aa0a6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="14" y1="8" x2="14" y2="16"/><line x1="20" y1="8" x2="20" y2="16"/><rect x="10" y="16" width="14" height="8" rx="2"/><line x1="17" y1="24" x2="20" y2="28"/><line x1="28" y1="20" x2="31" y2="24"/><rect x="24" y="24" width="14" height="8" rx="2"/><line x1="28" y1="32" x2="28" y2="40"/><line x1="34" y1="32" x2="34" y2="40"/></g></svg><span style="font-size:12px;color:#9aa0a6;font-weight:500">Student Offline</span>'
@@ -695,11 +857,26 @@ function makeTile(s) {
         '<button class="unlock-tile-btn" onclick="event.stopPropagation();doUnlock(\''+s.id+'\')">Unlock Device</button>'+
       '</div>'+
     '</div>'+
+
+    // ── FOOTER ──
     '<div class="tile-foot">'+
-      '<div class="tile-name">'+esc(s.name)+'</div>'+
-      '<div class="tile-url" id="turl_'+s.id+'">'+(urlTxt?esc(urlTxt):'<span style="color:#9aa0a6">No active tab</span>')+'</div>'+
-      '<div class="tile-tabs">'+tabDots+'</div>'+
+      // Active tab title + url
+      (activeTitle || activeUrl
+        ? '<div class="tile-active-tab">'+
+            (activeFav ? '<img src="'+activeFav+'" class="tile-active-fav" onerror="this.style.display=\'none\'">' : '')+
+            '<div class="tile-active-info">'+
+              '<div class="tile-active-title">'+esc((activeTitle||shortUrl(activeUrl)||'').slice(0,40))+'</div>'+
+              '<div class="tile-active-url" id="turl_'+s.id+'">'+esc(shortUrl(activeUrl))+'</div>'+
+            '</div>'+
+          '</div>'
+        : '<div class="tile-active-url" id="turl_'+s.id+'" style="color:#9aa0a6;font-size:11px;padding:4px 0">'+
+            (isOffline ? '' : 'No active tab')+
+          '</div>'
+      )+
+      // Tab icons row
+      '<div class="tile-tabs">'+tabIconsHtml+'</div>'+
     '</div>';
+
   div.addEventListener('click', function(){ openModal(s.id); });
   return div;
 }
@@ -880,9 +1057,58 @@ function openPanel(id) { closeAllPanels(); document.getElementById(id).classList
 function closePanel(id) { document.getElementById(id).classList.remove('show'); }
 function closeAllPanels() { ['blockPanel','addPanel','managePanel'].forEach(function(id){ document.getElementById(id).classList.remove('show'); }); }
 
-function navClick(el) {
+function setSection(section, el) {
+  // Update sidebar active state
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if (el) el.classList.add('active');
+
+  // Show/hide tab bars
+  var tabsMap = {classrooms:'tabsClassrooms', scenes:'tabsScenes', students:'tabsStudents'};
+  ['tabsClassrooms','tabsScenes','tabsStudents'].forEach(function(id){
+    var el2 = document.getElementById(id);
+    if (el2) el2.style.display = 'none';
+  });
+  var actions = document.getElementById('classroomsActions');
+
+  if (section === 'classrooms') {
+    var ct = document.getElementById('tabsClassrooms');
+    if (ct) ct.style.display = 'flex';
+    if (actions) actions.style.display = 'flex';
+    // Show screens content
+    switchToScreens();
+  } else if (section === 'scenes') {
+    var st = document.getElementById('tabsScenes');
+    if (st) st.style.display = 'flex';
+    if (actions) actions.style.display = 'none';
+    // Hide grid, show block panel inline
+    document.getElementById('screensWrap').style.display = 'none';
+    document.getElementById('ssGallery').classList.remove('show');
+    document.getElementById('emptyState').style.display = 'none';
+    openPanel('blockPanel');
+  } else if (section === 'students') {
+    var stt = document.getElementById('tabsStudents');
+    if (stt) stt.style.display = 'flex';
+    if (actions) actions.style.display = 'none';
+    document.getElementById('screensWrap').style.display = 'none';
+    document.getElementById('ssGallery').classList.remove('show');
+    document.getElementById('emptyState').style.display = 'none';
+    openPanel('addPanel');
+  } else {
+    // calendar, reports, help - just switch active
+    if (actions) actions.style.display = 'none';
+  }
+}
+
+function navItemClick(el) {
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
   el.classList.add('active');
+}
+
+function navClick(el) { navItemClick(el); }
+function toggleNavGroup(g, btn) { setSection(g.replace('Group',''), btn); }
+function navSubClick(el, view) {
+  if (view === 'screens') switchToScreens();
+  if (view === 'screenshots') switchToScreenshots();
 }
 
 // ── Block Sites ──
@@ -1042,6 +1268,10 @@ function switchToScreenshots() {
   document.getElementById('screensWrap').style.display = 'none';
   document.getElementById('emptyState').style.display = 'none';
   document.getElementById('ssGallery').classList.add('show');
+  // Update sidebar sub-item
+  document.querySelectorAll('.nav-sub-item').forEach(function(n){ n.classList.remove('active'); });
+  var ssSub = document.getElementById('nav-screenshots-sub');
+  if (ssSub) ssSub.classList.add('active');
   renderSSGallery();
 }
 
@@ -1050,6 +1280,10 @@ function switchToScreens() {
   document.getElementById('ssTab').classList.remove('active');
   document.getElementById('screensTab').classList.add('active');
   document.getElementById('ssGallery').classList.remove('show');
+  // Update sidebar sub-item
+  document.querySelectorAll('.nav-sub-item').forEach(function(n){ n.classList.remove('active'); });
+  var scSub = document.getElementById('nav-screens');
+  if (scSub) scSub.classList.add('active');
   renderGrid();
 }
 
