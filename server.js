@@ -76,40 +76,24 @@ app.post('/api/register', (req, res) => {
 
 app.post('/api/add-student', (req, res) => {
   try {
-    const { username, code } = req.body;
-    if (!username || !code) return res.json({ ok: false, error: 'Missing fields' });
-    const key = username.toLowerCase().trim();
-    const acc = db.accounts[key];
-    if (!acc) return res.json({ ok: false, error: 'Account not found' });
+    const { code } = req.body;
+    if (!code) return res.json({ ok: false, error: 'Missing code' });
     const code5 = String(code).trim();
     const studentId = db.studentLinks[code5];
     if (!studentId) {
-      console.log('[Code lookup] Code ' + code5 + ' not found. Known codes: ' + Object.keys(db.studentLinks).join(', '));
-      return res.json({ ok: false, error: 'Code not found. Make sure: 1) Student has Chrome open, 2) Extension is installed and running, 3) You entered the code correctly.' });
+      console.log('[Code lookup] ' + code5 + ' not found. Known: ' + Object.keys(db.studentLinks).join(', '));
+      return res.json({ ok: false, error: 'Code not found. Make sure the student has Chrome open with the extension installed and active.' });
     }
-    if (!acc.students) acc.students = [];
-    if (acc.students.includes(studentId)) return res.json({ ok: false, error: 'Student is already in your classroom' });
-    acc.students.push(studentId);
-    console.log(`[+] ${key} added student ${studentId} (code ${code5})`);
+    console.log('[+] Student lookup ok: ' + code5 + ' -> ' + studentId);
     res.json({ ok: true, studentId });
   } catch(e) {
-    console.error('Add student error:', e);
     res.json({ ok: false, error: 'Server error' });
   }
 });
 
-app.post('/api/remove-student', (req, res) => {
-  try {
-    const { username, studentId } = req.body;
-    const key = username.toLowerCase().trim();
-    const acc = db.accounts[key];
-    if (!acc) return res.json({ ok: false, error: 'Account not found' });
-    acc.students = (acc.students || []).filter(s => s !== studentId);
-    res.json({ ok: true });
-  } catch(e) {
-    res.json({ ok: false, error: 'Server error' });
-  }
-});
+app.post('/api/remove-student', (req, res) => res.json({ ok: true }));
+
+
 
 // ── WebSocket ────────────────────────────────────────────────────
 
