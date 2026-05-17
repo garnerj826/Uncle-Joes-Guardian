@@ -786,90 +786,78 @@ function switchLoginTab(tab) {
   document.getElementById('signupForm').style.display = tab==='signup' ? '' : 'none';
 }
 
-async function doLogin() {
-  const user = document.getElementById('loginUser').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  if (!user || !pass) return;
 
-  const btn = document.getElementById('loginBtn');
-  const spinner = document.getElementById('loginSpinner');
-  const btnText = document.getElementById('loginBtnText');
-  const signingIn = document.getElementById('signingInText');
-  const err = document.getElementById('loginError');
 
-  if (btn) btn.disabled = true;
-  if (spinner) spinner.style.display = 'block';
-  if (btnText) btnText.textContent = 'Signing in...';
-  if (signingIn) signingIn.style.display = 'block';
+async 
+function doLogin() {
+  var user = (document.getElementById('loginUser').value || '').trim().toLowerCase();
+  var pass = document.getElementById('loginPass').value || '';
+  var err = document.getElementById('loginError');
   err.style.display = 'none';
 
-  try {
-    const res = await fetch('/api/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: user, password: pass })
-    });
-    const data = await res.json();
-    if (data.ok) {
-      currentUser = { username: user, name: data.name };
-      myStudentIds = data.students || [];
-      setTimeout(() => {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('app').classList.add('visible');
-        document.getElementById('userAvatar').textContent = currentUser.name[0].toUpperCase();
-        if (btn) { btn.disabled = false; }
-        if (spinner) spinner.style.display = 'none';
-        if (btnText) btnText.textContent = 'Log In';
-        if (signingIn) signingIn.style.display = 'none';
-        connectWS();
-      }, 800);
-    } else {
-      err.style.display = 'block';
-      err.textContent = data.error || 'Incorrect username or password.';
-      if (btn) btn.disabled = false;
+  if (!user || !pass) {
+    err.style.display = 'block';
+    err.textContent = 'Please enter your username and password.';
+    return;
+  }
+
+  var accounts = {};
+  try { accounts = JSON.parse(localStorage.getItem('ujg_v2') || '{}'); } catch(e) {}
+  if (!accounts['admin']) accounts['admin'] = { password: 'admin123', name: 'Admin', students: [] };
+
+  if (accounts[user] && accounts[user].password === pass) {
+    var spinner = document.getElementById('loginSpinner');
+    var btnText = document.getElementById('loginBtnText');
+    var signingIn = document.getElementById('signingInText');
+    var btn = document.getElementById('loginBtn');
+    if (spinner) spinner.style.display = 'block';
+    if (btnText) btnText.textContent = 'Signing in...';
+    if (signingIn) signingIn.style.display = 'block';
+    if (btn) btn.disabled = true;
+
+    currentUser = { username: user, name: accounts[user].name || user };
+    myStudentIds = accounts[user].students || [];
+
+    setTimeout(function() {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('app').classList.add('visible');
+      document.getElementById('userAvatar').textContent = (currentUser.name || 'U')[0].toUpperCase();
       if (spinner) spinner.style.display = 'none';
       if (btnText) btnText.textContent = 'Log In';
       if (signingIn) signingIn.style.display = 'none';
-    }
-  } catch(e) {
+      if (btn) btn.disabled = false;
+      connectWS();
+    }, 800);
+  } else {
     err.style.display = 'block';
-    err.textContent = 'Cannot connect to server.';
-    if (btn) btn.disabled = false;
-    if (spinner) spinner.style.display = 'none';
-    if (btnText) btnText.textContent = 'Log In';
-    if (signingIn) signingIn.style.display = 'none';
+    err.textContent = 'Incorrect username or password.';
   }
 }
 
-async function doSignup() {
-  const name = document.getElementById('signupName').value.trim();
-  const user = document.getElementById('signupUser').value.trim().toLowerCase();
-  const pass = document.getElementById('signupPass').value;
-  const err = document.getElementById('signupError');
+function doSignup() {
+  var name = (document.getElementById('signupName').value || '').trim();
+  var user = (document.getElementById('signupUser').value || '').trim().toLowerCase();
+  var pass = document.getElementById('signupPass').value || '';
+  var err = document.getElementById('signupError');
   err.style.display = 'none';
 
   if (!name) { err.style.display='block'; err.textContent='Please enter your name.'; return; }
-  if (!user) { err.style.display='block'; err.textContent='Please enter a username.'; return; }
-  if (!pass) { err.style.display='block'; err.textContent='Please enter a password.'; return; }
+  if (!user) { err.style.display='block'; err.textContent='Please choose a username.'; return; }
+  if (!pass) { err.style.display='block'; err.textContent='Please choose a password.'; return; }
   if (pass.length < 4) { err.style.display='block'; err.textContent='Password must be at least 4 characters.'; return; }
 
-  // Save locally always
-  const accounts = getAccounts();
+  var accounts = {};
+  try { accounts = JSON.parse(localStorage.getItem('ujg_v2') || '{}'); } catch(e) {}
+  if (!accounts['admin']) accounts['admin'] = { password: 'admin123', name: 'Admin', students: [] };
+
   if (accounts[user]) {
     err.style.display = 'block';
-    err.textContent = 'That username is already taken. Try a different one.';
+    err.textContent = 'That username is already taken. Choose another.';
     return;
   }
-  accounts[user] = { password: pass, name, students: [] };
-  saveAccounts(accounts);
 
-  // Also register on server (best effort)
-  try {
-    await fetch('/api/register', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: user, password: pass, name }),
-      signal: AbortSignal.timeout(3000)
-    });
-  } catch(e) {}
+  accounts[user] = { password: pass, name: name, students: [] };
+  try { localStorage.setItem('ujg_v2', JSON.stringify(accounts)); } catch(e) {}
 
   // Auto login
   document.getElementById('loginUser').value = user;
