@@ -14,7 +14,20 @@ app.use(express.static(__dirname));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/locked', (req, res) => res.sendFile(path.join(__dirname, 'locked.html')));
-app.get('/health', (req, res) => res.json({ ok: true, accounts: Object.keys(db.accounts).length }));
+app.get('/health', (req, res) => res.json({ ok: true, accounts: Object.keys(db.accounts).length, codes: Object.keys(db.studentLinks).length }));
+
+// Extension calls this on startup to register its code BEFORE teacher adds them
+app.post('/api/register-code', function(req, res) {
+  try {
+    var code = String(req.body.code || '').trim();
+    var studentId = String(req.body.studentId || '').trim();
+    var studentName = String(req.body.studentName || 'Student').trim();
+    if (!code || !studentId) return res.json({ ok: false });
+    db.studentLinks[code] = studentId;
+    console.log('[Code] ' + code + ' -> ' + studentId + ' (' + studentName + ')');
+    res.json({ ok: true });
+  } catch(e) { res.json({ ok: false }); }
+});
 
 // ── In-memory database (persists while server runs) ──────────────
 // On Railway, file system may be read-only so we keep everything in memory
@@ -23,7 +36,8 @@ const db = {
   accounts: {
     admin: { password: 'admin123', name: 'Admin', students: [] }
   },
-  studentLinks: {}   // code (string) → studentId
+  studentLinks: {},   // code (string) → studentId
+  studentNames: {}    // code (string) → studentName
 };
 
 // ── REST API ─────────────────────────────────────────────────────
@@ -69,7 +83,10 @@ app.post('/api/add-student', (req, res) => {
     if (!acc) return res.json({ ok: false, error: 'Account not found' });
     const code5 = String(code).trim();
     const studentId = db.studentLinks[code5];
-    if (!studentId) return res.json({ ok: false, error: 'No student found with that code. Make sure the student has Chrome open with the extension installed.' });
+    if (!studentId) {
+      console.log('[Code lookup] Code ' + code5 + ' not found. Known codes: ' + Object.keys(db.studentLinks).join(', '));
+      return res.json({ ok: false, error: 'Code not found. Make sure: 1) Student has Chrome open, 2) Extension is installed and running, 3) You entered the code correctly.' });
+    }
     if (!acc.students) acc.students = [];
     if (acc.students.includes(studentId)) return res.json({ ok: false, error: 'Student is already in your classroom' });
     acc.students.push(studentId);
