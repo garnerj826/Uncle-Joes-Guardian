@@ -872,7 +872,7 @@ async function submitCode() {
     var r = await fetch('/api/add-student',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser.username,code:code}),signal:AbortSignal.timeout(5000)});
     var data = await r.json();
     if (data.ok) {
-      showResult(res,'✓ Student added!','ok');
+      showResult(res,'✓ Student added! They will appear when they open Chrome.','ok');
       document.getElementById('codeIn').value = '';
       if (!myStudentIds.includes(data.studentId)) {
         myStudentIds.push(data.studentId);
@@ -881,8 +881,10 @@ async function submitCode() {
       }
       wsSend({type:'TEACHER_CONNECT', username:currentUser.username});
       toast('Student added! ✓');
-    } else { showResult(res, data.error || 'Not found. Make sure student has extension open.', 'err'); }
-  } catch(e) { showResult(res, 'Could not reach server. Is the student online?', 'err'); }
+    } else {
+      showResult(res, '❌ ' + (data.error || 'Code not found.') + '<br><small>Make sure the student has Chrome open and the extension is active.</small>', 'err');
+    }
+  } catch(e) { showResult(res, '❌ Could not reach server. Check your connection.', 'err'); }
 }
 
 function showResult(el, msg, type) {
