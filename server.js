@@ -123,18 +123,23 @@ wss.on('connection', (ws) => {
         blockedSites: [], tabLimit: 0, lastSeen: Date.now()
       });
       console.log(`[Student] ${msg.studentName} code=${code}`);
+      // Send updated list to ALL teachers who have this student
       notifyRelevantTeachers(msg.studentId);
+      // Also send full list to every teacher (so offline->online transition shows)
+      notifyAllTeachers();
 
     } else if (msg.type === 'TEACHER_CONNECT') {
       ws.role = 'teacher';
       const username = (msg.username || '').toLowerCase().trim();
       ws.username = username;
+      // Accept student list directly from client (source of truth is localStorage)
+      const clientStudents = msg.studentIds || [];
+      ws.myStudentIds = clientStudents;
       teachers.set(ws, username);
-      console.log(`[Teacher] ${username}`);
+      console.log(`[Teacher] ${username} with ${clientStudents.length} students: ${clientStudents.join(',')}`);
       sendTeacherStudentList(ws);
-      // Send cached screenshots
-      const myIds = db.accounts[username]?.students || [];
-      myIds.forEach(sid => {
+      // Send cached screenshots for their students
+      clientStudents.forEach(sid => {
         if (screenshots.has(sid)) {
           const s = students.get(sid);
           try {
@@ -162,7 +167,7 @@ wss.on('connection', (ws) => {
         tabTitle: msg.tabTitle, tabUrl: msg.tabUrl
       });
       teachers.forEach((username, tws) => {
-        const myIds = db.accounts[username]?.students || [];
+        const myIds = tws.myStudentIds || [];
         if (myIds.includes(msg.studentId) && tws.readyState === WebSocket.OPEN) {
           try { tws.send(payload); } catch(e) {}
         }
@@ -170,7 +175,7 @@ wss.on('connection', (ws) => {
 
     } else if (msg.type === 'TEACHER_COMMAND' && ws.role === 'teacher') {
       const username = ws.username;
-      const myIds = db.accounts[username]?.students || [];
+      const myIds = ws.myStudentIds || [];
       const { command, targetId, payload } = msg;
 
       const targets = targetId === 'all'
@@ -214,16 +219,18 @@ function getStudentData(id) {
 }
 
 function sendTeacherStudentList(tws) {
-  const username = tws.username;
-  const myIds = db.accounts[username]?.students || [];
+  const myIds = tws.myStudentIds || [];
   const list = myIds.map(sid => getStudentData(sid));
   try { tws.send(JSON.stringify({ type: 'STUDENT_LIST', students: list })); } catch(e) {}
 }
 
 function notifyRelevantTeachers(studentId) {
   teachers.forEach((username, tws) => {
-    const myIds = db.accounts[username]?.students || [];
+    const myIds = tws.myStudentIds || [];
     if (myIds.includes(studentId) && tws.readyState === WebSocket.OPEN) {
+      // Send full list so dashboard always has complete picture
+      sendTeacherStudentList(tws);
+      // Also send individual update
       const data = getStudentData(studentId);
       try { tws.send(JSON.stringify({ type: 'STUDENT_UPDATE', student: data })); } catch(e) {}
     }
