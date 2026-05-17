@@ -11,153 +11,240 @@ const wss = new WebSocket.Server({ server, maxPayload: 5 * 1024 * 1024 });
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname));
 
-// Figure out where the HTML files are
-// They should be in the same directory as this server.js file
-const BASE_DIR = __dirname;
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/locked', (req, res) => res.sendFile(path.join(__dirname, 'locked.html')));
+app.get('/health', (req, res) => res.send('OK'));
 
-console.log('Base directory:', BASE_DIR);
-console.log('Files found:', fs.readdirSync(BASE_DIR).join(', '));
+// ── Persistent data stored in memory (survives reconnects, resets on server restart)
+// For true persistence across Railway restarts, we use a JSON file
+const DATA_FILE = path.join(__dirname, 'data.json');
 
-app.get('/', function(req, res) {
-  var indexPath = path.join(BASE_DIR, 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
+function loadData() {
+  try {
+    if (fs.existsSync(DATA_FILE)) return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  } catch(e) {}
+  return { accounts: { admin: { password: 'admin123', name: 'Admin', students: [] } }, studentLinks: {} };
+}
+
+function saveData() {
+  try { fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2)); } catch(e) {}
+}
+
+let db = loadData();
+
+// ── REST API for accounts & student management ──────────────────
+
+// Login
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+  const acc = db.accounts[username];
+  if (acc && acc.password === password) {
+    res.json({ ok: true, name: acc.name, students: acc.students || [] });
   } else {
-    res.send('<h1>index.html not found in ' + BASE_DIR + '</h1><p>Files: ' + fs.readdirSync(BASE_DIR).join(', ') + '</p>');
+    res.json({ ok: false, error: 'Invalid username or password' });
   }
 });
 
-app.get('/locked', function(req, res) {
-  var lockedPath = path.join(BASE_DIR, 'locked.html');
-  if (fs.existsSync(lockedPath)) {
-    res.sendFile(lockedPath);
-  } else {
-    res.status(404).send('locked.html not found');
-  }
+// Create account
+app.post('/api/register', (req, res) => {
+  const { username, password, name } = req.body;
+  if (!username || !password || !name) return res.json({ ok: false, error: 'Missing fields' });
+  if (db.accounts[username]) return res.json({ ok: false, error: 'Username already taken' });
+  db.accounts[username] = { password, name, students: [] };
+  saveData();
+  res.json({ ok: true });
 });
 
-app.get('/health', function(req, res) {
-  res.send('OK - files: ' + fs.readdirSync(BASE_DIR).join(', '));
+// Add student by code
+app.post('/api/add-student', (req, res) => {
+  const { username, code } = req.body;
+  if (!db.accounts[username]) return res.json({ ok: false, error: 'Account not found' });
+  const code5 = String(code).trim().toUpperCase();
+  // Find student with this code
+  const studentId = db.studentLinks[code5];
+  if (!studentId) return res.json({ ok: false, error: 'No student found with that code. Make sure the student has the extension open.' });
+  // Check not already added
+  const acc = db.accounts[username];
+  if (!acc.students) acc.students = [];
+  if (acc.students.includes(studentId)) return res.json({ ok: false, error: 'Student already in your classroom' });
+  acc.students.push(studentId);
+  saveData();
+  res.json({ ok: true, studentId });
 });
 
-const students = new Map();
-const teachers = new Set();
-const screenshots = new Map();
+// Remove student
+app.post('/api/remove-student', (req, res) => {
+  const { username, studentId } = req.body;
+  if (!db.accounts[username]) return res.json({ ok: false, error: 'Account not found' });
+  const acc = db.accounts[username];
+  acc.students = (acc.students || []).filter(s => s !== studentId);
+  saveData();
+  res.json({ ok: true });
+});
 
-wss.on('connection', function(ws) {
+// Get teacher's student list
+app.get('/api/students/:username', (req, res) => {
+  const acc = db.accounts[req.params.username];
+  if (!acc) return res.json({ ok: false });
+  res.json({ ok: true, students: acc.students || [] });
+});
+
+// ── WebSocket state ─────────────────────────────────────────────
+
+const students = new Map();    // studentId → { ws, info, code }
+const teachers = new Map();    // ws → { username }
+const screenshots = new Map(); // studentId → image
+
+// Register student code (called when extension starts)
+// code → studentId mapping stored in db.studentLinks
+function registerStudentCode(code, studentId) {
+  db.studentLinks[code] = studentId;
+  saveData();
+}
+
+wss.on('connection', (ws) => {
   ws.isAlive = true;
-  ws.on('pong', function() { ws.isAlive = true; });
+  ws.on('pong', () => { ws.isAlive = true; });
 
-  ws.on('message', function(data) {
-    var msg;
-    try { msg = JSON.parse(data); } catch(e) { return; }
+  ws.on('message', (rawData) => {
+    let msg;
+    try { msg = JSON.parse(rawData); } catch(e) { return; }
 
     if (msg.type === 'STUDENT_CONNECT') {
       ws.role = 'student';
       ws.studentId = msg.studentId;
+      ws.studentCode = msg.code ? String(msg.code).toUpperCase() : null;
+
+      // Register code → studentId mapping
+      if (ws.studentCode) registerStudentCode(ws.studentCode, msg.studentId);
+
       students.set(msg.studentId, {
-        ws: ws, id: msg.studentId,
+        ws, id: msg.studentId, code: ws.studentCode,
         name: msg.studentName || 'Student',
         isLocked: false, tabs: [], tabCount: 0,
         blockedSites: [], tabLimit: 0, lastSeen: Date.now()
       });
-      console.log('[+] Student: ' + msg.studentName);
-      broadcastToTeachers({ type: 'STUDENT_LIST', students: getStudentList() });
+      console.log(`[+] Student: ${msg.studentName} (code: ${ws.studentCode})`);
+      // Notify teachers who have this student
+      notifyRelevantTeachers(msg.studentId);
 
     } else if (msg.type === 'TEACHER_CONNECT') {
       ws.role = 'teacher';
-      teachers.add(ws);
-      console.log('[+] Teacher connected');
-      ws.send(JSON.stringify({ type: 'STUDENT_LIST', students: getStudentList() }));
-      screenshots.forEach(function(img, id) {
-        var s = students.get(id);
-        if (s) ws.send(JSON.stringify({ type: 'SCREENSHOT', studentId: id, studentName: s.name, image: img }));
+      ws.username = msg.username;
+      teachers.set(ws, { username: msg.username });
+      console.log(`[+] Teacher: ${msg.username}`);
+      // Send only this teacher's students
+      sendTeacherStudentList(ws);
+      // Send cached screenshots for their students
+      const myStudents = db.accounts[msg.username]?.students || [];
+      myStudents.forEach(sid => {
+        if (screenshots.has(sid)) {
+          const s = students.get(sid);
+          ws.send(JSON.stringify({ type: 'SCREENSHOT', studentId: sid, studentName: s?.name || '', image: screenshots.get(sid) }));
+        }
       });
 
     } else if (msg.type === 'STATUS_UPDATE' && ws.role === 'student') {
-      var s = students.get(msg.studentId);
+      const s = students.get(msg.studentId);
       if (s) {
         s.name = msg.studentName || s.name;
         s.isLocked = msg.isLocked;
         s.tabs = msg.tabs || [];
         s.tabCount = msg.tabCount;
-        s.blockedSites = msg.blockedSites || [];
-        s.tabLimit = msg.tabLimit || 0;
         s.lastSeen = Date.now();
       }
-      broadcastToTeachers({ type: 'STUDENT_UPDATE', student: getStudentData(msg.studentId) });
+      notifyRelevantTeachers(msg.studentId);
 
     } else if (msg.type === 'SCREENSHOT' && ws.role === 'student') {
       screenshots.set(msg.studentId, msg.image);
-      var payload = JSON.stringify({
-        type: 'SCREENSHOT', studentId: msg.studentId,
-        studentName: msg.studentName, image: msg.image,
-        tabTitle: msg.tabTitle, tabUrl: msg.tabUrl
-      });
-      teachers.forEach(function(t) {
-        if (t.readyState === WebSocket.OPEN) t.send(payload);
+      const payload = JSON.stringify({ type: 'SCREENSHOT', studentId: msg.studentId, studentName: msg.studentName, image: msg.image, tabTitle: msg.tabTitle, tabUrl: msg.tabUrl });
+      // Send only to teachers who own this student
+      teachers.forEach((info, tws) => {
+        const myStudents = db.accounts[info.username]?.students || [];
+        if (myStudents.includes(msg.studentId) && tws.readyState === WebSocket.OPEN) {
+          tws.send(payload);
+        }
       });
 
     } else if (msg.type === 'TEACHER_COMMAND' && ws.role === 'teacher') {
-      handleTeacherCommand(msg);
+      const username = ws.username;
+      const myStudents = db.accounts[username]?.students || [];
+      const { command, targetId, payload } = msg;
+
+      // Only allow commanding own students
+      const targets = targetId === 'all'
+        ? myStudents.map(sid => students.get(sid)?.ws).filter(Boolean)
+        : (myStudents.includes(targetId) && students.get(targetId)) ? [students.get(targetId).ws] : [];
+
+      targets.forEach(tw => {
+        if (tw && tw.readyState === WebSocket.OPEN) {
+          tw.send(JSON.stringify(Object.assign({ type: command }, payload || {})));
+        }
+      });
+
+      // Update local state
+      const ids = targetId === 'all' ? myStudents : [targetId];
+      ids.forEach(id => {
+        const s = students.get(id);
+        if (!s) return;
+        if (command === 'LOCK_SCREEN') s.isLocked = true;
+        if (command === 'UNLOCK_SCREEN') s.isLocked = false;
+        if (command === 'SET_TAB_LIMIT') s.tabLimit = payload?.limit || 0;
+        if (command === 'BLOCK_SITES') s.blockedSites = payload?.sites || [];
+      });
+      sendTeacherStudentList(ws);
     }
   });
 
-  ws.on('close', function() {
+  ws.on('close', () => {
     if (ws.role === 'student' && ws.studentId) {
       students.delete(ws.studentId);
       screenshots.delete(ws.studentId);
-      broadcastToTeachers({ type: 'STUDENT_LIST', students: getStudentList() });
+      notifyAllTeachers();
     } else if (ws.role === 'teacher') {
       teachers.delete(ws);
     }
   });
 });
 
-function handleTeacherCommand(msg) {
-  var command = msg.command;
-  var targetId = msg.targetId;
-  var payload = msg.payload || {};
-  var targets = targetId === 'all'
-    ? Array.from(students.values()).map(function(s) { return s.ws; })
-    : (students.has(targetId) ? [students.get(targetId).ws] : []);
-  targets.forEach(function(w) {
-    if (w.readyState === WebSocket.OPEN) w.send(JSON.stringify(Object.assign({ type: command }, payload)));
-  });
-  var ids = targetId === 'all' ? Array.from(students.keys()) : [targetId];
-  ids.forEach(function(id) {
-    var s = students.get(id);
-    if (!s) return;
-    if (command === 'LOCK_SCREEN') s.isLocked = true;
-    if (command === 'UNLOCK_SCREEN') s.isLocked = false;
-    if (command === 'SET_TAB_LIMIT') s.tabLimit = payload.limit || 0;
-    if (command === 'BLOCK_SITES') s.blockedSites = payload.sites || [];
-  });
-  broadcastToTeachers({ type: 'STUDENT_LIST', students: getStudentList() });
-}
-
-function getStudentList() {
-  return Array.from(students.values()).map(function(s) { return getStudentData(s.id); });
-}
 function getStudentData(id) {
-  var s = students.get(id); if (!s) return null;
-  return { id: s.id, name: s.name, isLocked: s.isLocked, tabs: s.tabs, tabCount: s.tabCount, blockedSites: s.blockedSites, tabLimit: s.tabLimit, lastSeen: s.lastSeen, online: (Date.now() - s.lastSeen) < 30000 };
-}
-function broadcastToTeachers(msg) {
-  var str = JSON.stringify(msg);
-  teachers.forEach(function(ws) { if (ws.readyState === WebSocket.OPEN) ws.send(str); });
+  const s = students.get(id);
+  if (!s) return null;
+  return { id: s.id, name: s.name, code: s.code, isLocked: s.isLocked, tabs: s.tabs, tabCount: s.tabCount, blockedSites: s.blockedSites, tabLimit: s.tabLimit, lastSeen: s.lastSeen, online: (Date.now() - s.lastSeen) < 30000 };
 }
 
-setInterval(function() {
-  wss.clients.forEach(function(ws) {
+function sendTeacherStudentList(tws) {
+  const username = tws.username;
+  const myStudentIds = db.accounts[username]?.students || [];
+  const list = myStudentIds.map(sid => {
+    const live = getStudentData(sid);
+    return live || { id: sid, name: 'Offline', online: false, tabs: [], tabCount: 0, isLocked: false };
+  });
+  tws.send(JSON.stringify({ type: 'STUDENT_LIST', students: list }));
+}
+
+function notifyRelevantTeachers(studentId) {
+  teachers.forEach((info, tws) => {
+    const myStudents = db.accounts[info.username]?.students || [];
+    if (myStudents.includes(studentId) && tws.readyState === WebSocket.OPEN) {
+      const data = getStudentData(studentId);
+      if (data) tws.send(JSON.stringify({ type: 'STUDENT_UPDATE', student: data }));
+    }
+  });
+}
+
+function notifyAllTeachers() {
+  teachers.forEach((info, tws) => { if (tws.readyState === WebSocket.OPEN) sendTeacherStudentList(tws); });
+}
+
+setInterval(() => {
+  wss.clients.forEach(ws => {
     if (!ws.isAlive) { ws.terminate(); return; }
     ws.isAlive = false; ws.ping();
   });
 }, 15000);
 
-var PORT = process.env.PORT || 3000;
-server.listen(PORT, function() {
-  console.log('Uncle Joes Guardian running on port ' + PORT);
-  console.log('Serving files from: ' + BASE_DIR);
-});
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log('Uncle Joes Guardian on port ' + PORT));
