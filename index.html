@@ -716,25 +716,67 @@ body { font-family:var(--font); background:var(--gray-50); color:var(--gray-900)
   </div>
 </div>
 
+
+<!-- Add Student Panel -->
+<div class="side-panel" id="addStudentPanel">
+  <div class="side-panel-header">
+    <span style="font-size:18px">➕</span>
+    <div class="side-panel-title">Add Student</div>
+    <button class="side-panel-close" onclick="document.getElementById('addStudentPanel').classList.remove('open')">✕</button>
+  </div>
+  <div class="side-panel-body">
+    <div class="panel-section">
+      <div class="panel-section-title">Enter Student Code</div>
+      <p style="font-size:12px;color:var(--gray-700);margin-bottom:12px;line-height:1.6">
+        Ask the student to open the Uncle Joe's Guardian extension in Chrome. They'll see a 5-digit code. Enter it below to add them to your classroom.
+      </p>
+      <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+        <input type="text" id="studentCodeInput" maxlength="5"
+          placeholder="e.g. 48271"
+          style="flex:1;padding:12px;border:2px solid var(--blue);border-radius:8px;font-size:22px;font-weight:800;letter-spacing:6px;text-align:center;font-family:'Courier New',monospace;outline:none;color:var(--blue)"
+          oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,5)"
+          onkeydown="if(event.key==='Enter')submitStudentCode()">
+      </div>
+      <button class="apply-btn" onclick="submitStudentCode()">➕ Add to My Classroom</button>
+      <div id="addStudentResult" style="margin-top:10px;font-size:13px;text-align:center;display:none"></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-section-title">How It Works</div>
+      <div style="font-size:12px;color:var(--gray-700);line-height:1.7">
+        <div style="margin-bottom:6px">① Student installs the extension</div>
+        <div style="margin-bottom:6px">② Student clicks the extension icon</div>
+        <div style="margin-bottom:6px">③ A 5-digit code appears</div>
+        <div style="margin-bottom:6px">④ Enter their code here</div>
+        <div>⑤ They appear in your screen view!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Manage Students Panel -->
+<div class="side-panel" id="manageStudentsPanel">
+  <div class="side-panel-header">
+    <span style="font-size:18px">👥</span>
+    <div class="side-panel-title">My Students</div>
+    <button class="side-panel-close" onclick="document.getElementById('manageStudentsPanel').classList.remove('open')">✕</button>
+  </div>
+  <div class="side-panel-body">
+    <div class="panel-section">
+      <div class="panel-section-title">Enrolled Students</div>
+      <div id="myStudentsList" style="min-height:40px">
+        <div style="font-size:12px;color:var(--gray-500);text-align:center;padding:20px">Loading...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
 // ── AUTH ──────────────────────────────────────────────────────
 
-// Simple localStorage-based accounts
-function getAccounts() {
-  return JSON.parse(localStorage.getItem('ujg_accounts') || '{}');
-}
-function saveAccounts(a) {
-  localStorage.setItem('ujg_accounts', JSON.stringify(a));
-}
-
-// Create default admin if none exist
-if (Object.keys(getAccounts()).length === 0) {
-  const a = getAccounts();
-  a['admin'] = { password: 'admin123', name: 'Admin' };
-  saveAccounts(a);
-}
+// Auth is handled server-side via /api/login and /api/register
 
 let currentUser = null;
 
@@ -744,56 +786,87 @@ function switchLoginTab(tab) {
   document.getElementById('signupForm').style.display = tab==='signup' ? '' : 'none';
 }
 
-function doLogin() {
+async function doLogin() {
   const user = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value;
-  const accounts = getAccounts();
-  if (accounts[user] && accounts[user].password === pass) {
-    // Show spinner
-    const btn = document.getElementById('loginBtn');
-    const spinner = document.getElementById('loginSpinner');
-    const btnText = document.getElementById('loginBtnText');
-    const signingIn = document.getElementById('signingInText');
-    if (btn) btn.disabled = true;
-    if (spinner) spinner.style.display = 'block';
-    if (btnText) btnText.textContent = 'Signing in...';
-    if (signingIn) signingIn.style.display = 'block';
+  if (!user || !pass) return;
 
-    setTimeout(() => {
-      currentUser = { username: user, name: accounts[user].name || user };
-      document.getElementById('loginPage').style.display = 'none';
-      document.getElementById('app').classList.add('visible');
-      document.getElementById('userAvatar').textContent = currentUser.name[0].toUpperCase();
-      // Reset button
+  const btn = document.getElementById('loginBtn');
+  const spinner = document.getElementById('loginSpinner');
+  const btnText = document.getElementById('loginBtnText');
+  const signingIn = document.getElementById('signingInText');
+  const err = document.getElementById('loginError');
+
+  if (btn) btn.disabled = true;
+  if (spinner) spinner.style.display = 'block';
+  if (btnText) btnText.textContent = 'Signing in...';
+  if (signingIn) signingIn.style.display = 'block';
+  err.style.display = 'none';
+
+  try {
+    const res = await fetch('/api/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user, password: pass })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      currentUser = { username: user, name: data.name };
+      myStudentIds = data.students || [];
+      setTimeout(() => {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('app').classList.add('visible');
+        document.getElementById('userAvatar').textContent = currentUser.name[0].toUpperCase();
+        if (btn) { btn.disabled = false; }
+        if (spinner) spinner.style.display = 'none';
+        if (btnText) btnText.textContent = 'Log In';
+        if (signingIn) signingIn.style.display = 'none';
+        connectWS();
+      }, 800);
+    } else {
+      err.style.display = 'block';
+      err.textContent = data.error || 'Incorrect username or password.';
       if (btn) btn.disabled = false;
       if (spinner) spinner.style.display = 'none';
       if (btnText) btnText.textContent = 'Log In';
       if (signingIn) signingIn.style.display = 'none';
-      connectWS();
-    }, 1200);
-  } else {
-    const err = document.getElementById('loginError');
+    }
+  } catch(e) {
     err.style.display = 'block';
-    err.textContent = 'Incorrect username or password.';
+    err.textContent = 'Cannot connect to server.';
+    if (btn) btn.disabled = false;
+    if (spinner) spinner.style.display = 'none';
+    if (btnText) btnText.textContent = 'Log In';
+    if (signingIn) signingIn.style.display = 'none';
   }
 }
 
-function doSignup() {
+async function doSignup() {
   const name = document.getElementById('signupName').value.trim();
   const user = document.getElementById('signupUser').value.trim().toLowerCase();
   const pass = document.getElementById('signupPass').value;
   const err = document.getElementById('signupError');
+  err.style.display = 'none';
   if (!name || !user || !pass) { err.style.display='block'; err.textContent='Please fill in all fields.'; return; }
   if (pass.length < 4) { err.style.display='block'; err.textContent='Password must be at least 4 characters.'; return; }
-  const accounts = getAccounts();
-  if (accounts[user]) { err.style.display='block'; err.textContent='That username is already taken.'; return; }
-  accounts[user] = { password: pass, name };
-  saveAccounts(accounts);
-  // Auto login
-  document.getElementById('loginUser').value = user;
-  document.getElementById('loginPass').value = pass;
-  switchLoginTab('signin');
-  doLogin();
+  try {
+    const res = await fetch('/api/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user, password: pass, name })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('loginUser').value = user;
+      document.getElementById('loginPass').value = pass;
+      switchLoginTab('signin');
+      doLogin();
+    } else {
+      err.style.display = 'block';
+      err.textContent = data.error || 'Could not create account.';
+    }
+  } catch(e) {
+    err.style.display = 'block';
+    err.textContent = 'Cannot connect to server.';
+  }
 }
 
 function doLogout() {
@@ -817,6 +890,7 @@ let screenshots = {};
 let selected = new Set();
 let modalStudentId = null;
 let tileSize = 220;
+let myStudentIds = []; // student IDs belonging to this teacher
 
 function connectWS() {
   const url = window.location.protocol === 'https:'
@@ -826,7 +900,7 @@ function connectWS() {
   try { ws = new WebSocket(url); } catch(e) { setTimeout(connectWS, 5000); return; }
   ws.onopen = () => {
     setConn(true);
-    ws.send(JSON.stringify({ type: 'TEACHER_CONNECT' }));
+    ws.send(JSON.stringify({ type: 'TEACHER_CONNECT', username: currentUser?.username }));
   };
   ws.onmessage = (e) => {
     let msg; try { msg = JSON.parse(e.data); } catch(er) { return; }
@@ -1269,7 +1343,10 @@ function openSidePanel() {
 }
 
 function closeSidePanel() {
-  document.getElementById('blockSitesPanel').classList.remove('open');
+  ['blockSitesPanel','addStudentPanel','manageStudentsPanel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('open');
+  });
 }
 
 function renderYtCategories() {
@@ -1362,6 +1439,98 @@ function getTarget() {
 
 function getStudentName(id) {
   return students[id]?.name || id;
+}
+
+
+// ── ADD / MANAGE STUDENTS ─────────────────────────────────────
+
+function openAddStudentPanel() {
+  closeSidePanel();
+  document.getElementById('addStudentPanel').classList.add('open');
+  document.getElementById('studentCodeInput').focus();
+}
+
+function openManageStudentsPanel() {
+  closeSidePanel();
+  document.getElementById('manageStudentsPanel').classList.add('open');
+  renderMyStudentsList();
+}
+
+async function submitStudentCode() {
+  const code = document.getElementById('studentCodeInput').value.trim();
+  const resultEl = document.getElementById('addStudentResult');
+  if (code.length !== 5) {
+    resultEl.style.display = 'block';
+    resultEl.style.color = 'var(--red)';
+    resultEl.textContent = 'Please enter a 5-digit code.';
+    return;
+  }
+  resultEl.style.display = 'block';
+  resultEl.style.color = 'var(--gray-700)';
+  resultEl.textContent = 'Looking up student...';
+
+  try {
+    const res = await fetch('/api/add-student', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: currentUser.username, code })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      resultEl.style.color = 'var(--green)';
+      resultEl.textContent = '✓ Student added to your classroom!';
+      document.getElementById('studentCodeInput').value = '';
+      myStudentIds.push(data.studentId);
+      // Reconnect WS to get updated student list
+      if (ws && ws.readyState === 1) {
+        ws.send(JSON.stringify({ type: 'TEACHER_CONNECT', username: currentUser.username }));
+      }
+      toast('Student added! ✓');
+    } else {
+      resultEl.style.color = 'var(--red)';
+      resultEl.textContent = data.error || 'Could not add student.';
+    }
+  } catch(e) {
+    resultEl.style.color = 'var(--red)';
+    resultEl.textContent = 'Connection error. Try again.';
+  }
+}
+
+async function removeMyStudent(studentId) {
+  if (!confirm('Remove this student from your classroom?')) return;
+  try {
+    const res = await fetch('/api/remove-student', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: currentUser.username, studentId })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      myStudentIds = myStudentIds.filter(s => s !== studentId);
+      delete students[studentId];
+      renderGrid();
+      renderMyStudentsList();
+      toast('Student removed');
+    }
+  } catch(e) { toast('Error removing student'); }
+}
+
+function renderMyStudentsList() {
+  const el = document.getElementById('myStudentsList');
+  if (!el) return;
+  if (myStudentIds.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--gray-500);text-align:center;padding:20px">No students added yet.<br>Use Add Student to enroll students.</div>';
+    return;
+  }
+  el.innerHTML = myStudentIds.map(id => {
+    const s = students[id];
+    const name = s?.name || 'Unknown Student';
+    const online = s?.online !== false && s != null;
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray-100)">' +
+      '<div style="width:8px;height:8px;border-radius:50%;background:' + (online ? 'var(--green)' : 'var(--gray-300)') + ';flex-shrink:0"></div>' +
+      '<div style="flex:1;font-size:13px;font-weight:500">' + esc(name) + '</div>' +
+      '<div style="font-size:10px;color:var(--gray-500);margin-right:8px">' + (online ? 'Online' : 'Offline') + '</div>' +
+      '<button onclick="removeMyStudent('' + id + '')" style="background:none;border:1px solid var(--red);color:var(--red);border-radius:4px;padding:2px 8px;font-size:11px;cursor:pointer">Remove</button>' +
+      '</div>';
+  }).join('');
 }
 
 </script>
