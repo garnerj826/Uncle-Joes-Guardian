@@ -869,22 +869,35 @@ async function submitCode() {
   showResult(res,'Looking up student...','');
 
   try {
-    var r = await fetch('/api/add-student',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser.username,code:code}),signal:AbortSignal.timeout(5000)});
+    // Just send the code - server doesn't need username anymore
+    var r = await fetch('/api/add-student', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ code: code }),
+      signal: AbortSignal.timeout(5000)
+    });
     var data = await r.json();
     if (data.ok) {
       showResult(res,'✓ Student added! They will appear when they open Chrome.','ok');
       document.getElementById('codeIn').value = '';
+      // Save student ID locally - this is the source of truth
       if (!myStudentIds.includes(data.studentId)) {
         myStudentIds.push(data.studentId);
         var accs = getAccounts();
-        if (accs[currentUser.username]) { accs[currentUser.username].students = myStudentIds; saveAccounts(accs); }
+        if (accs[currentUser.username]) {
+          accs[currentUser.username].students = myStudentIds;
+          saveAccounts(accs);
+        }
       }
-      wsSend({type:'TEACHER_CONNECT', username:currentUser.username});
+      // Refresh WS connection so server sends updated student list
+      wsSend({type:'TEACHER_CONNECT', username: currentUser.username});
       toast('Student added! ✓');
     } else {
-      showResult(res, '❌ ' + (data.error || 'Code not found.') + '<br><small>Make sure the student has Chrome open and the extension is active.</small>', 'err');
+      showResult(res, '❌ ' + (data.error || 'Code not found.'), 'err');
     }
-  } catch(e) { showResult(res, '❌ Could not reach server. Check your connection.', 'err'); }
+  } catch(e) {
+    showResult(res, '❌ Could not reach server.', 'err');
+  }
 }
 
 function showResult(el, msg, type) {
