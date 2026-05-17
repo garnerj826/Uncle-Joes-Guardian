@@ -525,10 +525,13 @@ function connectWS() {
   try { ws = new WebSocket(url); } catch(e) { setTimeout(connectWS, 5000); return; }
   ws.onopen = function() {
     setConn(true);
-    ws.send(JSON.stringify({type:'TEACHER_CONNECT', username: currentUser ? currentUser.username : ''}));
+    var tcMsg = {type:'TEACHER_CONNECT', username: currentUser ? currentUser.username : '', studentIds: myStudentIds || []};
+    console.log('[UJG] Sending TEACHER_CONNECT with studentIds:', tcMsg.studentIds);
+    ws.send(JSON.stringify(tcMsg));
   };
   ws.onmessage = function(e) {
     var msg; try { msg = JSON.parse(e.data); } catch(er) { return; }
+    console.log('[UJG Dashboard] msg:', msg.type, msg.students ? msg.students.length+'students' : (msg.student ? msg.student.name : ''));
     if (msg.type === 'STUDENT_LIST') updateStudents(msg.students);
     if (msg.type === 'STUDENT_UPDATE' && msg.student) updateOneStudent(msg.student);
     if (msg.type === 'SCREENSHOT') handleSS(msg);
@@ -553,6 +556,7 @@ function wsSend(msg) {
 // ═══════════════════════════════════════════════════════════
 
 function updateStudents(list) {
+  console.log('[UJG] updateStudents called with', (list||[]).length, 'students, myStudentIds:', myStudentIds);
   students = {};
   (list||[]).forEach(function(s){ if(s) students[s.id]=s; });
   renderGrid();
@@ -560,9 +564,15 @@ function updateStudents(list) {
 
 function updateOneStudent(s) {
   if (!s) return;
+  console.log('[UJG] updateOneStudent:', s.name, 'myStudentIds:', myStudentIds);
+  var isNew = !students[s.id];
   students[s.id] = s;
-  updateTile(s.id);
-  if (modalStudentId === s.id) updateModalTabs(s.id);
+  if (isNew) {
+    renderGrid(); // Full re-render for new students
+  } else {
+    updateTile(s.id);
+    if (modalStudentId === s.id) updateModalTabs(s.id);
+  }
 }
 
 function handleSS(msg) {
@@ -890,7 +900,7 @@ async function submitCode() {
         }
       }
       // Refresh WS connection so server sends updated student list
-      wsSend({type:'TEACHER_CONNECT', username: currentUser.username});
+      wsSend({type:'TEACHER_CONNECT', username: currentUser.username, studentIds: myStudentIds || []});
       toast('Student added! ✓');
     } else {
       showResult(res, '❌ ' + (data.error || 'Code not found.'), 'err');
