@@ -1112,6 +1112,7 @@ function renderSSGallery() {
           '<div class="ss-card-time">' + dateStr + ' at ' + timeStr + '</div>' +
         '</div>' +
         '<button class="ss-dl-btn" onclick="downloadScreenshot(' + ss.id + ')">⬇ Download</button>' +
+        '<button onclick="deleteScreenshot(' + ss.id + ')" style="padding:5px 11px;background:#d93025;color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;margin-left:4px">✕ Delete</button>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -1131,9 +1132,15 @@ function downloadScreenshot(id) {
 function previewScreenshot(id) {
   var ss = savedScreenshots.find(function(s){ return s.id === id; });
   if (!ss) return;
-  // Open in new tab for full preview
   var w = window.open();
   w.document.write('<html><body style="margin:0;background:#000"><img src="' + ss.image + '" style="width:100%;height:100vh;object-fit:contain"></body></html>');
+}
+
+function deleteScreenshot(id) {
+  savedScreenshots = savedScreenshots.filter(function(s){ return s.id !== id; });
+  document.getElementById('ssCount').textContent = savedScreenshots.length;
+  renderSSGallery();
+  toast('Screenshot deleted');
 }
 
 </script>
