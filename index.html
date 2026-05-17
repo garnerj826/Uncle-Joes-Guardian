@@ -593,12 +593,16 @@ function updateOneStudent(s) {
 function handleSS(msg) {
   screenshots[msg.studentId] = {image:msg.image, tabTitle:msg.tabTitle, tabUrl:msg.tabUrl};
   if (!students[msg.studentId]) {
-    students[msg.studentId] = {id:msg.studentId, name:msg.studentName||'Student', isLocked:false, tabs:[], tabCount:0, online:true};
+    students[msg.studentId] = {id:msg.studentId, name:msg.studentName||'Student', isLocked:false, tabs:[], tabCount:0, online:true, lastSeen:Date.now()};
     renderGrid(); return;
   }
+  // Update student lastSeen so isOffline check works
+  if (students[msg.studentId]) students[msg.studentId].lastSeen = Date.now();
+  // Directly update the tile DOM - fastest path
   var img = document.getElementById('timg_'+msg.studentId);
   var ph = document.getElementById('tph_'+msg.studentId);
-  if (img) { img.src = msg.image; img.style.display='block'; if(ph) ph.style.display='none'; }
+  if (img) { img.src = msg.image; img.style.display='block'; }
+  if (ph) ph.style.display='none'; // Hide placeholder when screenshot arrives
   var urlEl = document.getElementById('turl_'+msg.studentId);
   if (urlEl && msg.tabUrl) urlEl.textContent = shortUrl(msg.tabUrl);
   if (modalStudentId === msg.studentId) {
@@ -641,10 +645,10 @@ function makeTile(s) {
   div.dataset.id = s.id;
   var activeTab = (s.tabs||[]).find(function(t){return t.active;});
   var urlTxt = sc&&sc.tabUrl ? shortUrl(sc.tabUrl) : (activeTab&&activeTab.url ? shortUrl(activeTab.url) : '');
-  var isOnline = s.online !== false && s.online !== undefined && s.lastSeen && (Date.now() - s.lastSeen) < 60000;
-  var isOffline = !isOnline;
-  var showSc = !isOffline && !!sc; // Only show screenshot when actually online
+  var isOffline = (s.online === false) || (!s.lastSeen && !s.tabs.length);
+  var showSc = !isOffline && !!sc;
   var isInactive = !isOffline && !showSc && (!activeTab || !activeTab.url || activeTab.url.includes('newtab') || activeTab.url === '' || activeTab.url.startsWith('chrome'));
+  console.log('[tile2]', s.name, 'isOffline:', isOffline, 'showSc:', showSc, 'isInactive:', isInactive);
   var tabDots = (s.tabs||[]).slice(0,6).map(function(t){
     return '<div class="tab-dot">'+(t.favIconUrl?'<img src="'+t.favIconUrl+'" onerror="this.style.display=\'none\'">':'')+'</div>';
   }).join('');
@@ -654,12 +658,12 @@ function makeTile(s) {
     '<button class="tile-menu" onclick="event.stopPropagation();openModal(\''+s.id+'\')">⋮</button>'+
     '<div class="tile-screen">'+
       '<img id="timg_'+s.id+'" src="'+(showSc?sc.image:'')+'" style="display:'+(showSc?'block':'none')+'">'+
-      '<div class="tile-ph" id="tph_'+s.id+'" style="display:'+(showSc?'none':'flex')+'">'+
+      '<div class="tile-ph" id="tph_'+s.id+'" style="display:'+(showSc?'none':'flex')+';flex-direction:column;align-items:center;justify-content:center;position:absolute;inset:0">'+
         (isOffline
-          ? '<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMjAgMTYwIiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjE2MCI+CiAgPHJlY3Qgd2lkdGg9IjIyMCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiNmMWYzZjQiIHJ4PSIwIi8+CiAgPCEtLSBCcm9rZW4gbGluay9wbHVnIGljb24gY2VudGVyZWQgLS0+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTEwLDY4KSIgb3BhY2l0eT0iMC41NSIgc3Ryb2tlPSIjNWY2MzY4IiBzdHJva2Utd2lkdGg9IjIuNSIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgIDwhLS0gTGVmdCBwbHVnIHByb25nIC0tPgogICAgPGxpbmUgeDE9Ii0yMCIgeTE9Ii0yMiIgeDI9Ii0yMCIgeTI9Ii0xMCIvPgogICAgPGxpbmUgeDE9Ii0xMCIgeTE9Ii0yMiIgeDI9Ii0xMCIgeTI9Ii0xMCIvPgogICAgPCEtLSBMZWZ0IHBsdWcgYm9keSAtLT4KICAgIDxyZWN0IHg9Ii0yNiIgeT0iLTEwIiB3aWR0aD0iMjIiIGhlaWdodD0iMTQiIHJ4PSIzIi8+CiAgICA8IS0tIExlZnQgY29ubmVjdG9yIGxpbmUgLS0+CiAgICA8bGluZSB4MT0iLTE1IiB5MT0iNCIgeDI9Ii04IiB5Mj0iMTAiLz4KICAgIDwhLS0gUmlnaHQgY29ubmVjdG9yIGxpbmUgLS0+CiAgICA8bGluZSB4MT0iOCIgeTE9Ii0xMCIgeDI9IjE1IiB5Mj0iLTQiLz4KICAgIDwhLS0gUmlnaHQgcGx1ZyBib2R5IC0tPgogICAgPHJlY3QgeD0iNCIgeT0iLTQiIHdpZHRoPSIyMiIgaGVpZ2h0PSIxNCIgcng9IjMiLz4KICAgIDwhLS0gUmlnaHQgcGx1ZyBwcm9uZ3MgLS0+CiAgICA8bGluZSB4MT0iMTAiIHkxPSIxMCIgeDI9IjEwIiB5Mj0iMjIiLz4KICAgIDxsaW5lIHgxPSIyMCIgeTE9IjEwIiB4Mj0iMjAiIHkyPSIyMiIvPgogIDwvZz4KICA8IS0tIFRleHQgLS0+CiAgPHRleHQgeD0iMTEwIiB5PSIxMDgiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLEJsaW5rTWFjU3lzdGVtRm9udCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjE1IiBmb250LXdlaWdodD0iNTAwIiBmaWxsPSIjNWY2MzY4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5TdHVkZW50IE9mZmxpbmU8L3RleHQ+Cjwvc3ZnPg==" style="width:100%;height:100%;object-fit:cover">'
+          ? '<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:8px"><g stroke="#9aa0a6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="14" y1="8" x2="14" y2="16"/><line x1="20" y1="8" x2="20" y2="16"/><rect x="10" y="16" width="14" height="8" rx="2"/><line x1="17" y1="24" x2="20" y2="28"/><line x1="28" y1="20" x2="31" y2="24"/><rect x="24" y="24" width="14" height="8" rx="2"/><line x1="28" y1="32" x2="28" y2="40"/><line x1="34" y1="32" x2="34" y2="40"/></g></svg><span style="font-size:12px;color:#9aa0a6;font-weight:500">Student Offline</span>'
           : isInactive
-            ? '<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODAgMTQ4IiB3aWR0aD0iMjgwIiBoZWlnaHQ9IjE0OCI+CiAgPHJlY3Qgd2lkdGg9IjI4MCIgaGVpZ2h0PSIxNDgiIGZpbGw9IiNmOGY5ZmEiIHJ4PSIwIi8+CiAgPCEtLSBOZXV0cmFsIGZhY2UgY2lyY2xlIC0tPgogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE0MCw2MCkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzVmNjM2OCIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjciPgogICAgPGNpcmNsZSBjeD0iMCIgY3k9IjAiIHI9IjI2Ii8+CiAgICA8IS0tIEV5ZXMgLSBzbWFsbCBmaWxsZWQgY2lyY2xlcyAtLT4KICAgIDxjaXJjbGUgY3g9Ii05IiBjeT0iLTciIHI9IjIuNSIgZmlsbD0iIzVmNjM2OCIgc3Ryb2tlPSJub25lIi8+CiAgICA8Y2lyY2xlIGN4PSI5IiBjeT0iLTciIHI9IjIuNSIgZmlsbD0iIzVmNjM2OCIgc3Ryb2tlPSJub25lIi8+CiAgICA8IS0tIEZsYXQvbmV1dHJhbCBtb3V0aCAtLT4KICAgIDxsaW5lIHgxPSItOSIgeTE9IjEwIiB4Mj0iOSIgeTI9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8L2c+CiAgPCEtLSBOTyBBQ1RJVkUgVEFCIHRleHQgLS0+CiAgPHRleHQgeD0iMTI2IiB5PSIxMDgiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLEJsaW5rTWFjU3lzdGVtRm9udCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjEzIiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSIjNWY2MzY4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBsZXR0ZXItc3BhY2luZz0iMC41Ij5OTyBBQ1RJVkUgVEFCPC90ZXh0PgogIDwhLS0gSW5mbyBjaXJjbGUgaWNvbiAtLT4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNTgsMTAxKSIgZmlsbD0iIzVmNjM2OCIgb3BhY2l0eT0iMC43Ij4KICAgIDxjaXJjbGUgY3g9IjAiIGN5PSIwIiByPSI3IiBmaWxsPSJub25lIiBzdHJva2U9IiM1ZjYzNjgiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgICA8dGV4dCB4PSIwIiB5PSI0IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSxzYW5zLXNlcmlmIiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM1ZjYzNjgiPmk8L3RleHQ+CiAgPC9nPgo8L3N2Zz4=" style="width:100%;height:100%;object-fit:cover">'
-            : '<div class="phi" style="font-size:28px;opacity:.4">🖥️</div><div style="font-size:11px;color:#9aa0a6">Waiting...</div>'
+          ? '<svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:8px"><circle cx="22" cy="22" r="16" stroke="#9aa0a6" stroke-width="2"/><circle cx="16" cy="19" r="2" fill="#9aa0a6"/><circle cx="28" cy="19" r="2" fill="#9aa0a6"/><line x1="15" y1="28" x2="29" y2="28" stroke="#9aa0a6" stroke-width="2" stroke-linecap="round"/></svg><span style="font-size:11px;color:#9aa0a6;font-weight:600;letter-spacing:0.5px">NO ACTIVE TAB</span>'
+          : '<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:6px"><rect x="4" y="4" width="28" height="22" rx="2" stroke="#9aa0a6" stroke-width="2"/><line x1="14" y1="26" x2="22" y2="26" stroke="#9aa0a6" stroke-width="2"/><line x1="18" y1="26" x2="18" y2="30" stroke="#9aa0a6" stroke-width="2"/></svg><span style="font-size:11px;color:#9aa0a6">Waiting...</span>'
         )+
       '</div>'+
       '<div class="tile-lock-overlay" id="tlk_'+s.id+'" style="display:'+(s.isLocked?'flex':'none')+'">'+
