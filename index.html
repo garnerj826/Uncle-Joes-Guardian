@@ -44,8 +44,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .conn-badge.on{color:var(--green);border-color:#a8d5b5}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .avatar{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.signout-btn{padding:5px 12px;border:1px solid #dadce0;border-radius:6px;background:none;font-size:12px;color:#5f6368;cursor:pointer}
-.signout-btn:hover{background:#f1f3f4}
+
 
 .main{display:flex;flex:1;overflow:hidden}
 
@@ -326,8 +325,23 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
     <div class="live-badge"><div class="dot"></div>Live Session</div>
     <div class="topbar-right">
       <div class="conn-badge" id="connBadge"><div class="dot"></div><span id="connTxt">Disconnected</span></div>
-      <div class="avatar" id="userAvatar">J</div>
-      <button class="signout-btn" onclick="doLogout()">Sign Out</button>
+      <div style="position:relative">
+        <div class="avatar" id="userAvatar" onclick="toggleUserMenu()" style="cursor:pointer" title="Account">J</div>
+        <div id="userMenu" style="display:none;position:absolute;right:0;top:40px;background:#fff;border:1px solid #e8eaed;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.15);min-width:200px;z-index:1000;overflow:hidden">
+          <div style="padding:14px 16px;border-bottom:1px solid #f1f3f4">
+            <div id="userMenuName" style="font-size:14px;font-weight:700;color:#202124"></div>
+            <div id="userMenuUsername" style="font-size:12px;color:#5f6368;margin-top:2px"></div>
+          </div>
+          <div onclick="doLogout();toggleUserMenu()" style="display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;font-size:13px;color:#202124;transition:.1s" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background=''">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+          </div>
+          <div onclick="deleteAccount()" style="display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;font-size:13px;color:#d93025;transition:.1s;border-top:1px solid #f1f3f4" onmouseover="this.style.background='#fce8e6'" onmouseout="this.style.background=''">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Delete Account
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="main">
@@ -390,14 +404,14 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         </div>
         <!-- Scenes tabs -->
         <div id="tabsScenes" style="display:none;align-items:flex-end;flex:1">
-          <div class="content-tab active">Block Sites</div>
-          <div class="content-tab disabled">YouTube Filter</div>
-          <div class="content-tab disabled">Tab Limit</div>
+          <div class="content-tab active" id="ctab-block" onclick="switchScenesTopTab('block')">Block Sites</div>
+          <div class="content-tab" id="ctab-yt" onclick="switchScenesTopTab('yt')">YouTube Filter</div>
+          <div class="content-tab" id="ctab-tablimit" onclick="switchScenesTopTab('tablimit')">Tab Limit</div>
         </div>
         <!-- Students tabs -->
         <div id="tabsStudents" style="display:none;align-items:flex-end;flex:1">
-          <div class="content-tab active" onclick="openPanel('addPanel')">Add Student</div>
-          <div class="content-tab" onclick="openPanel('managePanel')">My Students</div>
+          <div class="content-tab active" id="ctab-add" onclick="switchStudentsTopTab('add')">Add Student</div>
+          <div class="content-tab" id="ctab-manage" onclick="switchStudentsTopTab('manage')">My Students</div>
         </div>
         <!-- Action buttons on right -->
         <div class="content-tab-right" id="classroomsActions">
@@ -413,7 +427,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         <button class="abtn" onclick="cmdSelected('LOCK_SCREEN')">🔒 Lock</button>
         <button class="abtn" onclick="clearSel()">✕ Cancel</button>
       </div>
-      <div class="filterbar">
+      <div class="filterbar" id="filterBar">
         <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
           <input type="checkbox" id="selAllChk" onchange="selectAll(this.checked)" style="accent-color:var(--blue)">
           Select All
@@ -441,7 +455,88 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         </div>
         <div class="ss-grid" id="ssGrid"></div>
       </div>
-    </div>
+
+      <!-- INLINE SECTIONS -->
+
+      <!-- Scenes / Block Sites inline -->
+      <div id="scenesSection" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+        <!-- Block Sites tab -->
+        <div id="stab-block-content" style="flex:1;overflow-y:auto;padding:28px;display:block">
+          <div style="max-width:600px">
+            <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">Block Websites</h2>
+            <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Enter a site to block for all students. Blocked sites redirect to the GoGuardian blocked page.</p>
+            <div style="display:flex;gap:8px;margin-bottom:12px">
+              <input id="siteIn2" class="sp-input" placeholder="e.g. youtube.com" style="flex:1;max-width:320px" onkeydown="if(event.key==='Enter')addSiteInline()">
+              <button class="sp-btn" style="width:auto;padding:8px 18px" onclick="addSiteInline()">Add</button>
+            </div>
+            <div id="siteList2" style="margin-bottom:14px"></div>
+            <div style="display:flex;gap:8px">
+              <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyBlockInline()">🚫 Apply Block List</button>
+              <button class="sp-btn gray" style="width:auto;padding:9px 20px" onclick="clearBlock()">↩ Clear All</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- YouTube Filter tab -->
+        <div id="stab-yt-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
+          <div style="max-width:600px">
+            <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">YouTube Category Filter</h2>
+            <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Block specific content categories on YouTube. Students will see a blocked message on matching videos.</p>
+            <div class="yt-grid" id="ytGrid2" style="max-width:520px;margin-bottom:16px"></div>
+            <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyYTInline()">🎬 Apply YouTube Filters</button>
+          </div>
+        </div>
+
+        <!-- Tab Limit tab -->
+        <div id="stab-tablimit-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
+          <div style="max-width:600px">
+            <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">Tab Limit</h2>
+            <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Limit how many tabs students can have open at once.</p>
+            <div style="display:flex;align-items:center;gap:14px;max-width:360px;margin-bottom:16px">
+              <span style="font-size:13px;color:#5f6368;white-space:nowrap">Max open tabs:</span>
+              <input type="range" id="tabLimitR2" min="0" max="10" value="0" oninput="document.getElementById('tabLimitV2').textContent=this.value==0?'Off':this.value" style="flex:1;accent-color:var(--blue)">
+              <span id="tabLimitV2" style="font-size:15px;font-weight:700;color:var(--blue);min-width:32px">Off</span>
+            </div>
+            <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyTabLimitInline()">📌 Apply Limit</button>
+          </div>
+        </div>
+      </div>
+      <!-- Students inline -->
+      <div id="studentsSection" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+        <!-- Add Student tab -->
+        <div id="stutab-add-content" style="flex:1;overflow-y:auto;padding:28px;display:block">
+          <div style="max-width:480px">
+            <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">Add Student by Code</h2>
+            <p style="font-size:13px;color:#5f6368;margin-bottom:20px;line-height:1.6">Ask the student to open the Uncle Joe's Guardian extension in Chrome. They'll see a 5-digit code — enter it below.</p>
+            <div style="display:flex;align-items:center;gap:4px;margin-bottom:6px">
+              <input class="code-input" type="text" id="codeIn2" maxlength="5" placeholder="00000"
+                oninput="this.value=this.value.replace(/\D/g,'').slice(0,5)"
+                onkeydown="if(event.key==='Enter')submitCodeInline()"
+                style="width:180px;margin-bottom:0">
+              <button class="sp-btn" style="width:auto;padding:11px 22px;font-size:14px" onclick="submitCodeInline()">Add Student</button>
+            </div>
+            <div class="result-msg" id="codeResult2" style="margin-top:10px"></div>
+            <div style="margin-top:28px;padding:16px;background:#f8f9fa;border-radius:8px;border:1px solid #e8eaed">
+              <div style="font-size:12px;font-weight:700;color:#5f6368;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px">How it works</div>
+              <div style="font-size:13px;color:#5f6368;line-height:2">
+                ① Student opens Chrome with the extension installed<br>
+                ② Student clicks the extension icon in the toolbar<br>
+                ③ A 5-digit code appears in the popup<br>
+                ④ Enter that code above and click Add Student<br>
+                ⑤ Student appears in your Screens view!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- My Students tab -->
+        <div id="stutab-manage-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
+          <div style="max-width:560px">
+            <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:16px">My Students</h2>
+            <div id="myStudentsList2"></div>
+          </div>
+        </div>
+      </div>
   </div>
 </div>
 
@@ -757,14 +852,16 @@ function updateStudents(list) {
 
 function updateOneStudent(s) {
   if (!s) return;
-  console.log('[UJG] updateOneStudent:', s.name, 'myStudentIds:', myStudentIds);
   var isNew = !students[s.id];
   students[s.id] = s;
   if (isNew) {
-    renderGrid(); // Full re-render for new students
+    renderGrid();
   } else {
     updateTile(s.id);
-    if (modalStudentId === s.id) updateModalTabs(s.id);
+    // Only update modal if it's already open for this student
+    if (modalStudentId === s.id && document.getElementById('modalOverlay').classList.contains('show')) {
+      updateModalTabs(s.id);
+    }
   }
 }
 
@@ -1081,44 +1178,51 @@ function closePanel(id) { document.getElementById(id).classList.remove('show'); 
 function closeAllPanels() { ['blockPanel','addPanel','managePanel'].forEach(function(id){ document.getElementById(id).classList.remove('show'); }); }
 
 function setSection(section, el) {
-  // Update sidebar active state
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
   if (el) el.classList.add('active');
 
-  // Show/hide tab bars
-  var tabsMap = {classrooms:'tabsClassrooms', scenes:'tabsScenes', students:'tabsStudents'};
+  // Hide all content areas
+  document.getElementById('screensWrap').style.display = 'none';
+  document.getElementById('ssGallery').classList.remove('show');
+  document.getElementById('emptyState').style.display = 'none';
+  var sc = document.getElementById('scenesSection');
+  var st = document.getElementById('studentsSection');
+  if (sc) sc.style.display = 'none';
+  if (st) st.style.display = 'none';
+
+  // Hide all tab groups
   ['tabsClassrooms','tabsScenes','tabsStudents'].forEach(function(id){
-    var el2 = document.getElementById(id);
-    if (el2) el2.style.display = 'none';
+    var e = document.getElementById(id); if(e) e.style.display='none';
   });
   var actions = document.getElementById('classroomsActions');
+  if (actions) actions.style.display = 'none';
+
+  // Close any open side panels
+  closeAllPanels();
+
+  var fb = document.getElementById('filterBar');
+  var ab = document.getElementById('actionBar');
 
   if (section === 'classrooms') {
     var ct = document.getElementById('tabsClassrooms');
     if (ct) ct.style.display = 'flex';
     if (actions) actions.style.display = 'flex';
-    // Show screens content
+    if (fb) fb.style.display = 'flex';
     switchToScreens();
+
   } else if (section === 'scenes') {
-    var st = document.getElementById('tabsScenes');
-    if (st) st.style.display = 'flex';
-    if (actions) actions.style.display = 'none';
-    // Hide grid, show block panel inline
-    document.getElementById('screensWrap').style.display = 'none';
-    document.getElementById('ssGallery').classList.remove('show');
-    document.getElementById('emptyState').style.display = 'none';
-    openPanel('blockPanel');
+    var st2 = document.getElementById('tabsScenes');
+    if (st2) st2.style.display = 'flex';
+    if (fb) fb.style.display = 'none';
+    if (ab) ab.classList.remove('show');
+    if (sc) { sc.style.display = 'flex'; switchScenesTopTab('block'); }
+
   } else if (section === 'students') {
     var stt = document.getElementById('tabsStudents');
     if (stt) stt.style.display = 'flex';
-    if (actions) actions.style.display = 'none';
-    document.getElementById('screensWrap').style.display = 'none';
-    document.getElementById('ssGallery').classList.remove('show');
-    document.getElementById('emptyState').style.display = 'none';
-    openPanel('addPanel');
-  } else {
-    // calendar, reports, help - just switch active
-    if (actions) actions.style.display = 'none';
+    if (fb) fb.style.display = 'none';
+    if (ab) ab.classList.remove('show');
+    if (st) { st.style.display = 'flex'; switchStudentsTopTab('add'); }
   }
 }
 
@@ -1398,6 +1502,192 @@ function deleteScreenshot(id) {
   document.getElementById('ssCount').textContent = savedScreenshots.length;
   renderSSGallery();
   toast('Screenshot deleted');
+}
+
+
+// ── INLINE SECTION HELPERS ────────────────────────────────
+
+function renderYTCatsInline() {
+  var grid = document.getElementById('ytGrid2');
+  if (!grid) return;
+  grid.innerHTML = YT_CATS.map(function(c){
+    var onAttr = 'onclick="toggleYTInline(\'' + c.id + '\')"';
+    return '<div class="yt-cat'+(blockedYT.has(c.id)?' on':'')+'" id="ytci_'+c.id+'" '+onAttr+'>'+
+      '<span class="yt-icon">'+c.icon+'</span><span>'+c.label+'</span>'+
+      (blockedYT.has(c.id)?'<span style="margin-left:auto">&#10003;</span>':'')+
+    '</div>';
+  }).join('');
+  // Sync site list
+  renderSitesInline();
+}
+
+function toggleYTInline(id) {
+  toggleYT(id);
+  renderYTCatsInline();
+}
+
+function renderSitesInline() {
+  var el = document.getElementById('siteList2');
+  if (!el) return;
+  el.innerHTML = blockedSites.map(function(s){
+    return '<span class="site-tag">'+esc(s)+'<button onclick="removeSiteInline(\'' + s + '\')">&#10005;</button></span>';
+  }).join('');
+}
+
+function removeSiteInline(s) {
+  removeSite(s);
+  renderSitesInline();
+}
+
+function addSiteInline() {
+  var input = document.getElementById('siteIn2');
+  if (!input) { addSite(); return; }
+  document.getElementById('siteIn').value = input.value;
+  addSite();
+  input.value = '';
+  renderSitesInline();
+}
+
+function applyBlockInline() {
+  // Sync from inline input first
+  var input = document.getElementById('siteIn2');
+  if (input && input.value.trim()) {
+    document.getElementById('siteIn').value = input.value;
+    addSite();
+    input.value = '';
+  }
+  applyBlock();
+  renderSitesInline();
+}
+
+function applyYTInline() { applyYT(); }
+
+function applyTabLimitInline() {
+  var r = document.getElementById('tabLimitR2');
+  if (r) document.getElementById('tabLimitR').value = r.value;
+  applyTabLimit();
+}
+
+function renderMyStudentsInline() {
+  var el = document.getElementById('myStudentsList2');
+  if (!el) return;
+  if (!myStudentIds.length) {
+    el.innerHTML = '<div style="font-size:13px;color:#9aa0a6;text-align:center;padding:20px">No students yet.</div>';
+    return;
+  }
+  el.innerHTML = myStudentIds.map(function(id){
+    var s = students[id];
+    var name = s ? s.name : 'Unknown Student';
+    var on = s && s.online !== false && s.lastSeen;
+    return '<div class="student-list-item">'+
+      '<div class="sdot'+(on?' on':'')+'"></div>'+
+      '<div class="sname">'+esc(name)+'</div>'+
+      '<div style="font-size:10px;color:#9aa0a6;margin-right:8px">'+(on?'Online':'Offline')+'</div>'+
+      '<button class="remove-btn" onclick="removeStudentInline(\'' + id + '\')">Remove</button>'+
+    '</div>';
+  }).join('');
+  // Update count in header
+  var hdr = document.querySelector('#studentsSection h2 span');
+  if (hdr) hdr.textContent = '('+myStudentIds.length+' enrolled)';
+}
+
+async function submitCodeInline() {
+  var input = document.getElementById('codeIn2');
+  var res = document.getElementById('codeResult2');
+  if (!input) return;
+  document.getElementById('codeIn').value = input.value;
+  // Use existing submitCode but show result in inline element
+  var code = input.value.trim();
+  if (code.length !== 5) { showResult(res,'Please enter a 5-digit code.','err'); return; }
+  showResult(res,'Looking up student...','');
+  try {
+    var r = await fetch('/api/add-student',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code}),signal:AbortSignal.timeout(5000)});
+    var data = await r.json();
+    if (data.ok) {
+      showResult(res,'✓ Student added!','ok');
+      input.value = '';
+      if (!myStudentIds.includes(data.studentId)) {
+        myStudentIds.push(data.studentId);
+        var accs = getAccounts();
+        if (accs[currentUser.username]) { accs[currentUser.username].students = myStudentIds; saveAccounts(accs); }
+      }
+      wsSend({type:'TEACHER_CONNECT', username:currentUser.username, studentIds:myStudentIds||[]});
+      renderMyStudentsInline();
+      toast('Student added! ✓');
+    } else { showResult(res,'❌ '+(data.error||'Code not found.'),'err'); }
+  } catch(e) { showResult(res,'❌ Could not reach server.','err'); }
+}
+
+function removeStudentInline(id) {
+  removeStudent(id);
+  renderMyStudentsInline();
+}
+
+
+function switchScenesTopTab(tab) {
+  // Update top tab bar active state
+  ['block','yt','tablimit'].forEach(function(t){
+    var el = document.getElementById('ctab-'+t);
+    if (el) el.classList.toggle('active', t===tab);
+  });
+  // Show correct content panel
+  ['block','yt','tablimit'].forEach(function(t){
+    var c = document.getElementById('stab-'+t+'-content');
+    if (c) c.style.display = t===tab ? 'block' : 'none';
+  });
+  if (tab === 'yt') renderYTCatsInline();
+  if (tab === 'block') renderSitesInline();
+}
+
+function switchStudentsTopTab(tab) {
+  ['add','manage'].forEach(function(t){
+    var el = document.getElementById('ctab-'+t);
+    if (el) el.classList.toggle('active', t===tab);
+  });
+  ['add','manage'].forEach(function(t){
+    var c = document.getElementById('stutab-'+t+'-content');
+    if (c) c.style.display = t===tab ? 'block' : 'none';
+  });
+  if (tab === 'manage') renderMyStudentsInline();
+}
+
+// Keep these for backward compat
+function switchScenesTab(tab, el) { switchScenesTopTab(tab); }
+function switchStudentsTab(tab, el) { switchStudentsTopTab(tab); }
+
+
+function toggleUserMenu() {
+  var menu = document.getElementById('userMenu');
+  if (!menu) return;
+  var isOpen = menu.style.display !== 'none';
+  menu.style.display = isOpen ? 'none' : 'block';
+  // Update name display
+  if (!isOpen && currentUser) {
+    var n = document.getElementById('userMenuName');
+    var u = document.getElementById('userMenuUsername');
+    if (n) n.textContent = currentUser.name || currentUser.username;
+    if (u) u.textContent = '@' + (currentUser.username || '');
+  }
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('userMenu');
+  var avatar = document.getElementById('userAvatar');
+  if (menu && avatar && !menu.contains(e.target) && !avatar.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
+
+function deleteAccount() {
+  if (!currentUser) return;
+  toggleUserMenu();
+  if (!confirm('Are you sure you want to delete your account "' + currentUser.username + '"? This cannot be undone.')) return;
+  var accounts = getAccounts();
+  delete accounts[currentUser.username];
+  saveAccounts(accounts);
+  toast('Account deleted.');
+  setTimeout(doLogout, 800);
 }
 
 </script>
