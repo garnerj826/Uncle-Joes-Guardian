@@ -159,6 +159,22 @@ wss.on('connection', (ws) => {
       }
       notifyRelevantTeachers(msg.studentId);
 
+    } else if (msg.type === 'CHAT_MSG' && ws.role === 'student') {
+      // Student sent a chat message back to teacher
+      var chatPayload = JSON.stringify({
+        type: 'CHAT_MSG',
+        studentId: ws.studentId,
+        studentName: msg.studentName || 'Student',
+        text: msg.text || '',
+        timestamp: Date.now()
+      });
+      teachers.forEach(function(username, tws) {
+        var myIds = tws.myStudentIds || [];
+        if (myIds.includes(ws.studentId) && tws.readyState === WebSocket.OPEN) {
+          tws.send(chatPayload);
+        }
+      });
+
     } else if (msg.type === 'SCREENSHOT' && ws.role === 'student') {
       screenshots.set(msg.studentId, msg.image);
       const payload = JSON.stringify({
@@ -214,7 +230,7 @@ wss.on('connection', (ws) => {
 
 function getStudentData(id) {
   const s = students.get(id);
-  if (!s) return { id, name: 'Offline', online: false, tabs: [], tabCount: 0, isLocked: false, code: null };
+  if (!s) return { id, name: null, online: false, tabs: [], tabCount: 0, isLocked: false, code: null };
   return { id: s.id, name: s.name, code: s.code, isLocked: s.isLocked, tabs: s.tabs, tabCount: s.tabCount, lastSeen: s.lastSeen, online: (Date.now() - s.lastSeen) < 30000 };
 }
 
