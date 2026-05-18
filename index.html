@@ -58,6 +58,11 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .nav-item.open{background:rgba(255,255,255,0.08);color:#fff}
 .nav-icon{font-size:20px;line-height:1}
 .nav-icon svg{display:block}
+/* Dark mode */
+[data-dark] { filter: invert(0.9) hue-rotate(180deg); }
+[data-dark] img, [data-dark] video, [data-dark] .tile-screen img { filter: invert(1) hue-rotate(180deg); }
+[data-dark] .sidebar { filter: none; background: #0d0f1a; }
+
 /* Slanted GoGuardian-style tab bar */
 .content-tabs{background:#f1f3f4;border-bottom:2px solid #d0d3d8;display:flex;align-items:flex-end;flex-shrink:0;padding:0 0 0 8px;overflow:hidden}
 .content-tab{
@@ -113,6 +118,17 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .content-tab.disabled{color:#adb5bd;cursor:default;pointer-events:none}
 .content-tab-right{margin-left:auto;display:flex;gap:7px;align-items:center;padding:6px 16px 0 12px;flex-shrink:0;position:relative;z-index:20}
 
+/* Timelines */
+.tl-wrap{flex:1;overflow-y:auto;padding:16px 20px;background:#f8f9fa}
+.tl-student-select{display:flex;align-items:center;gap:10px;padding:12px 20px;background:#fff;border-bottom:1px solid #e8eaed;flex-shrink:0}
+.tl-select{padding:7px 12px;border:1px solid #dadce0;border-radius:6px;font-size:13px;font-family:inherit;outline:none;min-width:180px}
+.tl-entry{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #f1f3f4}
+.tl-time{font-size:11px;color:#9aa0a6;white-space:nowrap;min-width:52px;padding-top:2px}
+.tl-fav{width:16px;height:16px;border-radius:2px;flex-shrink:0;margin-top:2px}
+.tl-info{flex:1;overflow:hidden}
+.tl-title{font-size:13px;font-weight:500;color:#202124;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-url{font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-empty{text-align:center;padding:60px 20px;color:#9aa0a6;font-size:13px}
 /* Chat */
 .chat-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden}
 .chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
@@ -345,6 +361,10 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
             <div id="userMenuName" style="font-size:14px;font-weight:700;color:#202124"></div>
             <div id="userMenuUsername" style="font-size:12px;color:#5f6368;margin-top:2px"></div>
           </div>
+          <div id="darkModeBtn" onclick="toggleDarkMode()" style="display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;font-size:13px;color:#202124;transition:.1s" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background=''">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            🌙 Dark Mode
+          </div>
           <div onclick="doLogout();toggleUserMenu()" style="display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;font-size:13px;color:#202124;transition:.1s" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background=''">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             Sign Out
@@ -411,7 +431,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         <!-- Classrooms tabs -->
         <div id="tabsClassrooms" style="display:flex;align-items:flex-end;flex:1">
           <div class="content-tab active" id="screensTab" onclick="switchToScreens()">Screens</div>
-          <div class="content-tab disabled">Timelines</div>
+          <div class="content-tab" id="timelinesTab" onclick="switchToTimelines()">Timelines</div>
           <div class="content-tab" id="ssTab" onclick="switchToScreenshots()">Screenshots<span class="ss-count" id="ssCount" style="background:rgba(26,115,232,0.12);color:var(--blue);padding:1px 6px;border-radius:10px;font-size:11px;font-weight:700">0</span></div>
           <div class="content-tab disabled">Call Students</div>
         </div>
@@ -420,6 +440,8 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
           <div class="content-tab active" id="ctab-block" onclick="switchScenesTopTab('block')">Block Sites</div>
           <div class="content-tab" id="ctab-yt" onclick="switchScenesTopTab('yt')">YouTube Filter</div>
           <div class="content-tab" id="ctab-tablimit" onclick="switchScenesTopTab('tablimit')">Tab Limit</div>
+          <div class="content-tab" id="ctab-scenes" onclick="switchScenesTopTab('scenes')">Scenes</div>
+          <div class="content-tab" id="ctab-autocap" onclick="switchScenesTopTab('autocap')">Auto-capture</div>
         </div>
         <!-- Students tabs -->
         <div id="tabsStudents" style="display:none;align-items:flex-end;flex:1">
@@ -429,6 +451,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         <!-- Action buttons on right -->
         <div class="content-tab-right" id="classroomsActions">
           <input type="text" id="lockMsgInput" placeholder="Lock message..." style="padding:5px 10px;border:1px solid #dadce0;border-radius:6px;font-size:12px;width:180px;font-family:inherit;outline:none">
+          <button class="tbtn" onclick="openUrlPrompt()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Open URL for All</button>
           <button class="tbtn danger" onclick="cmdAll('LOCK_SCREEN')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Lock All</button>
           <button class="tbtn" onclick="cmdAll('UNLOCK_SCREEN')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 0 9.9-1"/></svg>Unlock All</button>
           <button class="tbtn" onclick="cmdAll('CLOSE_ALL_TABS')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Close Tabs</button>
@@ -437,8 +460,8 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
       <div class="action-bar" id="actionBar">
         <span class="action-bar-text" id="actionTxt">0 selected</span>
         <button class="abtn" onclick="openUrlPrompt()">Open Tab</button>
-        <button class="abtn" onclick="cmdSelected('LOCK_SCREEN')">🔒 Lock</button>
-        <button class="abtn" onclick="clearSel()">✕ Cancel</button>
+        <button class="abtn" onclick="cmdSelected('LOCK_SCREEN')">Lock</button>
+        <button class="abtn" onclick="clearSel()">Cancel</button>
       </div>
       <div class="filterbar" id="filterBar">
         <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
@@ -460,6 +483,21 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
       <div class="screens-wrap" id="screensWrap" style="display:none">
         <div class="screens-grid" id="grid"></div>
       </div>
+      <!-- TIMELINES VIEW -->
+      <div id="timelinesView" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+        <div class="tl-student-select">
+          <label style="font-size:13px;font-weight:600;color:#5f6368">Student:</label>
+          <select class="tl-select" id="tlStudentSelect" onchange="renderTimeline(this.value)">
+            <option value="">Select a student...</option>
+          </select>
+          <button onclick="clearTimeline()" style="padding:6px 12px;border:1px solid #dadce0;border-radius:6px;font-size:12px;color:#5f6368;background:#fff;cursor:pointer">Clear</button>
+          <button onclick="exportTimeline()" style="padding:6px 12px;border:1px solid var(--blue);border-radius:6px;font-size:12px;color:var(--blue);background:#fff;cursor:pointer">⬇ Export CSV</button>
+        </div>
+        <div class="tl-wrap" id="tlContent">
+          <div class="tl-empty">Select a student to view their browsing timeline</div>
+        </div>
+      </div>
+
       <div class="ss-gallery" id="ssGallery">
         <div id="ssEmpty" class="ss-empty">
           <div class="sei"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dadce0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
@@ -486,6 +524,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
             <div style="display:flex;gap:8px">
               <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyBlockInline()">Apply Block List</button>
               <button class="sp-btn gray" style="width:auto;padding:9px 20px" onclick="clearBlock()">Clear All</button>
+            <button class="sp-btn" style="width:auto;padding:9px 20px;background:#f59e0b;margin-top:8px" onclick="saveScene()">⭐ Save as Scene</button>
             </div>
           </div>
         </div>
@@ -497,6 +536,39 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
             <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Block specific content categories on YouTube. Students will see a blocked message on matching videos.</p>
             <div class="yt-grid" id="ytGrid2" style="max-width:520px;margin-bottom:16px"></div>
             <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyYTInline()">Apply YouTube Filters</button>
+          </div>
+        </div>
+
+        <!-- Scenes tab -->
+        <div id="stab-scenes-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
+          <div style="max-width:600px">
+            <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">Saved Scenes</h2>
+            <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Save your current block settings as a reusable scene. Apply a scene to push all settings at once.</p>
+            <button class="sp-btn" style="width:auto;padding:9px 20px;margin-bottom:16px" onclick="saveScene()">⭐ Save Current Settings as Scene</button>
+            <div id="scenesList"></div>
+          </div>
+        </div>
+
+        <!-- Auto-capture tab -->
+        <div id="stab-autocap-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
+          <div style="max-width:600px">
+            <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">Auto Screenshot</h2>
+            <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Automatically capture screenshots from all students at a set interval.</p>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+              <span style="font-size:13px;color:#5f6368">Every</span>
+              <select id="autoCaptureInterval" style="padding:6px 10px;border:1px solid #dadce0;border-radius:6px;font-size:13px;font-family:inherit;outline:none">
+                <option value="15">15 seconds</option>
+                <option value="30" selected>30 seconds</option>
+                <option value="60">1 minute</option>
+                <option value="120">2 minutes</option>
+                <option value="300">5 minutes</option>
+              </select>
+            </div>
+            <button id="autoCaptureBtn" class="sp-btn" style="width:auto;padding:9px 20px" onclick="toggleAutoCapture()">Start Auto-capture</button>
+          </div>
+        </div>
+
+        <div style="display:none"><!-- placeholder
           </div>
         </div>
 
@@ -1103,13 +1175,23 @@ function doUnlock(id) {
   toast('Unlocked');
 }
 
-function openUrlPrompt() {
-  var url = prompt('Enter URL to open for selected students:');
+function openUrlPrompt(targetId) {
+  var url = prompt('Enter URL to open:');
   if (!url) return;
   if (!url.startsWith('http')) url = 'https://'+url;
-  var targets = selected.size > 0 ? [...selected] : ['all'];
-  targets.forEach(function(id){ wsSend({type:'TEACHER_COMMAND', command:'NAVIGATE_TO', targetId:id, payload:{url:url}}); });
-  toast('Opening URL...');
+  if (targetId) {
+    // Specific student (from modal)
+    wsSend({type:'TEACHER_COMMAND', command:'NAVIGATE_TO', targetId:targetId, payload:{url:url}});
+    toast('Opening URL for student...');
+  } else if (selected.size > 0) {
+    // Selected students
+    selected.forEach(function(id){ wsSend({type:'TEACHER_COMMAND', command:'NAVIGATE_TO', targetId:id, payload:{url:url}}); });
+    toast('Opening URL for '+selected.size+' student(s)...');
+  } else {
+    // All students
+    wsSend({type:'TEACHER_COMMAND', command:'NAVIGATE_TO', targetId:'all', payload:{url:url}});
+    toast('Opening URL for all students...');
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1160,8 +1242,12 @@ function updateModalTabs(id) {
 }
 
 function closeTab(sid, tabId) {
-  wsSend({type:'TEACHER_COMMAND', command:'CLOSE_TAB', targetId:sid, payload:{tabId:tabId}});
-  if (students[sid]) { students[sid].tabs = (students[sid].tabs||[]).filter(function(t){return t.id!==tabId;}); updateModalTabs(sid); }
+  var numId = parseInt(tabId);
+  wsSend({type:'TEACHER_COMMAND', command:'CLOSE_TAB', targetId:sid, payload:{tabId:numId}});
+  if (students[sid]) {
+    students[sid].tabs = (students[sid].tabs||[]).filter(function(t){ return t.id !== numId && t.id !== tabId; });
+    updateModalTabs(sid);
+  }
   toast('Tab closed');
 }
 
@@ -1196,12 +1282,7 @@ function modalCmd(cmd) {
   toast(cmd.replace(/_/g,' '));
 }
 
-function modalOpenTab() {
-  var url = prompt('Enter URL:'); if (!url||!modalStudentId) return;
-  if (!url.startsWith('http')) url='https://'+url;
-  wsSend({type:'TEACHER_COMMAND', command:'NAVIGATE_TO', targetId:modalStudentId, payload:{url:url}});
-  toast('Opening URL...');
-}
+function modalOpenTab() { openUrlPrompt(modalStudentId); }
 
 // ═══════════════════════════════════════════════════════════
 // PANELS
@@ -1384,9 +1465,16 @@ function renderMyStudents() {
     var s = students[id];
     var name = s ? s.name : 'Offline';
     var on = s && s.online !== false;
-    return '<div class="student-list-item"><div class="sdot'+(on?' on':'')+'"></div><div class="sname">'+esc(name)+'</div>'+
-      '<div style="font-size:10px;color:#9aa0a6;margin-right:8px">'+(on?'Online':'Offline')+'</div>'+
-      '<button class="remove-btn" onclick="removeStudent(\''+id+'\')">Remove</button></div>';
+    var renameBtn = '<button onclick="editStudentName(\'' + id + '\',false)" style="background:none;border:1px solid #dadce0;border-radius:4px;padding:2px 7px;font-size:10px;color:#5f6368;cursor:pointer">Rename</button>';
+    return '<div class="student-list-item" id="sli_'+id+'">' +
+      '<div class="sdot'+(on?' on':'')+'"></div>' +
+      '<div class="sname" id="sname_'+id+'">' + esc(name) + '</div>' +
+      '<div style="display:flex;gap:4px;align-items:center">' +
+        '<span style="font-size:10px;color:#9aa0a6;margin-right:4px">'+(on?'Online':'Offline')+'</span>' +
+        renameBtn +
+        '<button class="remove-btn" onclick="removeStudent(\'' + id + '\')">Remove</button>' +
+      '</div>' +
+    '</div>';
   }).join('');
 }
 
@@ -1429,6 +1517,10 @@ function switchToScreenshots() {
   document.getElementById('screensWrap').style.display = 'none';
   document.getElementById('emptyState').style.display = 'none';
   document.getElementById('ssGallery').classList.add('show');
+  var tl = document.getElementById('timelinesView');
+  if (tl) tl.style.display = 'none';
+  var tlTab = document.getElementById('timelinesTab');
+  if (tlTab) tlTab.classList.remove('active');
   // Update sidebar sub-item
   document.querySelectorAll('.nav-sub-item').forEach(function(n){ n.classList.remove('active'); });
   var ssSub = document.getElementById('nav-screenshots-sub');
@@ -1441,6 +1533,10 @@ function switchToScreens() {
   document.getElementById('ssTab').classList.remove('active');
   document.getElementById('screensTab').classList.add('active');
   document.getElementById('ssGallery').classList.remove('show');
+  var tl = document.getElementById('timelinesView');
+  if (tl) tl.style.display = 'none';
+  var tlTab = document.getElementById('timelinesTab');
+  if (tlTab) tlTab.classList.remove('active');
   // Update sidebar sub-item
   document.querySelectorAll('.nav-sub-item').forEach(function(n){ n.classList.remove('active'); });
   var scSub = document.getElementById('nav-screens');
@@ -1506,6 +1602,7 @@ function renderSSGallery() {
           '<div class="ss-card-name">' + esc(ss.studentName) + '</div>' +
           '<div class="ss-card-time">' + dateStr + ' at ' + timeStr + '</div>' +
         '</div>' +
+        '<button onclick="openFullscreen(\'' + ss.studentId + '\')" style="padding:5px 10px;background:#f1f3f4;border:1px solid #dadce0;border-radius:5px;font-size:11px;cursor:pointer;margin-right:4px">⛶ Full</button>' +
         '<button class="ss-dl-btn" onclick="downloadScreenshot(' + ss.id + ')">⬇ Download</button>' +
         '<button onclick="deleteScreenshot(' + ss.id + ')" style="padding:5px 11px;background:#d93025;color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;margin-left:4px">✕ Delete</button>' +
       '</div>' +
@@ -1611,13 +1708,17 @@ function renderMyStudentsInline() {
   }
   el.innerHTML = myStudentIds.map(function(id){
     var s = students[id];
-    var name = s ? s.name : 'Unknown Student';
+    var name = s ? s.name : (studentNames[id] || 'Student');
     var on = s && s.online !== false && s.lastSeen;
-    return '<div class="student-list-item">'+
-      '<div class="sdot'+(on?' on':'')+'"></div>'+
-      '<div class="sname">'+esc(name)+'</div>'+
-      '<div style="font-size:10px;color:#9aa0a6;margin-right:8px">'+(on?'Online':'Offline')+'</div>'+
-      '<button class="remove-btn" onclick="removeStudentInline(\'' + id + '\')">Remove</button>'+
+    var rnBtn = '<button onclick="editStudentName(\'' + id + '\',true)" style="background:none;border:1px solid #dadce0;border-radius:4px;padding:2px 7px;font-size:10px;color:#5f6368;cursor:pointer">Rename</button>';
+    return '<div class="student-list-item" id="sli2_' + id + '">' +
+      '<div class="sdot' + (on?' on':'') + '"></div>' +
+      '<div class="sname" id="sname2_' + id + '">' + esc(name) + '</div>' +
+      '<div style="display:flex;gap:4px;align-items:center">' +
+        '<span style="font-size:10px;color:#9aa0a6;margin-right:4px">' + (on?'Online':'Offline') + '</span>' +
+        rnBtn +
+        '<button class="remove-btn" onclick="removeStudentInline(\'' + id + '\')">Remove</button>' +
+      '</div>' +
     '</div>';
   }).join('');
   // Update count in header
@@ -1659,18 +1760,15 @@ function removeStudentInline(id) {
 
 
 function switchScenesTopTab(tab) {
-  // Update top tab bar active state
-  ['block','yt','tablimit'].forEach(function(t){
+  ['block','yt','tablimit','scenes','autocap'].forEach(function(t){
     var el = document.getElementById('ctab-'+t);
     if (el) el.classList.toggle('active', t===tab);
-  });
-  // Show correct content panel
-  ['block','yt','tablimit'].forEach(function(t){
     var c = document.getElementById('stab-'+t+'-content');
     if (c) c.style.display = t===tab ? 'block' : 'none';
   });
   if (tab === 'yt') renderYTCatsInline();
   if (tab === 'block') renderSitesInline();
+  if (tab === 'scenes') renderScenesList();
 }
 
 function switchStudentsTopTab(tab) {
@@ -1807,6 +1905,284 @@ function handleChatMsg(msg) {
   // Toast notification
   var sName = students[sid] ? students[sid].name : 'Student';
   toast(sName + ': ' + msg.text.slice(0, 40));
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// TIMELINES
+// ═══════════════════════════════════════════════════════════
+
+var browsing_history = {}; // studentId → [{time, title, url, favIconUrl}]
+var MAX_HISTORY = 200;
+
+function recordTabVisit(studentId, tab) {
+  if (!tab || !tab.url || tab.url.startsWith('chrome') || tab.url.includes('newtab')) return;
+  if (!browsing_history[studentId]) browsing_history[studentId] = [];
+  var hist = browsing_history[studentId];
+  // Don't duplicate consecutive same URL
+  if (hist.length > 0 && hist[hist.length-1].url === tab.url) return;
+  hist.push({ time: Date.now(), title: tab.title||'', url: tab.url, favIconUrl: tab.favIconUrl||'' });
+  if (hist.length > MAX_HISTORY) hist.shift();
+}
+
+// Hook into student updates to record active tab
+var _origUpdateStudents = updateStudents;
+updateStudents = function(list) {
+  (list||[]).forEach(function(s) {
+    if (!s) return;
+    var activeTab = (s.tabs||[]).find(function(t){ return t.active; });
+    if (activeTab && activeTab.url) recordTabVisit(s.id, activeTab);
+  });
+  _origUpdateStudents(list);
+};
+
+function switchToTimelines() {
+  currentView = 'timelines';
+  document.querySelectorAll('#tabsClassrooms .content-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('timelinesTab').classList.add('active');
+  document.getElementById('screensWrap').style.display = 'none';
+  document.getElementById('ssGallery').classList.remove('show');
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('timelinesView').style.display = 'flex';
+  // Populate student dropdown
+  var sel = document.getElementById('tlStudentSelect');
+  var prev = sel.value;
+  sel.innerHTML = '<option value="">Select a student...</option>';
+  myStudentIds.forEach(function(id) {
+    var s = students[id];
+    var name = s ? s.name : 'Unknown';
+    sel.innerHTML += '<option value="'+id+'"'+(id===prev?' selected':'')+'>'+esc(name)+'</option>';
+  });
+  if (prev) renderTimeline(prev);
+}
+
+function renderTimeline(studentId) {
+  var el = document.getElementById('tlContent');
+  if (!el) return;
+  if (!studentId) { el.innerHTML = '<div class="tl-empty">Select a student to view their browsing timeline</div>'; return; }
+  var hist = (browsing_history[studentId] || []).slice().reverse(); // newest first
+  if (hist.length === 0) {
+    el.innerHTML = '<div class="tl-empty">No browsing activity recorded yet for this student.<br>Activity is tracked while they are connected.</div>';
+    return;
+  }
+  el.innerHTML = hist.map(function(h) {
+    var t = new Date(h.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    var domain = '';
+    try { domain = new URL(h.url).hostname; } catch(e) { domain = h.url; }
+    return '<div class="tl-entry">'+
+      '<div class="tl-time">'+t+'</div>'+
+      (h.favIconUrl ? '<img class="tl-fav" src="'+h.favIconUrl+'" onerror="this.src=\"\"">' : '<div class="tl-fav" style="background:#e8eaed;border-radius:2px"></div>')+
+      '<div class="tl-info">'+
+        '<div class="tl-title">'+esc(h.title||domain)+'</div>'+
+        '<div class="tl-url">'+esc(domain)+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function clearTimeline() {
+  var sel = document.getElementById('tlStudentSelect');
+  if (sel && sel.value) {
+    browsing_history[sel.value] = [];
+    renderTimeline(sel.value);
+    toast('Timeline cleared');
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// MEDIUM: STUDENT NAME EDITING
+// ═══════════════════════════════════════════════════════════
+
+var studentNames = {}; // id → custom name, persisted in localStorage
+
+function loadStudentNames() {
+  try { studentNames = JSON.parse(localStorage.getItem('ujg_names') || '{}'); } catch(e) {}
+}
+function saveStudentNames() {
+  try { localStorage.setItem('ujg_names', JSON.stringify(studentNames)); } catch(e) {}
+}
+loadStudentNames();
+
+function editStudentName(id, isInline) {
+  var s = students[id];
+  var current = studentNames[id] || (s ? s.name : '') || 'Student';
+  var newName = prompt('Enter new name for this student:', current);
+  if (!newName || !newName.trim()) return;
+  newName = newName.trim();
+  studentNames[id] = newName;
+  saveStudentNames();
+  // Update live student object
+  if (students[id]) students[id].name = newName;
+  // Update tile
+  updateTile(id);
+  // Update student lists
+  renderMyStudents();
+  if (isInline) renderMyStudentsInline();
+  toast('Student renamed to "' + newName + '"');
+}
+
+// Override getName used in tiles
+function getStudentDisplayName(id) {
+  return studentNames[id] || (students[id] ? students[id].name : '') || 'Student';
+}
+
+// ═══════════════════════════════════════════════════════════
+// MEDIUM: SCENES / PRESETS
+// ═══════════════════════════════════════════════════════════
+
+var scenes = JSON.parse(localStorage.getItem('ujg_scenes') || '[]');
+
+function saveScene() {
+  var name = prompt('Name this scene (e.g. "Test Mode", "Free Work"):');
+  if (!name || !name.trim()) return;
+  var scene = {
+    id: Date.now(),
+    name: name.trim(),
+    blockedSites: blockedSites.slice(),
+    blockedYT: Array.from(blockedYT),
+    tabLimit: parseInt(document.getElementById('tabLimitR2')?.value || document.getElementById('tabLimitR')?.value || 0)
+  };
+  scenes.unshift(scene);
+  if (scenes.length > 20) scenes.pop();
+  localStorage.setItem('ujg_scenes', JSON.stringify(scenes));
+  renderScenesList();
+  toast('Scene "' + name.trim() + '" saved!');
+}
+
+function applyScene(id) {
+  var scene = scenes.find(function(s){ return s.id === id; });
+  if (!scene) return;
+  blockedSites = scene.blockedSites || [];
+  blockedYT = new Set(scene.blockedYT || []);
+  var tabLimit = scene.tabLimit || 0;
+  // Apply all at once
+  wsSend({type:'TEACHER_COMMAND', command:'BLOCK_SITES', targetId:'all', payload:{sites:blockedSites}});
+  wsSend({type:'TEACHER_COMMAND', command:'BLOCK_YT_CATEGORIES', targetId:'all', payload:{categories:Array.from(blockedYT)}});
+  wsSend({type:'TEACHER_COMMAND', command:'SET_TAB_LIMIT', targetId:'all', payload:{limit:tabLimit}});
+  renderSitesInline();
+  renderYTCatsInline();
+  var r = document.getElementById('tabLimitR2'); if (r) r.value = tabLimit;
+  var v = document.getElementById('tabLimitV2'); if (v) v.textContent = tabLimit === 0 ? 'Off' : tabLimit;
+  toast('Scene "' + scene.name + '" applied to all students');
+}
+
+function deleteScene(id) {
+  scenes = scenes.filter(function(s){ return s.id !== id; });
+  localStorage.setItem('ujg_scenes', JSON.stringify(scenes));
+  renderScenesList();
+  toast('Scene deleted');
+}
+
+function renderScenesList() {
+  var el = document.getElementById('scenesList');
+  if (!el) return;
+  if (!scenes.length) {
+    el.innerHTML = '<div style="font-size:12px;color:#9aa0a6;text-align:center;padding:16px">No saved scenes yet. Set up your blocks above and click Save as Scene.</div>';
+    return;
+  }
+  el.innerHTML = scenes.map(function(sc) {
+    var parts = [];
+    if (sc.blockedSites && sc.blockedSites.length) parts.push(sc.blockedSites.length + ' site(s)');
+    if (sc.blockedYT && sc.blockedYT.length) parts.push(sc.blockedYT.length + ' YT category/categories');
+    if (sc.tabLimit) parts.push('max ' + sc.tabLimit + ' tabs');
+    return '<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f1f3f4">' +
+      '<div style="flex:1;overflow:hidden">' +
+        '<div style="font-size:13px;font-weight:600;color:#202124">' + esc(sc.name) + '</div>' +
+        '<div style="font-size:11px;color:#5f6368">' + (parts.length ? parts.join(' · ') : 'No restrictions') + '</div>' +
+      '</div>' +
+      '<button onclick="applyScene(' + sc.id + ')" style="padding:5px 12px;background:var(--blue);color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer">Apply</button>' +
+      '<button onclick="deleteScene(' + sc.id + ')" style="padding:5px 10px;background:none;border:1px solid #dadce0;border-radius:5px;font-size:11px;color:#5f6368;cursor:pointer">✕</button>' +
+    '</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MEDIUM: AUTO-CAPTURE SCREENSHOTS
+// ═══════════════════════════════════════════════════════════
+
+var autoCapture = false;
+var autoCaptureInterval = null;
+var autoCaptureSeconds = 30;
+
+function toggleAutoCapture() {
+  autoCapture = !autoCapture;
+  var btn = document.getElementById('autoCaptureBtn');
+  if (autoCapture) {
+    autoCaptureSeconds = parseInt(document.getElementById('autoCaptureInterval')?.value || 30);
+    autoCaptureInterval = setInterval(function() {
+      wsSend({type:'TEACHER_COMMAND', command:'REQUEST_SCREENSHOT', targetId:'all', payload:{}});
+    }, autoCaptureSeconds * 1000);
+    if (btn) { btn.textContent = 'Stop Auto-capture'; btn.style.background = '#d93025'; }
+    toast('Auto-capturing every ' + autoCaptureSeconds + 's');
+  } else {
+    clearInterval(autoCaptureInterval);
+    autoCaptureInterval = null;
+    if (btn) { btn.textContent = 'Start Auto-capture'; btn.style.background = 'var(--blue)'; }
+    toast('Auto-capture stopped');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// LOW: DARK MODE
+// ═══════════════════════════════════════════════════════════
+
+var darkMode = localStorage.getItem('ujg_dark') === '1';
+
+function applyDarkMode() {
+  if (darkMode) {
+    document.body.setAttribute('data-dark', '1');
+    var btn = document.getElementById('darkModeBtn');
+    if (btn) btn.textContent = '☀️ Light Mode';
+  } else {
+    document.body.removeAttribute('data-dark');
+    var btn = document.getElementById('darkModeBtn');
+    if (btn) btn.textContent = '🌙 Dark Mode';
+  }
+}
+
+function toggleDarkMode() {
+  darkMode = !darkMode;
+  localStorage.setItem('ujg_dark', darkMode ? '1' : '0');
+  applyDarkMode();
+}
+
+applyDarkMode();
+
+// ═══════════════════════════════════════════════════════════
+// LOW: EXPORT TIMELINE
+// ═══════════════════════════════════════════════════════════
+
+function exportTimeline() {
+  var sel = document.getElementById('tlStudentSelect');
+  var studentId = sel ? sel.value : '';
+  if (!studentId) { toast('Select a student first'); return; }
+  var hist = browsing_history[studentId] || [];
+  if (!hist.length) { toast('No timeline data to export'); return; }
+  var s = students[studentId];
+  var name = (s ? s.name : 'Student').replace(/[^a-z0-9]/gi, '_');
+  var csv = 'Time,Title,URL\n' + hist.map(function(h) {
+    var t = new Date(h.time).toLocaleString();
+    return '"' + t + '","' + (h.title||'').replace(/"/g,'""') + '","' + (h.url||'') + '"';
+  }).join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'timeline-' + name + '-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('Timeline exported as CSV');
+}
+
+// ═══════════════════════════════════════════════════════════
+// LOW: FULLSCREEN TILE VIEW
+// ═══════════════════════════════════════════════════════════
+
+function openFullscreen(studentId) {
+  var sc = screenshots[studentId];
+  if (!sc || !sc.image) { toast('No screenshot available yet'); return; }
+  var w = window.open('', '_blank', 'width=1200,height=800');
+  var s = students[studentId];
+  var name = s ? s.name : 'Student';
+  w.document.write('<html><head><title>' + name + ' - Uncle Joe\'s Guardian</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;display:flex;flex-direction:column;height:100vh}header{background:#1a1f36;color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;font-family:sans-serif;font-size:14px;font-weight:600}img{flex:1;object-fit:contain;width:100%;height:calc(100vh - 44px)}</style></head><body><header>🖥️ ' + name + '</header><img src="' + sc.image + '"></body></html>');
 }
 
 </script>
