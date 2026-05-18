@@ -113,6 +113,19 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .content-tab.disabled{color:#adb5bd;cursor:default;pointer-events:none}
 .content-tab-right{margin-left:auto;display:flex;gap:7px;align-items:center;padding:6px 16px 0 12px;flex-shrink:0;position:relative;z-index:20}
 
+/* Chat */
+.chat-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden}
+.chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.chat-msg{max-width:85%;padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.4;word-break:break-word}
+.chat-msg.teacher{background:var(--blue);color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
+.chat-msg.student{background:#f1f3f4;color:#202124;align-self:flex-start;border-bottom-left-radius:3px}
+.chat-msg-time{font-size:10px;opacity:.65;margin-top:3px}
+.chat-input-row{display:flex;gap:6px;padding:10px;border-top:1px solid #e8eaed;flex-shrink:0}
+.chat-input{flex:1;padding:8px 12px;border:1px solid #dadce0;border-radius:20px;font-size:13px;font-family:inherit;outline:none}
+.chat-input:focus{border-color:var(--blue)}
+.chat-send-btn{width:36px;height:36px;border-radius:50%;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-send-btn:hover{background:var(--blue-dark)}
+.chat-empty{text-align:center;color:#9aa0a6;font-size:12px;padding:30px 10px;margin:auto}
 /* Sign-in spinner */
 @keyframes spin{to{transform:rotate(360deg)}}
 .signin-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:7px}
@@ -399,7 +412,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         <div id="tabsClassrooms" style="display:flex;align-items:flex-end;flex:1">
           <div class="content-tab active" id="screensTab" onclick="switchToScreens()">Screens</div>
           <div class="content-tab disabled">Timelines</div>
-          <div class="content-tab" id="ssTab" onclick="switchToScreenshots()">Screenshots <span class="ss-count" id="ssCount" style="background:rgba(26,115,232,0.12);color:var(--blue);padding:1px 6px;border-radius:10px;font-size:11px;font-weight:700">0</span></div>
+          <div class="content-tab" id="ssTab" onclick="switchToScreenshots()">Screenshots<span class="ss-count" id="ssCount" style="background:rgba(26,115,232,0.12);color:var(--blue);padding:1px 6px;border-radius:10px;font-size:11px;font-weight:700">0</span></div>
           <div class="content-tab disabled">Call Students</div>
         </div>
         <!-- Scenes tabs -->
@@ -416,9 +429,9 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         <!-- Action buttons on right -->
         <div class="content-tab-right" id="classroomsActions">
           <input type="text" id="lockMsgInput" placeholder="Lock message..." style="padding:5px 10px;border:1px solid #dadce0;border-radius:6px;font-size:12px;width:180px;font-family:inherit;outline:none">
-          <button class="tbtn danger" onclick="cmdAll('LOCK_SCREEN')">🔒 Lock All</button>
-          <button class="tbtn" onclick="cmdAll('UNLOCK_SCREEN')">🔓 Unlock All</button>
-          <button class="tbtn" onclick="cmdAll('CLOSE_ALL_TABS')">✕ Close Tabs</button>
+          <button class="tbtn danger" onclick="cmdAll('LOCK_SCREEN')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Lock All</button>
+          <button class="tbtn" onclick="cmdAll('UNLOCK_SCREEN')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 0 9.9-1"/></svg>Unlock All</button>
+          <button class="tbtn" onclick="cmdAll('CLOSE_ALL_TABS')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Close Tabs</button>
         </div>
       </div>
       <div class="action-bar" id="actionBar">
@@ -440,7 +453,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         <div class="filter-count" id="onlineCountBadge"><span id="onlineCnt">0</span> online</div>
       </div>
       <div id="emptyState" class="empty">
-        <div class="empty-icon">👩‍💻</div>
+        <div class="empty-icon"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#dadce0" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
         <h3>No Students Connected</h3>
         <p>Add students using their 5-digit code from the extension, then they'll appear here when online.</p>
       </div>
@@ -449,7 +462,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
       </div>
       <div class="ss-gallery" id="ssGallery">
         <div id="ssEmpty" class="ss-empty">
-          <div class="sei">📷</div>
+          <div class="sei"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dadce0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
           <div style="font-size:15px;font-weight:600;color:#5f6368;margin-bottom:6px">No screenshots yet</div>
           <div style="font-size:13px">Click the Screenshot button on a student tile to capture their screen</div>
         </div>
@@ -471,8 +484,8 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
             </div>
             <div id="siteList2" style="margin-bottom:14px"></div>
             <div style="display:flex;gap:8px">
-              <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyBlockInline()">🚫 Apply Block List</button>
-              <button class="sp-btn gray" style="width:auto;padding:9px 20px" onclick="clearBlock()">↩ Clear All</button>
+              <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyBlockInline()">Apply Block List</button>
+              <button class="sp-btn gray" style="width:auto;padding:9px 20px" onclick="clearBlock()">Clear All</button>
             </div>
           </div>
         </div>
@@ -483,7 +496,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
             <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">YouTube Category Filter</h2>
             <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Block specific content categories on YouTube. Students will see a blocked message on matching videos.</p>
             <div class="yt-grid" id="ytGrid2" style="max-width:520px;margin-bottom:16px"></div>
-            <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyYTInline()">🎬 Apply YouTube Filters</button>
+            <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyYTInline()">Apply YouTube Filters</button>
           </div>
         </div>
 
@@ -497,7 +510,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
               <input type="range" id="tabLimitR2" min="0" max="10" value="0" oninput="document.getElementById('tabLimitV2').textContent=this.value==0?'Off':this.value" style="flex:1;accent-color:var(--blue)">
               <span id="tabLimitV2" style="font-size:15px;font-weight:700;color:var(--blue);min-width:32px">Off</span>
             </div>
-            <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyTabLimitInline()">📌 Apply Limit</button>
+            <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyTabLimitInline()">Apply Limit</button>
           </div>
         </div>
       </div>
@@ -564,10 +577,30 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
       </div>
       <div class="modal-panel">
         <div class="mpanel-tabs">
-          <div class="mpanel-tab active">Student Activity</div>
-          <div class="mpanel-tab" style="opacity:.5">Chat</div>
+          <div class="mpanel-tab active" id="mptab-activity" onclick="switchModalPanel('activity')">Student Activity</div>
+          <div class="mpanel-tab" id="mptab-chat" onclick="switchModalPanel('chat')">Chat</div>
         </div>
-        <div class="tab-list" id="modalTabs"></div>
+        <!-- Activity view -->
+        <div id="modalActivityView" style="flex:1;overflow-y:auto">
+          <div class="tab-list" id="modalTabs"></div>
+        </div>
+        <!-- Chat view -->
+        <div id="modalChatView" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+          <div class="chat-wrap">
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-empty" id="chatEmpty">No messages yet.<br>Start a conversation!</div>
+            </div>
+            <div class="chat-input-row">
+              <input type="text" class="chat-input" id="chatInput" placeholder="Message student..." maxlength="200"
+                onkeydown="if(event.key==='Enter')sendChatMsg()">
+              <button class="chat-send-btn" onclick="sendChatMsg()" title="Send">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <!-- Action buttons: start at midpoint of screen, go to right edge -->
@@ -610,13 +643,13 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         <button class="sp-btn" style="width:auto;padding:8px 14px" onclick="addSite()">Add</button>
       </div>
       <div id="siteList" style="margin-bottom:8px"></div>
-      <button class="sp-btn" onclick="applyBlock()">🚫 Apply Block List</button>
-      <button class="sp-btn gray" onclick="clearBlock()" style="margin-top:6px">↩ Clear Blocks</button>
+      <button class="sp-btn" onclick="applyBlock()">Apply Block List</button>
+      <button class="sp-btn gray" onclick="clearBlock()" style="margin-top:6px">Clear Blocks</button>
     </div>
     <div class="sp-section">
       <div class="sp-label">YouTube Categories</div>
       <div class="yt-grid" id="ytGrid"></div>
-      <button class="sp-btn" onclick="applyYT()" style="margin-top:10px">🎬 Apply YouTube Filters</button>
+      <button class="sp-btn" onclick="applyYT()" style="margin-top:10px">Apply YouTube Filters</button>
     </div>
     <div class="sp-section">
       <div class="sp-label">Tab Limit</div>
@@ -625,7 +658,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         <input type="range" id="tabLimitR" min="0" max="10" value="0" oninput="document.getElementById('tabLimitV').textContent=this.value==0?'Off':this.value" style="flex:1;accent-color:var(--blue)">
         <span id="tabLimitV" style="font-size:12px;font-weight:600;color:var(--blue);min-width:24px">Off</span>
       </div>
-      <button class="sp-btn" onclick="applyTabLimit()">📌 Apply Limit</button>
+      <button class="sp-btn" onclick="applyTabLimit()">Apply Limit</button>
     </div>
   </div>
 </div>
@@ -638,7 +671,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
       <div class="sp-label">Enter Student Code</div>
       <p style="font-size:12px;color:#5f6368;margin-bottom:12px;line-height:1.6">Ask the student to open the Uncle Joe's Guardian extension and share their 5-digit code.</p>
       <input class="code-input" type="text" id="codeIn" maxlength="5" placeholder="00000" oninput="this.value=this.value.replace(/\D/g,'').slice(0,5)" onkeydown="if(event.key==='Enter')submitCode()">
-      <button class="sp-btn" onclick="submitCode()">➕ Add to Classroom</button>
+      <button class="sp-btn" onclick="submitCode()">Add to Classroom</button>
       <div class="result-msg" id="codeResult"></div>
     </div>
     <div class="sp-section">
@@ -808,6 +841,7 @@ function connectWS() {
     if (msg.type === 'STUDENT_LIST') updateStudents(msg.students);
     if (msg.type === 'STUDENT_UPDATE' && msg.student) updateOneStudent(msg.student);
     if (msg.type === 'SCREENSHOT') handleSS(msg);
+    if (msg.type === 'CHAT_MSG') handleChatMsg(msg);
   };
   ws.onclose = function() { setConn(false); setTimeout(connectWS, 5000); };
   ws.onerror = function() { setConn(false); };
@@ -972,7 +1006,7 @@ function makeTile(s) {
         )+
       '</div>'+
       '<div class="tile-lock-overlay" id="tlk_'+s.id+'" style="display:'+(s.isLocked?'flex':'none')+'">'+
-        '<div class="li">🔒</div>'+
+        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'+
         '<div>Screen Locked</div>'+
         '<button class="unlock-tile-btn" onclick="event.stopPropagation();doUnlock(\''+s.id+'\')">Unlock Device</button>'+
       '</div>'+
@@ -1688,6 +1722,91 @@ function deleteAccount() {
   saveAccounts(accounts);
   toast('Account deleted.');
   setTimeout(doLogout, 800);
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// CHAT SYSTEM
+// ═══════════════════════════════════════════════════════════
+
+var chatHistory = {}; // studentId → [{from, text, time}]
+
+function switchModalPanel(panel) {
+  var actTab = document.getElementById('mptab-activity');
+  var chatTab = document.getElementById('mptab-chat');
+  var actView = document.getElementById('modalActivityView');
+  var chatView = document.getElementById('modalChatView');
+  if (!actTab) return;
+  actTab.classList.toggle('active', panel === 'activity');
+  chatTab.classList.toggle('active', panel === 'chat');
+  if (actView) actView.style.display = panel === 'activity' ? '' : 'none';
+  if (chatView) { chatView.style.display = panel === 'chat' ? 'flex' : 'none'; chatView.style.flexDirection = 'column'; }
+  if (panel === 'chat' && modalStudentId) {
+    renderChat(modalStudentId);
+    setTimeout(function() { scrollChatToBottom(); }, 50);
+  }
+}
+
+function renderChat(studentId) {
+  var msgs = chatHistory[studentId] || [];
+  var container = document.getElementById('chatMessages');
+  var empty = document.getElementById('chatEmpty');
+  if (!container) return;
+  if (msgs.length === 0) {
+    container.innerHTML = '<div class="chat-empty" id="chatEmpty">No messages yet.<br>Start a conversation!</div>';
+    return;
+  }
+  container.innerHTML = msgs.map(function(m) {
+    var t = new Date(m.time).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    return '<div style="display:flex;flex-direction:column;align-items:'+(m.from==='teacher'?'flex-end':'flex-start')+'">' +
+      '<div class="chat-msg '+m.from+'">'+esc(m.text)+'</div>' +
+      '<div class="chat-msg-time">'+t+'</div>' +
+    '</div>';
+  }).join('');
+  scrollChatToBottom();
+}
+
+function scrollChatToBottom() {
+  var c = document.getElementById('chatMessages');
+  if (c) c.scrollTop = c.scrollHeight;
+}
+
+function sendChatMsg() {
+  if (!modalStudentId) return;
+  var input = document.getElementById('chatInput');
+  var text = (input ? input.value : '').trim();
+  if (!text) return;
+  input.value = '';
+
+  // Add to local history
+  if (!chatHistory[modalStudentId]) chatHistory[modalStudentId] = [];
+  chatHistory[modalStudentId].push({ from: 'teacher', text: text, time: Date.now() });
+
+  // Send to student via server
+  wsSend({ type: 'TEACHER_COMMAND', command: 'CHAT_MSG', targetId: modalStudentId, payload: { text: text, from: 'teacher' } });
+
+  renderChat(modalStudentId);
+}
+
+// Handle incoming chat messages from students
+function handleChatMsg(msg) {
+  var sid = msg.studentId;
+  if (!chatHistory[sid]) chatHistory[sid] = [];
+  chatHistory[sid].push({ from: 'student', text: msg.text, time: msg.timestamp || Date.now() });
+
+  // Show notification badge on chat tab if modal is open on activity tab
+  var chatTab = document.getElementById('mptab-chat');
+  if (chatTab && modalStudentId === sid) {
+    var isOnChat = chatTab.classList.contains('active');
+    if (!isOnChat) {
+      chatTab.textContent = 'Chat 🔴';
+    } else {
+      renderChat(sid);
+    }
+  }
+  // Toast notification
+  var sName = students[sid] ? students[sid].name : 'Student';
+  toast(sName + ': ' + msg.text.slice(0, 40));
 }
 
 </script>
