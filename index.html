@@ -1462,6 +1462,7 @@ function setSection(section, el) {
   var ab = document.getElementById('actionBar');
 
   if (section === 'classrooms') {
+    currentView = 'screens';
     var ct = document.getElementById('tabsClassrooms');
     if (ct) ct.style.display = 'flex';
     if (actions) actions.style.display = 'flex';
@@ -1469,6 +1470,7 @@ function setSection(section, el) {
     switchToScreens();
 
   } else if (section === 'scenes') {
+    currentView = 'scenes';
     var st2 = document.getElementById('tabsScenes');
     if (st2) st2.style.display = 'flex';
     if (fb) fb.style.display = 'none';
@@ -1476,6 +1478,7 @@ function setSection(section, el) {
     if (sc) { sc.style.display = 'flex'; switchScenesTopTab('scenes'); renderScenesList(); }
 
   } else if (section === 'students') {
+    currentView = 'students';
     var stt = document.getElementById('tabsStudents');
     if (stt) stt.style.display = 'flex';
     if (fb) fb.style.display = 'none';
