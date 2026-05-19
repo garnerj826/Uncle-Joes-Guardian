@@ -511,82 +511,210 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 
       <!-- Scenes / Block Sites inline -->
       <div id="scenesSection" style="display:none;flex-direction:column;flex:1;overflow:hidden">
-        <!-- Block Sites tab -->
-        <div id="stab-block-content" style="flex:1;overflow-y:auto;padding:28px;display:block">
-          <div style="max-width:600px">
-            <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">Block Websites</h2>
-            <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Enter a site to block for all students. Blocked sites redirect to the GoGuardian blocked page.</p>
-            <div style="display:flex;gap:8px;margin-bottom:12px">
-              <input id="siteIn2" class="sp-input" placeholder="e.g. youtube.com" style="flex:1;max-width:320px" onkeydown="if(event.key==='Enter')addSiteInline()">
-              <button class="sp-btn" style="width:auto;padding:8px 18px" onclick="addSiteInline()">Add</button>
-            </div>
-            <div id="siteList2" style="margin-bottom:14px"></div>
-            <div style="display:flex;gap:8px">
-              <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyBlockInline()">Apply Block List</button>
-              <button class="sp-btn gray" style="width:auto;padding:9px 20px" onclick="clearBlock()">Clear All</button>
-            <button class="sp-btn" style="width:auto;padding:9px 20px;background:#f59e0b;margin-top:8px" onclick="saveScene()">⭐ Save as Scene</button>
-            </div>
+
+  <div id="stab-scenes-content" style="flex:1;overflow-y:auto;display:flex;flex-direction:column">
+  <!-- Top create cards -->
+  <div style="display:flex;gap:16px;padding:20px 24px;background:#f8f9fa;border-bottom:1px solid #e8eaed;flex-shrink:0">
+
+    <!-- Block List card -->
+    <div style="flex:1;background:linear-gradient(135deg,#0d5c7e,#0a4a6b);border-radius:12px;padding:22px 24px;color:#fff;position:relative;overflow:hidden;min-height:140px">
+      <div style="position:absolute;right:-10px;top:-10px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>
+      <div style="position:absolute;right:20px;bottom:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        <span style="font-size:17px;font-weight:700">Block List</span>
+      </div>
+      <div style="font-size:12px;opacity:0.85;margin-bottom:5px;display:flex;align-items:center;gap:6px">
+        <span style="color:#fbbf24">★</span> Students can browse websites, except what you block
+      </div>
+      <div style="font-size:12px;opacity:0.85;margin-bottom:16px;display:flex;align-items:center;gap:6px">
+        <span style="color:#fbbf24">★</span> Use this to block games and other distractions
+      </div>
+      <button onclick="createNewScene('block')" style="padding:8px 18px;background:#fff;color:#0d5c7e;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer">Create Block List</button>
+    </div>
+
+    <!-- Allow List card -->
+    <div style="flex:1;background:linear-gradient(135deg,#1a56a0,#1340a0);border-radius:12px;padding:22px 24px;color:#fff;position:relative;overflow:hidden;min-height:140px">
+      <div style="position:absolute;right:-10px;top:-10px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>
+      <div style="position:absolute;right:20px;bottom:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        <span style="font-size:17px;font-weight:700">Allow List</span>
+      </div>
+      <div style="font-size:12px;opacity:0.85;margin-bottom:5px;display:flex;align-items:center;gap:6px">
+        <span style="color:#fbbf24">★</span> Students can <u>only</u> access the websites you allow
+      </div>
+      <div style="font-size:12px;opacity:0.85;margin-bottom:16px;display:flex;align-items:center;gap:6px">
+        <span style="color:#fbbf24">★</span> Keep students focused on a quiz, test or assignment
+      </div>
+      <button onclick="createNewScene('allow')" style="padding:8px 18px;background:#fff;color:#1a56a0;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer">Create Allow List</button>
+    </div>
+
+  </div>
+
+  <!-- Scenes list -->
+  <div style="flex:1;overflow-y:auto;padding:0 24px 24px">
+
+    <!-- Sort + header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0 10px">
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5f6368">
+        Sort by
+        <select onchange="sortScenes(this.value)" style="padding:5px 10px;border:1px solid #dadce0;border-radius:6px;font-size:12px;font-family:inherit;outline:none">
+          <option value="recent">Recently Used</option>
+          <option value="name">Name A–Z</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Scenes list -->
+    <div id="scenesList"></div>
+
+  </div>
+
+
+  </div><!-- /stab-scenes-content -->
+
+
+  <!-- Block Sites tab -->
+  <div id="stab-block-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
+    <div style="max-width:600px">
+      <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">Block Websites</h2>
+      <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Enter a site to block for all students. Blocked sites redirect to the blocked page.</p>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input id="siteIn2" class="sp-input" placeholder="e.g. youtube.com" style="flex:1;max-width:320px" onkeydown="if(event.key==='Enter')addSiteInline()">
+        <button class="sp-btn" style="width:auto;padding:8px 18px" onclick="addSiteInline()">Add</button>
+      </div>
+      <div id="siteList2" style="margin-bottom:14px"></div>
+      <div style="display:flex;gap:8px">
+        <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyBlockInline()">Apply Block List</button>
+        <button class="sp-btn gray" style="width:auto;padding:9px 20px" onclick="clearBlock()">Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- YouTube Filter tab -->
+  <div id="stab-yt-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
+    <div style="max-width:600px">
+      <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">YouTube Category Filter</h2>
+      <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Block specific content categories on YouTube.</p>
+      <div class="yt-grid" id="ytGrid2" style="max-width:520px;margin-bottom:16px"></div>
+      <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyYTInline()">Apply YouTube Filters</button>
+    </div>
+  </div>
+
+  <!-- Tab Limit tab -->
+  <div id="stab-tablimit-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
+    <div style="max-width:600px">
+      <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">Tab Limit</h2>
+      <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Limit how many tabs students can have open at once.</p>
+      <div style="display:flex;align-items:center;gap:14px;max-width:360px;margin-bottom:16px">
+        <span style="font-size:13px;color:#5f6368;white-space:nowrap">Max open tabs:</span>
+        <input type="range" id="tabLimitR2" min="0" max="10" value="0" oninput="document.getElementById('tabLimitV2').textContent=this.value==0?'Off':this.value" style="flex:1;accent-color:var(--blue)">
+        <span id="tabLimitV2" style="font-size:15px;font-weight:700;color:var(--blue);min-width:32px">Off</span>
+      </div>
+      <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyTabLimitInline()">Apply Limit</button>
+    </div>
+  </div>
+
+  <!-- Auto-capture tab -->
+  <div id="stab-autocap-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
+    <div style="max-width:600px">
+      <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">Auto Screenshot</h2>
+      <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Automatically capture screenshots from all students at a set interval.</p>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <span style="font-size:13px;color:#5f6368">Every</span>
+        <select id="autoCaptureInterval" style="padding:6px 10px;border:1px solid #dadce0;border-radius:6px;font-size:13px;font-family:inherit;outline:none">
+          <option value="15">15 seconds</option>
+          <option value="30" selected>30 seconds</option>
+          <option value="60">1 minute</option>
+          <option value="120">2 minutes</option>
+          <option value="300">5 minutes</option>
+        </select>
+      </div>
+      <button id="autoCaptureBtn" class="sp-btn" style="width:auto;padding:9px 20px" onclick="toggleAutoCapture()">Start Auto-capture</button>
+    </div>
+  </div>
+
+  <!-- CREATE/EDIT SCENE MODAL -->
+  <div id="sceneModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:600;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:12px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.2);margin:20px">
+      <div style="padding:20px 24px;border-bottom:1px solid #e8eaed;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#202124" id="sceneModalTitle">New Scene</div>
+          <div style="font-size:12px;color:#5f6368;margin-top:2px" id="sceneModalSubtitle">Configure what this scene will do</div>
+        </div>
+        <button onclick="closeSceneModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#5f6368;padding:2px 8px">✕</button>
+      </div>
+      <div style="padding:20px 24px">
+
+        <!-- Name -->
+        <div style="margin-bottom:18px">
+          <label style="display:block;font-size:12px;font-weight:700;color:#5f6368;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Scene Name</label>
+          <input type="text" id="sceneNameInput" placeholder='e.g. "Test Mode", "Free Work", "Math Class"'
+            style="width:100%;padding:10px 12px;border:1.5px solid #dadce0;border-radius:7px;font-size:14px;font-family:inherit;outline:none"
+            onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='#dadce0'">
+        </div>
+
+        <!-- Color picker -->
+        <div style="margin-bottom:18px">
+          <label style="display:block;font-size:12px;font-weight:700;color:#5f6368;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Color</label>
+          <div style="display:flex;gap:8px" id="sceneColorPicker">
+            <div onclick="selectSceneColor(this,'#1a73e8')" style="width:28px;height:28px;border-radius:6px;background:#1a73e8;cursor:pointer;border:2px solid transparent" data-color="#1a73e8"></div>
+            <div onclick="selectSceneColor(this,'#1e8e3e')" style="width:28px;height:28px;border-radius:6px;background:#1e8e3e;cursor:pointer;border:2px solid transparent" data-color="#1e8e3e"></div>
+            <div onclick="selectSceneColor(this,'#d93025')" style="width:28px;height:28px;border-radius:6px;background:#d93025;cursor:pointer;border:2px solid transparent" data-color="#d93025"></div>
+            <div onclick="selectSceneColor(this,'#f59e0b')" style="width:28px;height:28px;border-radius:6px;background:#f59e0b;cursor:pointer;border:2px solid transparent" data-color="#f59e0b"></div>
+            <div onclick="selectSceneColor(this,'#7c3aed')" style="width:28px;height:28px;border-radius:6px;background:#7c3aed;cursor:pointer;border:2px solid transparent" data-color="#7c3aed"></div>
+            <div onclick="selectSceneColor(this,'#0d5c7e')" style="width:28px;height:28px;border-radius:6px;background:#0d5c7e;cursor:pointer;border:2px solid transparent" data-color="#0d5c7e"></div>
           </div>
         </div>
 
-        <!-- YouTube Filter tab -->
-        <div id="stab-yt-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
-          <div style="max-width:600px">
-            <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">YouTube Category Filter</h2>
-            <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Block specific content categories on YouTube. Students will see a blocked message on matching videos.</p>
-            <div class="yt-grid" id="ytGrid2" style="max-width:520px;margin-bottom:16px"></div>
-            <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyYTInline()">Apply YouTube Filters</button>
+        <!-- Blocked Sites -->
+        <div style="margin-bottom:18px">
+          <label style="display:block;font-size:12px;font-weight:700;color:#5f6368;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Blocked Websites</label>
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <input type="text" id="sceneSiteInput" placeholder="e.g. youtube.com"
+              style="flex:1;padding:8px 12px;border:1px solid #dadce0;border-radius:6px;font-size:13px;font-family:inherit;outline:none"
+              onkeydown="if(event.key==='Enter')addSceneSite()">
+            <button onclick="addSceneSite()" style="padding:8px 16px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">Add</button>
+          </div>
+          <div id="sceneSiteList" style="min-height:24px"></div>
+        </div>
+
+        <!-- YouTube Categories -->
+        <div style="margin-bottom:18px">
+          <label style="display:block;font-size:12px;font-weight:700;color:#5f6368;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Block YouTube Categories</label>
+          <div class="yt-grid" id="sceneYTGrid"></div>
+        </div>
+
+        <!-- Tab Limit -->
+        <div style="margin-bottom:18px">
+          <label style="display:block;font-size:12px;font-weight:700;color:#5f6368;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Tab Limit</label>
+          <div style="display:flex;align-items:center;gap:12px">
+            <input type="range" id="sceneTabLimit" min="0" max="10" value="0"
+              oninput="document.getElementById('sceneTabLimitV').textContent=this.value==0?'Off':this.value"
+              style="flex:1;accent-color:var(--blue)">
+            <span id="sceneTabLimitV" style="font-size:14px;font-weight:700;color:var(--blue);min-width:32px">Off</span>
           </div>
         </div>
 
-        <!-- Scenes tab -->
-        <div id="stab-scenes-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
-          <div style="max-width:600px">
-            <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">Saved Scenes</h2>
-            <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Save your current block settings as a reusable scene. Apply a scene to push all settings at once.</p>
-            <button class="sp-btn" style="width:auto;padding:9px 20px;margin-bottom:16px" onclick="saveScene()">⭐ Save Current Settings as Scene</button>
-            <div id="scenesList"></div>
-          </div>
+        <!-- Open URL for students -->
+        <div style="margin-bottom:24px">
+          <label style="display:block;font-size:12px;font-weight:700;color:#5f6368;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Open URL when activated (optional)</label>
+          <input type="text" id="sceneOpenUrl" placeholder="e.g. https://classroom.google.com"
+            style="width:100%;padding:8px 12px;border:1px solid #dadce0;border-radius:6px;font-size:13px;font-family:inherit;outline:none">
         </div>
 
-        <!-- Auto-capture tab -->
-        <div id="stab-autocap-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
-          <div style="max-width:600px">
-            <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">Auto Screenshot</h2>
-            <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Automatically capture screenshots from all students at a set interval.</p>
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-              <span style="font-size:13px;color:#5f6368">Every</span>
-              <select id="autoCaptureInterval" style="padding:6px 10px;border:1px solid #dadce0;border-radius:6px;font-size:13px;font-family:inherit;outline:none">
-                <option value="15">15 seconds</option>
-                <option value="30" selected>30 seconds</option>
-                <option value="60">1 minute</option>
-                <option value="120">2 minutes</option>
-                <option value="300">5 minutes</option>
-              </select>
-            </div>
-            <button id="autoCaptureBtn" class="sp-btn" style="width:auto;padding:9px 20px" onclick="toggleAutoCapture()">Start Auto-capture</button>
-          </div>
-        </div>
-
-        <div style="display:none"><!-- placeholder
-          </div>
-        </div>
-
-        <!-- Tab Limit tab -->
-        <div id="stab-tablimit-content" style="flex:1;overflow-y:auto;padding:28px;display:none">
-          <div style="max-width:600px">
-            <h2 style="font-size:16px;font-weight:700;color:#202124;margin-bottom:4px">Tab Limit</h2>
-            <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Limit how many tabs students can have open at once.</p>
-            <div style="display:flex;align-items:center;gap:14px;max-width:360px;margin-bottom:16px">
-              <span style="font-size:13px;color:#5f6368;white-space:nowrap">Max open tabs:</span>
-              <input type="range" id="tabLimitR2" min="0" max="10" value="0" oninput="document.getElementById('tabLimitV2').textContent=this.value==0?'Off':this.value" style="flex:1;accent-color:var(--blue)">
-              <span id="tabLimitV2" style="font-size:15px;font-weight:700;color:var(--blue);min-width:32px">Off</span>
-            </div>
-            <button class="sp-btn" style="width:auto;padding:9px 20px" onclick="applyTabLimitInline()">Apply Limit</button>
-          </div>
+        <div style="display:flex;gap:10px">
+          <button onclick="saveSceneFromModal()" style="flex:1;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer">Save Scene</button>
+          <button onclick="closeSceneModal()" style="padding:11px 20px;border:1px solid #dadce0;background:#fff;border-radius:7px;font-size:14px;cursor:pointer">Cancel</button>
         </div>
       </div>
-      <!-- Students inline -->
+    </div>
+  </div>
+
+</div>
+
+            <!-- Students inline -->
       <div id="studentsSection" style="display:none;flex-direction:column;flex:1;overflow:hidden">
         <!-- Add Student tab -->
         <div id="stutab-add-content" style="flex:1;overflow-y:auto;padding:28px;display:block">
@@ -1330,7 +1458,7 @@ function setSection(section, el) {
     if (st2) st2.style.display = 'flex';
     if (fb) fb.style.display = 'none';
     if (ab) ab.classList.remove('show');
-    if (sc) { sc.style.display = 'flex'; switchScenesTopTab('block'); }
+    if (sc) { sc.style.display = 'flex'; switchScenesTopTab('scenes'); renderScenesList(); }
 
   } else if (section === 'students') {
     var stt = document.getElementById('tabsStudents');
@@ -1760,11 +1888,15 @@ function removeStudentInline(id) {
 
 
 function switchScenesTopTab(tab) {
-  ['block','yt','tablimit','scenes','autocap'].forEach(function(t){
+  ['scenes','block','yt','tablimit','autocap'].forEach(function(t){
     var el = document.getElementById('ctab-'+t);
     if (el) el.classList.toggle('active', t===tab);
     var c = document.getElementById('stab-'+t+'-content');
-    if (c) c.style.display = t===tab ? 'block' : 'none';
+    if (c) {
+      var show = t === tab;
+      c.style.display = show ? (t==='scenes' ? 'flex' : 'block') : 'none';
+      if (t==='scenes' && show) c.style.flexDirection = 'column';
+    }
   });
   if (tab === 'yt') renderYTCatsInline();
   if (tab === 'block') renderSitesInline();
@@ -2028,73 +2160,259 @@ function getStudentDisplayName(id) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// MEDIUM: SCENES / PRESETS
+// SCENES SYSTEM
 // ═══════════════════════════════════════════════════════════
 
-var scenes = JSON.parse(localStorage.getItem('ujg_scenes') || '[]');
+var scenes = JSON.parse(localStorage.getItem('ujg_scenes_v2') || '[]');
+var editingSceneId = null;
+var sceneColor = '#1a73e8';
+var sceneSites = [];
+var sceneYTCats = new Set();
 
-function saveScene() {
-  var name = prompt('Name this scene (e.g. "Test Mode", "Free Work"):');
-  if (!name || !name.trim()) return;
-  var scene = {
-    id: Date.now(),
-    name: name.trim(),
-    blockedSites: blockedSites.slice(),
-    blockedYT: Array.from(blockedYT),
-    tabLimit: parseInt(document.getElementById('tabLimitR2')?.value || document.getElementById('tabLimitR')?.value || 0)
+function saveSceneData() {
+  localStorage.setItem('ujg_scenes_v2', JSON.stringify(scenes));
+}
+
+function createNewScene(type) {
+  editingSceneId = null;
+  sceneColor = type === 'block' ? '#0d5c7e' : '#1a56a0';
+  sceneSites = [];
+  sceneYTCats = new Set();
+  document.getElementById('sceneNameInput').value = '';
+  document.getElementById('sceneSiteInput').value = '';
+  document.getElementById('sceneOpenUrl').value = '';
+  document.getElementById('sceneTabLimit').value = 0;
+  document.getElementById('sceneTabLimitV').textContent = 'Off';
+  document.getElementById('sceneSiteList').innerHTML = '';
+  document.getElementById('sceneModalTitle').textContent = type === 'block' ? 'New Block List Scene' : 'New Allow List Scene';
+  document.getElementById('sceneModalSubtitle').textContent = type === 'block' ? 'Block specific sites for all students' : 'Set sites students can only access';
+  // Set color
+  selectSceneColor(document.querySelector('[data-color="'+sceneColor+'"]'), sceneColor);
+  // Render YT grid
+  renderSceneYTGrid();
+  document.getElementById('sceneModal').style.display = 'flex';
+  setTimeout(function(){ document.getElementById('sceneNameInput').focus(); }, 100);
+}
+
+function editScene(id) {
+  var sc = scenes.find(function(s){ return s.id === id; });
+  if (!sc) return;
+  editingSceneId = id;
+  sceneColor = sc.color || '#1a73e8';
+  sceneSites = (sc.blockedSites || []).slice();
+  sceneYTCats = new Set(sc.blockedYT || []);
+  document.getElementById('sceneNameInput').value = sc.name;
+  document.getElementById('sceneOpenUrl').value = sc.openUrl || '';
+  document.getElementById('sceneTabLimit').value = sc.tabLimit || 0;
+  document.getElementById('sceneTabLimitV').textContent = sc.tabLimit ? sc.tabLimit : 'Off';
+  document.getElementById('sceneModalTitle').textContent = 'Edit Scene';
+  document.getElementById('sceneModalSubtitle').textContent = sc.name;
+  selectSceneColor(document.querySelector('[data-color="'+sceneColor+'"]'), sceneColor);
+  renderSceneSiteList();
+  renderSceneYTGrid();
+  document.getElementById('sceneModal').style.display = 'flex';
+}
+
+function closeSceneModal() {
+  document.getElementById('sceneModal').style.display = 'none';
+}
+
+function selectSceneColor(el, color) {
+  sceneColor = color;
+  document.querySelectorAll('#sceneColorPicker div').forEach(function(d){
+    d.style.border = '2px solid transparent';
+    d.style.transform = 'scale(1)';
+  });
+  if (el) { el.style.border = '2px solid #202124'; el.style.transform = 'scale(1.2)'; }
+}
+
+function addSceneSite() {
+  var input = document.getElementById('sceneSiteInput');
+  var val = (input.value || '').trim().toLowerCase().replace(/^https?:\/\//,'').replace(/\/.*$/,'');
+  if (!val) return;
+  if (!sceneSites.includes(val)) { sceneSites.push(val); renderSceneSiteList(); }
+  input.value = '';
+  input.focus();
+}
+
+function removeSceneSite(site) {
+  sceneSites = sceneSites.filter(function(s){ return s !== site; });
+  renderSceneSiteList();
+}
+
+function renderSceneSiteList() {
+  var el = document.getElementById('sceneSiteList');
+  if (!el) return;
+  el.innerHTML = sceneSites.map(function(s){
+    return '<span class="site-tag">'+esc(s)+'<button onclick="removeSceneSite(\'' + s + '\')">✕</button></span>';
+  }).join('');
+}
+
+function renderSceneYTGrid() {
+  var grid = document.getElementById('sceneYTGrid');
+  if (!grid) return;
+  grid.innerHTML = YT_CATS.map(function(c){
+    var on = sceneYTCats.has(c.id);
+    var ytOnClick = 'onclick="toggleSceneYT(\'' + c.id + '\')"';
+    return '<div class="yt-cat'+(on?' on':'')+'" id="sytc_'+c.id+'" '+ytOnClick+'>'+
+      '<span class="yt-icon">'+c.icon+'</span><span>'+c.label+'</span>'+
+      (on?'<span style="margin-left:auto">✓</span>':'')+
+    '</div>';
+  }).join('');
+}
+
+function toggleSceneYT(id) {
+  if (sceneYTCats.has(id)) sceneYTCats.delete(id); else sceneYTCats.add(id);
+  renderSceneYTGrid();
+}
+
+function saveSceneFromModal() {
+  var name = document.getElementById('sceneNameInput').value.trim();
+  if (!name) { document.getElementById('sceneNameInput').focus(); toast('Please enter a scene name'); return; }
+  var tabLimit = parseInt(document.getElementById('sceneTabLimit').value) || 0;
+  var openUrl = document.getElementById('sceneOpenUrl').value.trim();
+
+  var sceneData = {
+    id: editingSceneId || Date.now(),
+    name: name,
+    color: sceneColor,
+    blockedSites: sceneSites.slice(),
+    blockedYT: Array.from(sceneYTCats),
+    tabLimit: tabLimit,
+    openUrl: openUrl,
+    lastUsed: null,
+    createdAt: editingSceneId ? undefined : Date.now()
   };
-  scenes.unshift(scene);
-  if (scenes.length > 20) scenes.pop();
-  localStorage.setItem('ujg_scenes', JSON.stringify(scenes));
+
+  if (editingSceneId) {
+    var idx = scenes.findIndex(function(s){ return s.id === editingSceneId; });
+    if (idx >= 0) { sceneData.createdAt = scenes[idx].createdAt; scenes[idx] = sceneData; }
+  } else {
+    scenes.unshift(sceneData);
+  }
+  if (scenes.length > 30) scenes.pop();
+  saveSceneData();
+  closeSceneModal();
   renderScenesList();
-  toast('Scene "' + name.trim() + '" saved!');
+  toast((editingSceneId ? 'Scene updated' : 'Scene saved') + ': "' + name + '"');
 }
 
 function applyScene(id) {
   var scene = scenes.find(function(s){ return s.id === id; });
   if (!scene) return;
+
+  // Update last used
+  scene.lastUsed = Date.now();
+  saveSceneData();
+
+  // Apply blocks
   blockedSites = scene.blockedSites || [];
   blockedYT = new Set(scene.blockedYT || []);
   var tabLimit = scene.tabLimit || 0;
-  // Apply all at once
+
   wsSend({type:'TEACHER_COMMAND', command:'BLOCK_SITES', targetId:'all', payload:{sites:blockedSites}});
   wsSend({type:'TEACHER_COMMAND', command:'BLOCK_YT_CATEGORIES', targetId:'all', payload:{categories:Array.from(blockedYT)}});
   wsSend({type:'TEACHER_COMMAND', command:'SET_TAB_LIMIT', targetId:'all', payload:{limit:tabLimit}});
+
+  // Open URL if set
+  if (scene.openUrl) {
+    var url = scene.openUrl;
+    if (!url.startsWith('http')) url = 'https://' + url;
+    wsSend({type:'TEACHER_COMMAND', command:'NAVIGATE_TO', targetId:'all', payload:{url:url}});
+  }
+
+  // Sync UI
   renderSitesInline();
   renderYTCatsInline();
   var r = document.getElementById('tabLimitR2'); if (r) r.value = tabLimit;
   var v = document.getElementById('tabLimitV2'); if (v) v.textContent = tabLimit === 0 ? 'Off' : tabLimit;
-  toast('Scene "' + scene.name + '" applied to all students');
+  renderScenesList();
+
+  var summary = [];
+  if (blockedSites.length) summary.push(blockedSites.length + ' site(s) blocked');
+  if (blockedYT.size) summary.push(blockedYT.size + ' YouTube category/categories blocked');
+  if (tabLimit) summary.push('max ' + tabLimit + ' tabs');
+  if (scene.openUrl) summary.push('URL opened');
+  toast('Scene "' + scene.name + '" activated! ' + (summary.length ? '(' + summary.join(', ') + ')' : ''));
+}
+
+function deactivateScene() {
+  blockedSites = [];
+  blockedYT = new Set();
+  wsSend({type:'TEACHER_COMMAND', command:'BLOCK_SITES', targetId:'all', payload:{sites:[]}});
+  wsSend({type:'TEACHER_COMMAND', command:'BLOCK_YT_CATEGORIES', targetId:'all', payload:{categories:[]}});
+  wsSend({type:'TEACHER_COMMAND', command:'SET_TAB_LIMIT', targetId:'all', payload:{limit:0}});
+  renderSitesInline();
+  renderYTCatsInline();
+  renderScenesList();
+  toast('All restrictions cleared');
 }
 
 function deleteScene(id) {
+  if (!confirm('Delete this scene?')) return;
   scenes = scenes.filter(function(s){ return s.id !== id; });
-  localStorage.setItem('ujg_scenes', JSON.stringify(scenes));
+  saveSceneData();
   renderScenesList();
   toast('Scene deleted');
+}
+
+function sortScenes(by) {
+  if (by === 'name') scenes.sort(function(a,b){ return a.name.localeCompare(b.name); });
+  else scenes.sort(function(a,b){ return (b.lastUsed||b.createdAt||0) - (a.lastUsed||a.createdAt||0); });
+  renderScenesList();
 }
 
 function renderScenesList() {
   var el = document.getElementById('scenesList');
   if (!el) return;
   if (!scenes.length) {
-    el.innerHTML = '<div style="font-size:12px;color:#9aa0a6;text-align:center;padding:16px">No saved scenes yet. Set up your blocks above and click Save as Scene.</div>';
+    el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#9aa0a6">' +
+      '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dadce0" stroke-width="1.5" style="display:block;margin:0 auto 12px"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>' +
+      '<div style="font-size:14px;font-weight:600;color:#5f6368;margin-bottom:4px">No scenes yet</div>' +
+      '<div style="font-size:12px">Create a Block List or Allow List above to get started</div>' +
+    '</div>';
     return;
   }
+
   el.innerHTML = scenes.map(function(sc) {
+    var color = sc.color || '#1a73e8';
     var parts = [];
-    if (sc.blockedSites && sc.blockedSites.length) parts.push(sc.blockedSites.length + ' site(s)');
+    if (sc.blockedSites && sc.blockedSites.length) parts.push(sc.blockedSites.length + ' site(s) blocked');
     if (sc.blockedYT && sc.blockedYT.length) parts.push(sc.blockedYT.length + ' YT category/categories');
     if (sc.tabLimit) parts.push('max ' + sc.tabLimit + ' tabs');
-    return '<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f1f3f4">' +
-      '<div style="flex:1;overflow:hidden">' +
-        '<div style="font-size:13px;font-weight:600;color:#202124">' + esc(sc.name) + '</div>' +
-        '<div style="font-size:11px;color:#5f6368">' + (parts.length ? parts.join(' · ') : 'No restrictions') + '</div>' +
+    if (sc.openUrl) parts.push('opens URL');
+    var lastUsedTxt = sc.lastUsed ? 'Last used ' + timeAgo(sc.lastUsed) : 'Never used';
+
+    return '<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #f1f3f4">' +
+      // Color icon
+      '<div style="width:36px;height:36px;border-radius:8px;background:'+color+';flex-shrink:0;display:flex;align-items:center;justify-content:center">' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>' +
       '</div>' +
-      '<button onclick="applyScene(' + sc.id + ')" style="padding:5px 12px;background:var(--blue);color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer">Apply</button>' +
-      '<button onclick="deleteScene(' + sc.id + ')" style="padding:5px 10px;background:none;border:1px solid #dadce0;border-radius:5px;font-size:11px;color:#5f6368;cursor:pointer">✕</button>' +
+      // Info
+      '<div style="flex:1;overflow:hidden">' +
+        '<div style="font-size:14px;font-weight:600;color:#202124">' + esc(sc.name) + '</div>' +
+        '<div style="font-size:11px;color:#5f6368;margin-top:1px">' + (parts.length ? parts.join(' · ') : 'No restrictions set') + '</div>' +
+        '<div style="font-size:10px;color:#9aa0a6;margin-top:1px">' + lastUsedTxt + '</div>' +
+      '</div>' +
+      // Buttons
+      '<div style="display:flex;gap:6px;flex-shrink:0">' +
+        '<button onclick="applyScene('+sc.id+')" style="padding:7px 16px;background:'+color+';color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">Activate</button>' +
+        '<button onclick="editScene('+sc.id+')" style="padding:7px 10px;background:none;border:1px solid #dadce0;border-radius:6px;font-size:12px;color:#5f6368;cursor:pointer" title="Edit">✏️</button>' +
+        '<button onclick="deleteScene('+sc.id+')" style="padding:7px 10px;background:none;border:1px solid #f5c6c2;border-radius:6px;font-size:12px;color:#d93025;cursor:pointer" title="Delete">✕</button>' +
+      '</div>' +
     '</div>';
-  }).join('');
+  }).join('') +
+  '<div style="padding:16px 0;text-align:center">' +
+    '<button onclick="deactivateScene()" style="padding:8px 20px;border:1px solid #dadce0;border-radius:7px;font-size:13px;color:#5f6368;background:#fff;cursor:pointer">↩ Clear All Restrictions</button>' +
+  '</div>';
+}
+
+function timeAgo(ts) {
+  var diff = Date.now() - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+  return Math.floor(diff/86400000) + 'd ago';
 }
 
 // ═══════════════════════════════════════════════════════════
