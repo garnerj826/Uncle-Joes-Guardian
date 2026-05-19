@@ -437,10 +437,10 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         </div>
         <!-- Scenes tabs -->
         <div id="tabsScenes" style="display:none;align-items:flex-end;flex:1">
-          <div class="content-tab active" id="ctab-block" onclick="switchScenesTopTab('block')">Block Sites</div>
+          <div class="content-tab active" id="ctab-scenes" onclick="switchScenesTopTab('scenes')">Scenes</div>
           <div class="content-tab" id="ctab-yt" onclick="switchScenesTopTab('yt')">YouTube Filter</div>
           <div class="content-tab" id="ctab-tablimit" onclick="switchScenesTopTab('tablimit')">Tab Limit</div>
-          <div class="content-tab" id="ctab-scenes" onclick="switchScenesTopTab('scenes')">Scenes</div>
+          <div class="content-tab" id="ctab-block" onclick="switchScenesTopTab('block')">Block Sites</div>
           <div class="content-tab" id="ctab-autocap" onclick="switchScenesTopTab('autocap')">Auto-capture</div>
         </div>
         <!-- Students tabs -->
@@ -1888,7 +1888,7 @@ function removeStudentInline(id) {
 
 
 function switchScenesTopTab(tab) {
-  ['scenes','block','yt','tablimit','autocap'].forEach(function(t){
+  ['block','scenes','yt','tablimit','autocap'].forEach(function(t){
     var el = document.getElementById('ctab-'+t);
     if (el) el.classList.toggle('active', t===tab);
     var c = document.getElementById('stab-'+t+'-content');
