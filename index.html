@@ -1063,39 +1063,44 @@ function wsSend(msg) {
 // ═══════════════════════════════════════════════════════════
 
 function updateStudents(list) {
-  console.log('[UJG] updateStudents called with', (list||[]).length, 'students, myStudentIds:', myStudentIds);
   // Preserve known names for offline students
   var oldStudents = students;
   students = {};
   (list||[]).forEach(function(s){
     if (!s) return;
-    // Keep last known name if server returns 'Offline'
     if (s.name === 'Offline' && oldStudents[s.id] && oldStudents[s.id].name !== 'Offline') {
       s.name = oldStudents[s.id].name;
     }
     students[s.id] = s;
   });
-  // Add any myStudentIds not in list as offline placeholders
   (myStudentIds || []).forEach(function(id) {
     if (!students[id]) {
-      students[id] = { id: id, name: oldStudents[id]?.name || 'Student', online: false, tabs: [], tabCount: 0, isLocked: false };
+      var oldName = studentNames[id] || (oldStudents[id] ? oldStudents[id].name : null) || 'Student';
+      students[id] = { id: id, name: oldName, online: false, tabs: [], tabCount: 0, isLocked: false };
     }
   });
-  renderGrid();
+  // Only update the grid if we're on the screens/timelines tab
+  if (currentView === 'screens' || currentView === 'screenshots') renderGrid();
+  if (currentView === 'timelines') renderTimeline(document.getElementById('tlStudentSelect')?.value);
+  renderMyStudents();
+  renderMyStudentsInline();
 }
 
 function updateOneStudent(s) {
   if (!s) return;
   var isNew = !students[s.id];
   students[s.id] = s;
-  if (isNew) {
-    renderGrid();
-  } else {
-    updateTile(s.id);
-    // Only update modal if it's already open for this student
-    if (modalStudentId === s.id && document.getElementById('modalOverlay').classList.contains('show')) {
-      updateModalTabs(s.id);
+  // Only touch the grid if we're on the screens tab
+  if (currentView === 'screens') {
+    if (isNew) {
+      renderGrid();
+    } else {
+      updateTile(s.id);
     }
+  }
+  // Only update modal if it's already open for this student
+  if (modalStudentId === s.id && document.getElementById('modalOverlay').classList.contains('show')) {
+    updateModalTabs(s.id);
   }
 }
 
@@ -1103,20 +1108,27 @@ function handleSS(msg) {
   screenshots[msg.studentId] = {image:msg.image, tabTitle:msg.tabTitle, tabUrl:msg.tabUrl};
   if (!students[msg.studentId]) {
     students[msg.studentId] = {id:msg.studentId, name:msg.studentName||'Student', isLocked:false, tabs:[], tabCount:0, online:true, lastSeen:Date.now()};
-    renderGrid(); return;
+    if (currentView === 'screens') renderGrid();
+    return;
   }
-  // Update student lastSeen so isOffline check works
   if (students[msg.studentId]) students[msg.studentId].lastSeen = Date.now();
-  // Directly update the tile DOM - fastest path
-  var img = document.getElementById('timg_'+msg.studentId);
-  var ph = document.getElementById('tph_'+msg.studentId);
-  if (img) { img.src = msg.image; img.style.display='block'; }
-  if (ph) ph.style.display='none'; // Hide placeholder when screenshot arrives
-  var urlEl = document.getElementById('turl_'+msg.studentId);
-  if (urlEl && msg.tabUrl) urlEl.textContent = shortUrl(msg.tabUrl);
+  // Only update tile DOM if on screens tab
+  if (currentView === 'screens') {
+    var img = document.getElementById('timg_'+msg.studentId);
+    var ph = document.getElementById('tph_'+msg.studentId);
+    if (img) { img.src = msg.image; img.style.display='block'; }
+    if (ph) ph.style.display='none';
+    var urlEl = document.getElementById('turl_'+msg.studentId);
+    if (urlEl && msg.tabUrl) urlEl.textContent = shortUrl(msg.tabUrl);
+  }
+  // Always update modal if open
   if (modalStudentId === msg.studentId) {
     var mi = document.getElementById('modalImg');
     if (mi) { mi.src=msg.image; mi.style.display='block'; document.getElementById('modalNoSc').style.display='none'; }
+  }
+  // Auto-save to gallery if auto-capture is on
+  if (autoCapture) {
+    saveScreenshot(msg.studentId, msg.studentName || (students[msg.studentId] ? students[msg.studentId].name : 'Student'), msg.image);
   }
 }
 
