@@ -1133,6 +1133,8 @@ function handleSS(msg) {
 }
 
 function renderGrid() {
+  // Never render grid when not on screens/screenshots view
+  if (currentView !== 'screens' && currentView !== 'screenshots') return;
   var ids = Object.keys(students);
   var onlineCount = ids.filter(function(id){ return students[id] && students[id].online !== false; }).length;
   document.getElementById('onlineCnt').textContent = onlineCount;
@@ -1249,6 +1251,7 @@ function makeTile(s) {
 
 function updateTile(id) {
   var s = students[id]; if (!s) return;
+  if (currentView !== 'screens') return;
   var tile = document.querySelector('.tile[data-id="'+id+'"]');
   if (!tile) { renderGrid(); return; }
   var lk = document.getElementById('tlk_'+id);
@@ -1595,7 +1598,7 @@ async function removeStudent(id) {
   if (accs[currentUser.username]) { accs[currentUser.username].students = myStudentIds; saveAccounts(accs); }
   delete students[id];
   try { await fetch('/api/remove-student',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:currentUser.username,studentId:id})}); } catch(e){}
-  renderGrid(); renderMyStudents(); toast('Student removed');
+  if (currentView === 'screens') renderGrid(); renderMyStudents(); toast('Student removed');
 }
 
 function renderMyStudents() {
