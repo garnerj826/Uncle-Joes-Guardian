@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uncle Joe's Guardian – Privacy Policy</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 760px; margin: 40px auto; padding: 0 24px; color: #202124; line-height: 1.7; }
+  h1 { font-size: 28px; color: #1a73e8; border-bottom: 2px solid #e8eaed; padding-bottom: 12px; }
+  h2 { font-size: 18px; margin-top: 32px; color: #202124; }
+  p, li { font-size: 15px; color: #3c4043; }
+  ul { padding-left: 20px; }
+  .date { color: #5f6368; font-size: 13px; margin-top: -8px; }
+  a { color: #1a73e8; }
+  .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e8eaed; font-size: 13px; color: #9aa0a6; }
+</style>
+</head>
+<body>
+
+<h1>Privacy Policy</h1>
+<p class="date">Last updated: May 2026</p>
+
+<p>Uncle Joe's Guardian ("the Extension") is a classroom management tool designed for use by teachers to monitor and manage student Chrome browsers in an educational setting. This Privacy Policy explains what data is collected, how it is used, and how it is protected.</p>
+
+<h2>1. Who This Extension Is For</h2>
+<p>This Extension is intended for use by teachers and school administrators. It is installed on student devices with the knowledge and consent of the school or educational institution. It is not intended for use by or directed at children independently.</p>
+
+<h2>2. Data Collected</h2>
+<p>The Extension collects the following data from student devices when the extension is active:</p>
+<ul>
+  <li><strong>Active tab URL and title</strong> – to display the current website a student is visiting</li>
+  <li><strong>Tab list</strong> – to show all open browser tabs to the connected teacher</li>
+  <li><strong>Screenshots</strong> – browser screenshots taken on demand by the teacher or on a scheduled interval</li>
+  <li><strong>Browsing activity</strong> – page visit history recorded during the active session for timeline review</li>
+  <li><strong>Google account name</strong> – optionally retrieved to identify the student device</li>
+  <li><strong>A randomly generated 5-digit class code</strong> – used to link the student to their teacher's classroom</li>
+</ul>
+
+<h2>3. How Data Is Used</h2>
+<p>All collected data is used solely for classroom management purposes:</p>
+<ul>
+  <li>Displaying live student screens to the teacher dashboard</li>
+  <li>Allowing teachers to close tabs, lock screens, or block websites</li>
+  <li>Providing teachers with a browsing timeline for monitoring</li>
+  <li>Sending messages from teacher to student devices</li>
+</ul>
+<p>Data is <strong>not</strong> sold, shared with third parties, used for advertising, or retained beyond the active session. All data is transmitted in real time to the teacher's dashboard and is not stored permanently on any server.</p>
+
+<h2>4. Data Storage</h2>
+<p>Session data (screenshots, tab lists, browsing history) exists only in memory while the server is running and is automatically cleared when the session ends or the server restarts. No student data is written to a permanent database.</p>
+<p>The following data is stored locally in the browser using <code>chrome.storage.local</code>:</p>
+<ul>
+  <li>Student's chosen display name</li>
+  <li>The student's unique 5-digit class code</li>
+  <li>Lock state and tab limit settings</li>
+</ul>
+
+<h2>5. Data Transmission</h2>
+<p>All data is transmitted over an encrypted WebSocket connection (WSS) and HTTPS between the student device and the teacher's dashboard server. No data is transmitted to any third-party service.</p>
+
+<h2>6. Permissions Used</h2>
+<p>The Extension requests the following Chrome permissions, each used solely for its stated classroom management purpose:</p>
+<ul>
+  <li><strong>tabs</strong> – to read and display open tabs to the teacher</li>
+  <li><strong>activeTab</strong> – to capture the current tab screenshot</li>
+  <li><strong>storage</strong> – to save the student's name and class code locally</li>
+  <li><strong>scripting</strong> – to inject content scripts for chat bubbles and YouTube filtering</li>
+  <li><strong>windows</strong> – to open and manage the lock screen window</li>
+  <li><strong>notifications</strong> – to show teacher messages and alerts to the student</li>
+  <li><strong>declarativeNetRequest</strong> – to block websites as configured by the teacher</li>
+  <li><strong>identity</strong> – to optionally retrieve the student's Google account display name</li>
+</ul>
+
+<h2>7. Children's Privacy</h2>
+<p>This Extension is deployed by schools and teachers, not directly by students. Schools are responsible for obtaining appropriate parental or guardian consent in accordance with applicable laws (including COPPA, FERPA, or local equivalents) before deploying this Extension on student devices.</p>
+
+<h2>8. Teacher Dashboard</h2>
+<p>The teacher dashboard stores account credentials (username and hashed password) in the teacher's own browser <code>localStorage</code>. No account data is transmitted to or stored on a third-party service. Teachers are responsible for keeping their login credentials secure.</p>
+
+<h2>9. Changes to This Policy</h2>
+<p>This Privacy Policy may be updated from time to time. Continued use of the Extension after changes constitutes acceptance of the updated policy.</p>
+
+<h2>10. Contact</h2>
+<p>For questions about this privacy policy or data practices, please open an issue on our <a href="https://github.com">GitHub support page</a> or contact the extension developer directly.</p>
+
+<div class="footer">
+  Uncle Joe's Guardian &nbsp;·&nbsp; Classroom Management Extension &nbsp;·&nbsp; © 2026
+</div>
+
+</body>
+</html>
