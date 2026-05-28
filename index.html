@@ -12,19 +12,19 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 
 /* LOGIN */
 #loginPage{position:fixed;inset:0;background:linear-gradient(135deg,#e8f0fe,#f0f4ff,#e8f5e9);display:flex;align-items:center;justify-content:center;z-index:1000}
-.login-card{background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.12);padding:36px 32px;width:100%;max-width:400px}
+.login-card{background:#fff;border-radius:0;box-shadow:0 4px 24px rgba(0,0,0,.12);padding:36px 32px;width:100%;max-width:400px}
 .login-logo{text-align:center;margin-bottom:24px}
-.login-logo img{width:52px;height:52px;border-radius:10px;margin-bottom:10px}
+.login-logo img{width:52px;height:52px;border-radius:0;margin-bottom:10px}
 .login-logo h1{font-size:20px;font-weight:700;color:#202124}
 .login-logo p{font-size:13px;color:#5f6368;margin-top:2px}
-.tab-row{display:flex;background:#f1f3f4;border-radius:8px;padding:3px;margin-bottom:20px}
-.tab-btn{flex:1;padding:8px;border:none;background:none;border-radius:6px;font-size:13px;font-weight:500;color:#5f6368;cursor:pointer;transition:.15s}
+.tab-row{display:flex;background:#f1f3f4;border-radius:0;padding:3px;margin-bottom:20px}
+.tab-btn{flex:1;padding:8px;border:none;background:none;border-radius:0;font-size:13px;font-weight:500;color:#5f6368;cursor:pointer;transition:.15s}
 .tab-btn.active{background:#fff;color:var(--blue);box-shadow:var(--shadow)}
 .field{margin-bottom:14px}
 .field label{display:block;font-size:12px;font-weight:600;color:#5f6368;margin-bottom:5px}
-.field input{width:100%;padding:10px 12px;border:1.5px solid #dadce0;border-radius:7px;font-size:14px;font-family:inherit;outline:none;transition:.15s}
+.field input{width:100%;padding:10px 12px;border:1.5px solid #dadce0;border-radius:0;font-size:14px;font-family:inherit;outline:none;transition:.15s}
 .field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,115,232,.1)}
-.login-btn{width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;transition:.15s}
+.login-btn{width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:0;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px;transition:.15s}
 .login-btn:hover{background:var(--blue-dark)}
 .err-msg{color:#d93025;font-size:12px;margin-top:8px;text-align:center;min-height:18px}
 
@@ -33,12 +33,12 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 #app.show{display:flex}
 .topbar{height:56px;background:#fff;border-bottom:1px solid #e8eaed;display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;box-shadow:var(--shadow);z-index:10}
 .topbar-logo{display:flex;align-items:center;gap:9px}
-.topbar-logo img{width:30px;height:30px;border-radius:6px}
+.topbar-logo img{width:30px;height:30px;border-radius:0}
 .topbar-logo span{font-size:15px;font-weight:700}
 .topbar-logo span b{color:var(--blue)}
-.live-badge{display:flex;align-items:center;gap:6px;background:var(--blue);color:#fff;border-radius:20px;padding:5px 13px;font-size:12px;font-weight:600;margin-left:12px}
+.live-badge{display:flex;align-items:center;gap:6px;background:var(--blue);color:#fff;border-radius:0;padding:5px 13px;font-size:12px;font-weight:600;margin-left:12px}
 .live-badge .dot{width:7px;height:7px;border-radius:50%;background:#4ade80}
-.conn-badge{display:flex;align-items:center;gap:5px;font-size:12px;padding:4px 10px;border-radius:20px;border:1px solid #dadce0;color:#5f6368}
+.conn-badge{display:flex;align-items:center;gap:5px;font-size:12px;padding:4px 10px;border-radius:0;border:1px solid #dadce0;color:#5f6368}
 .conn-badge .dot{width:7px;height:7px;border-radius:50%;background:#dadce0}
 .conn-badge.on .dot{background:var(--green)}
 .conn-badge.on{color:var(--green);border-color:#a8d5b5}
@@ -52,7 +52,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .sidebar{width:88px;background:#1a1f36;border-right:none;flex-shrink:0;overflow-y:auto;display:flex;flex-direction:column;padding:8px 0}
 .nav-section{margin-bottom:4px}
 .nav-group-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35);padding:12px 8px 4px;text-align:center}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:8px;font-size:10px;font-weight:500;color:rgba(255,255,255,0.6);cursor:pointer;margin:2px 6px;transition:.15s;text-align:center;line-height:1.2}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:0;font-size:10px;font-weight:500;color:rgba(255,255,255,0.6);cursor:pointer;margin:2px 6px;transition:.15s;text-align:center;line-height:1.2}
 .nav-item:hover{background:rgba(255,255,255,0.1);color:#fff}
 .nav-item.active{background:rgba(99,132,255,0.25);color:#fff}
 .nav-item.open{background:rgba(255,255,255,0.08);color:#fff}
@@ -121,7 +121,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 /* Timelines */
 .tl-wrap{flex:1;overflow-y:auto;padding:16px 20px;background:#f8f9fa}
 .tl-student-select{display:flex;align-items:center;gap:10px;padding:12px 20px;background:#fff;border-bottom:1px solid #e8eaed;flex-shrink:0}
-.tl-select{padding:7px 12px;border:1px solid #dadce0;border-radius:6px;font-size:13px;font-family:inherit;outline:none;min-width:180px}
+.tl-select{padding:7px 12px;border:1px solid #dadce0;border-radius:0;font-size:13px;font-family:inherit;outline:none;min-width:180px}
 .tl-entry{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #f1f3f4}
 .tl-time{font-size:11px;color:#9aa0a6;white-space:nowrap;min-width:52px;padding-top:2px}
 .tl-fav{width:16px;height:16px;border-radius:2px;flex-shrink:0;margin-top:2px}
@@ -132,12 +132,12 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 /* Chat */
 .chat-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden}
 .chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
-.chat-msg{max-width:85%;padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.4;word-break:break-word}
+.chat-msg{max-width:85%;padding:8px 12px;border-radius:0;font-size:13px;line-height:1.4;word-break:break-word}
 .chat-msg.teacher{background:var(--blue);color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
 .chat-msg.student{background:#f1f3f4;color:#202124;align-self:flex-start;border-bottom-left-radius:3px}
 .chat-msg-time{font-size:10px;opacity:.65;margin-top:3px}
 .chat-input-row{display:flex;gap:6px;padding:10px;border-top:1px solid #e8eaed;flex-shrink:0}
-.chat-input{flex:1;padding:8px 12px;border:1px solid #dadce0;border-radius:20px;font-size:13px;font-family:inherit;outline:none}
+.chat-input{flex:1;padding:8px 12px;border:1px solid #dadce0;border-radius:0;font-size:13px;font-family:inherit;outline:none}
 .chat-input:focus{border-color:var(--blue)}
 .chat-send-btn{width:36px;height:36px;border-radius:50%;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .chat-send-btn:hover{background:var(--blue-dark)}
@@ -150,16 +150,16 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .content{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .toolbar{background:#fff;border-bottom:1px solid #e8eaed;padding:0 20px;display:flex;align-items:center;flex-shrink:0}
 .toolbar-actions{margin-left:auto;display:flex;gap:7px;padding:8px 0}
-.tbtn{display:flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid #dadce0;border-radius:6px;font-size:12px;font-weight:500;color:#5f6368;background:#fff;cursor:pointer}
+.tbtn{display:flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid #dadce0;border-radius:0;font-size:12px;font-weight:500;color:#5f6368;background:#fff;cursor:pointer}
 .tbtn:hover{background:#f1f3f4}
 .tbtn.danger{background:#d93025;color:#fff;border-color:#d93025}
 .tbtn.danger:hover{background:#b71c1c}
-#lockMsgInput{padding:5px 10px;border:1px solid #dadce0;border-radius:6px;font-size:12px;width:200px;font-family:inherit;outline:none}
+#lockMsgInput{padding:5px 10px;border:1px solid #dadce0;border-radius:0;font-size:12px;width:200px;font-family:inherit;outline:none}
 #lockMsgInput:focus{border-color:var(--blue)}
 
 .filterbar{padding:9px 20px;background:#fff;border-bottom:1px solid #e8eaed;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.filterbar select{padding:5px 9px;border:1px solid #dadce0;border-radius:6px;font-size:12px;font-family:inherit;outline:none;cursor:pointer}
-.filter-count{font-size:12px;color:#5f6368;background:#f1f3f4;padding:4px 10px;border-radius:20px}
+.filterbar select{padding:5px 9px;border:1px solid #dadce0;border-radius:0;font-size:12px;font-family:inherit;outline:none;cursor:pointer}
+.filter-count{font-size:12px;color:#5f6368;background:#f1f3f4;padding:4px 10px;border-radius:0}
 .tile-ctrl{display:flex;align-items:center;gap:6px;font-size:12px;color:#5f6368}
 .tile-ctrl input{width:80px;accent-color:var(--blue)}
 
@@ -174,11 +174,13 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .empty p{font-size:13px;text-align:center;max-width:320px;line-height:1.6}
 
 /* STUDENT TILE */
-.tile{background:#fff;border:1px solid #e8eaed;border-radius:8px;overflow:hidden;cursor:pointer;transition:.15s;position:relative;display:flex;flex-direction:column}
+.tile{background:#fff;border:1px solid #e8eaed;border-radius:0;overflow:hidden;cursor:grab;transition:box-shadow .15s,border-color .15s;position:relative;display:flex;flex-direction:column}
 .tile:hover{box-shadow:0 2px 10px rgba(0,0,0,.1);border-color:#bdc1c6}
 .tile.locked{border-color:#d93025}
 .tile.selected{border-color:var(--blue);box-shadow:0 0 0 2px rgba(26,115,232,.2)}
-.tile-header{display:flex;align-items:center;gap:6px;padding:7px 8px;border-bottom:1px solid #f1f3f4;flex-shrink:0}
+.tile.dragging{opacity:.5;cursor:grabbing}
+.tile.drag-over{border:2px dashed var(--blue);background:#f0f4ff}
+.tile-header{display:flex;align-items:center;gap:6px;padding:7px 8px;border-bottom:1px solid #e8eaed;flex-shrink:0}
 .tile-chk{width:14px;height:14px;accent-color:var(--blue);cursor:pointer;flex-shrink:0}
 .tile-header-icon{position:relative;display:flex;align-items:center;flex-shrink:0}
 .tile-status-dot{position:absolute;bottom:-1px;right:-2px;width:7px;height:7px;border-radius:50%;border:1.5px solid #fff}
@@ -193,7 +195,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .tile-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#9aa0a6;font-size:11px;position:absolute;top:0;left:0;right:0;bottom:0}
 .tile-lock-overlay{position:absolute;inset:0;background:rgba(217,48,37,.88);display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:8px;font-size:12px;font-weight:600}
 .tile-lock-overlay .li{font-size:28px}
-.unlock-tile-btn{padding:5px 14px;background:#fff;color:#d93025;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer}
+.unlock-tile-btn{padding:5px 14px;background:#fff;color:#d93025;border:none;border-radius:0;font-size:11px;font-weight:700;cursor:pointer}
 .tile-foot{padding:7px 9px 6px;border-top:1px solid #f1f3f4;flex-shrink:0}
 .tile-active-tab{display:flex;align-items:center;gap:6px;margin-bottom:5px}
 .tile-active-fav{width:14px;height:14px;border-radius:2px;flex-shrink:0}
@@ -201,21 +203,25 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .tile-active-title{font-size:12px;font-weight:500;color:#202124;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tile-active-url{font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tile-tabs{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
-.tab-dot{width:16px;height:16px;border-radius:3px;background:#f1f3f4;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.tab-dot{width:16px;height:16px;border-radius:0;background:#f1f3f4;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .tab-dot img{width:14px;height:14px;object-fit:contain}
-.tile-extra-tabs{font-size:10px;font-weight:600;color:#5f6368;background:#e8eaed;border-radius:3px;padding:1px 4px;flex-shrink:0}
+.tile-extra-tabs{font-size:10px;font-weight:600;color:#5f6368;background:#e8eaed;border-radius:0;padding:1px 4px;flex-shrink:0}
+/* Drag and drop */
+.tile{cursor:grab}
+.tile.dragging{opacity:.4;cursor:grabbing}
+.tile.drag-over{outline:2px solid var(--blue);outline-offset:-2px;background:#e8f0fe}
 
 /* ACTION BAR */
 .action-bar{background:var(--blue);color:#fff;padding:9px 20px;display:none;align-items:center;gap:10px;flex-shrink:0}
 .action-bar.show{display:flex}
 .action-bar-text{font-size:13px;font-weight:500;flex:1}
-.abtn{padding:6px 14px;border:1px solid rgba(255,255,255,.5);border-radius:6px;background:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+.abtn{padding:6px 14px;border:1px solid rgba(255,255,255,.5);border-radius:0;background:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer}
 .abtn:hover{background:rgba(255,255,255,.15)}
 
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .overlay.show{display:flex}
-.modal{background:#fff;border-radius:10px;overflow:hidden;width:100%;max-width:1000px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal{background:#fff;border-radius:0;overflow:hidden;width:100%;max-width:1000px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.25)}
 .modal-top{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid #e8eaed;flex-shrink:0}
 .modal-top .odot{width:10px;height:10px;border-radius:50%;background:var(--green)}
 .modal-name{font-size:15px;font-weight:700;flex:1}
@@ -225,9 +231,9 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .modal-lock-bar h4{font-size:12px;font-weight:600;color:#856404;margin-bottom:4px}
 .modal-lock-bar p{font-size:11px;color:#856404;margin-bottom:8px}
 .modal-lock-bar .lrow{display:flex;gap:8px}
-.modal-lock-bar input{flex:1;padding:7px 10px;border:1px solid #ffe082;border-radius:6px;font-size:13px;font-family:inherit;outline:none;background:#fff}
-.modal-lock-bar .lbtn{padding:7px 14px;background:var(--blue);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer}
-.modal-lock-bar .cbtn{padding:7px 12px;border:1px solid #dadce0;background:#fff;border-radius:6px;font-size:13px;cursor:pointer}
+.modal-lock-bar input{flex:1;padding:7px 10px;border:1px solid #ffe082;border-radius:0;font-size:13px;font-family:inherit;outline:none;background:#fff}
+.modal-lock-bar .lbtn{padding:7px 14px;background:var(--blue);color:#fff;border:none;border-radius:0;font-size:13px;font-weight:600;cursor:pointer}
+.modal-lock-bar .cbtn{padding:7px 12px;border:1px solid #dadce0;background:#fff;border-radius:0;font-size:13px;cursor:pointer}
 .modal-body{display:flex;flex:1;overflow:hidden;min-height:0}
 .modal-screen{flex:1;background:#111;display:flex;align-items:center;justify-content:center;position:relative}
 .modal-screen img{width:100%;height:100%;object-fit:contain}
@@ -266,9 +272,9 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .sp-section{margin-bottom:20px}
 .sp-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#9aa0a6;margin-bottom:9px}
 .sp-input-row{display:flex;gap:6px;margin-bottom:8px}
-.sp-input{flex:1;padding:8px 10px;border:1.5px solid #dadce0;border-radius:7px;font-size:13px;font-family:inherit;outline:none}
+.sp-input{flex:1;padding:8px 10px;border:1.5px solid #dadce0;border-radius:0;font-size:13px;font-family:inherit;outline:none}
 .sp-input:focus{border-color:var(--blue)}
-.sp-btn{width:100%;padding:9px;background:var(--blue);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:6px}
+.sp-btn{width:100%;padding:9px;background:var(--blue);color:#fff;border:none;border-radius:0;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:6px}
 .sp-btn:hover{background:var(--blue-dark)}
 .sp-btn.red{background:#d93025}
 .sp-btn.gray{background:#f1f3f4;color:#202124}
@@ -276,7 +282,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .site-tag{display:inline-flex;align-items:center;gap:4px;background:#fce8e6;border:1px solid #f5c6c2;color:#d93025;border-radius:4px;padding:3px 8px;font-size:11px;margin:2px}
 .site-tag button{background:none;border:none;cursor:pointer;color:#d93025;font-size:11px;line-height:1}
 .yt-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.yt-cat{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1.5px solid #e8eaed;border-radius:7px;cursor:pointer;font-size:12px;transition:.15s}
+.yt-cat{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1.5px solid #e8eaed;border-radius:0;cursor:pointer;font-size:12px;transition:.15s}
 .yt-cat:hover{background:#f8f9fa}
 .yt-cat.on{background:#e8f0fe;border-color:var(--blue);color:var(--blue);font-weight:600}
 .yt-icon{font-size:15px}
@@ -284,30 +290,30 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .student-list-item .sdot{width:8px;height:8px;border-radius:50%;background:#dadce0;flex-shrink:0}
 .student-list-item .sdot.on{background:var(--green)}
 .sname{flex:1;font-size:13px;font-weight:500}
-.remove-btn{border:1px solid #d93025;color:#d93025;background:none;border-radius:5px;padding:3px 9px;font-size:11px;cursor:pointer}
+.remove-btn{border:1px solid #d93025;color:#d93025;background:none;border-radius:2px;padding:3px 9px;font-size:11px;cursor:pointer}
 .remove-btn:hover{background:#d93025;color:#fff}
-.code-input{width:100%;padding:12px;border:2px solid var(--blue);border-radius:8px;font-size:22px;font-weight:800;letter-spacing:6px;text-align:center;font-family:'Courier New',monospace;outline:none;color:var(--blue);margin-bottom:10px}
-.result-msg{font-size:13px;text-align:center;padding:8px;border-radius:6px;display:none}
+.code-input{width:100%;padding:12px;border:2px solid var(--blue);border-radius:0;font-size:22px;font-weight:800;letter-spacing:6px;text-align:center;font-family:'Courier New',monospace;outline:none;color:var(--blue);margin-bottom:10px}
+.result-msg{font-size:13px;text-align:center;padding:8px;border-radius:0;display:none}
 .result-msg.ok{background:#e6f4ea;color:var(--green)}
 .result-msg.err{background:#fce8e6;color:#d93025}
 
 .ss-gallery{display:none;flex:1;overflow-y:auto;padding:16px 20px;background:#f8f9fa}
 .ss-gallery.show{display:block}
 .ss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.ss-card{background:#fff;border:1px solid #e8eaed;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.ss-card{background:#fff;border:1px solid #e8eaed;border-radius:0;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .ss-card-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#f1f3f4;cursor:pointer}
 .ss-card-img:hover{opacity:.92}
 .ss-card-foot{padding:8px 12px;display:flex;align-items:center;gap:8px}
 .ss-card-info{flex:1;overflow:hidden}
 .ss-card-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#202124}
 .ss-card-time{font-size:11px;color:#9aa0a6}
-.ss-dl-btn{padding:5px 11px;background:var(--blue);color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer}
+.ss-dl-btn{padding:5px 11px;background:var(--blue);color:#fff;border:none;border-radius:2px;font-size:11px;font-weight:600;cursor:pointer}
 .ss-dl-btn:hover{background:var(--blue-dark)}
 .ss-empty{text-align:center;padding:60px 20px;color:#9aa0a6}
 .ss-empty .sei{font-size:48px;opacity:.3;margin-bottom:12px}
-.ss-count{font-size:12px;color:#5f6368;background:#f1f3f4;padding:3px 9px;border-radius:20px;margin-left:8px}
+.ss-count{font-size:12px;color:#5f6368;background:#f1f3f4;padding:3px 9px;border-radius:0;margin-left:8px}
 /* TOAST */
-#toast{position:fixed;bottom:20px;right:20px;z-index:9999;background:#202124;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}
+#toast{position:fixed;bottom:20px;right:20px;z-index:9999;background:#202124;color:#fff;padding:10px 16px;border-radius:0;font-size:13px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}
 #toast.show{opacity:1;transform:translateY(0)}
 
 ::-webkit-scrollbar{width:5px}
@@ -320,7 +326,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 <div id="loginPage">
   <div class="login-card">
     <div class="login-logo">
-      <img src="data:image/png;base64,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" alt="logo">
+      <img src="data:image/png;base64,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" alt="logo">
       <h1>Uncle Joe's Guardian</h1>
       <p>Classroom Management Platform</p>
     </div>
@@ -348,7 +354,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 <div id="app">
   <div class="topbar">
     <div class="topbar-logo">
-      <img src="data:image/png;base64,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" alt="">
+      <img src="data:image/png;base64,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" alt="">
       <span>Uncle <b>Joe's</b> Guardian</span>
     </div>
     <div class="live-badge"><div class="dot"></div>Live Session</div>
@@ -512,67 +518,91 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
       <!-- Scenes / Block Sites inline -->
       <div id="scenesSection" style="display:none;flex-direction:column;flex:1;overflow:hidden">
 
-  <div id="stab-scenes-content" style="flex:1;overflow-y:auto;display:flex;flex-direction:column">
-  <!-- Top create cards -->
-  <div style="display:flex;gap:16px;padding:20px 24px;background:#f8f9fa;border-bottom:1px solid #e8eaed;flex-shrink:0">
+  <div id="stab-scenes-content" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;background:#f1f3f4">
 
-    <!-- Block List card -->
-    <div style="flex:1;background:linear-gradient(135deg,#0d5c7e,#0a4a6b);border-radius:12px;padding:22px 24px;color:#fff;position:relative;overflow:hidden;min-height:140px">
-      <div style="position:absolute;right:-10px;top:-10px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>
-      <div style="position:absolute;right:20px;bottom:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-        <span style="font-size:17px;font-weight:700">Block List</span>
+  <!-- Two-column layout: Block List on left, Allow List on right -->
+  <div style="display:flex;gap:0;padding:20px;gap:16px">
+
+    <!-- BLOCK LIST COLUMN -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:0;border:1px solid #d0d3d8;border-radius:4px;overflow:hidden">
+      <!-- Header card -->
+      <div style="background:linear-gradient(160deg,#0a6b6b,#0d5c7e 60%,#0a4a6b);padding:22px 24px;position:relative;overflow:hidden;min-height:160px">
+        <div style="position:absolute;right:16px;top:10px;display:flex;flex-direction:column;gap:8px;opacity:0.9">
+          <div style="width:54px;height:54px;border-radius:50%;border:3px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.15)">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M2 12l4-4 4 4 4-4 4 4"/><line x1="3" y1="3" x2="21" y2="21" stroke-width="2.5"/></svg>
+          </div>
+          <div style="width:54px;height:54px;border-radius:50%;border:3px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.15)">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/><line x1="3" y1="3" x2="21" y2="21" stroke-width="2.5"/></svg>
+          </div>
+          <div style="width:54px;height:54px;border-radius:50%;border:3px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.15)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/><line x1="3" y1="3" x2="21" y2="21" stroke-width="2.5"/></svg>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div style="width:28px;height:28px;border-radius:50%;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </div>
+          <span style="font-size:20px;font-weight:700;color:#fff">Blocked Websites List</span>
+        </div>
+        <div style="font-size:13px;color:#fff;margin-bottom:5px;display:flex;align-items:center;gap:7px"><span style="color:#fbbf24;font-size:15px">★</span> Students can browse any website, except what you blocked</div>
+        <div style="font-size:13px;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:7px"><span style="color:#fbbf24;font-size:15px">★</span> Use this to block games and other distractions</div>
+        <button onclick="createNewScene('block')" style="padding:10px 22px;background:#fff;color:#0d5c7e;border:none;border-radius:4px;font-size:13px;font-weight:700;cursor:pointer">Create List</button>
       </div>
-      <div style="font-size:12px;opacity:0.85;margin-bottom:5px;display:flex;align-items:center;gap:6px">
-        <span style="color:#fbbf24">★</span> Students can browse websites, except what you block
+      <!-- Sort bar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#fff;border-bottom:1px solid #e8eaed">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5f6368">
+          Sort by
+          <select onchange="sortScenes(this.value,'block')" style="padding:4px 8px;border:1px solid #dadce0;border-radius:4px;font-size:12px;font-family:inherit;outline:none">
+            <option value="recent">Recently Used</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </div>
       </div>
-      <div style="font-size:12px;opacity:0.85;margin-bottom:16px;display:flex;align-items:center;gap:6px">
-        <span style="color:#fbbf24">★</span> Use this to block games and other distractions
-      </div>
-      <button onclick="createNewScene('block')" style="padding:8px 18px;background:#fff;color:#0d5c7e;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer">Create Block List</button>
+      <!-- Block list scenes -->
+      <div id="scenesListBlock" style="background:#fff"></div>
     </div>
 
-    <!-- Allow List card -->
-    <div style="flex:1;background:linear-gradient(135deg,#1a56a0,#1340a0);border-radius:12px;padding:22px 24px;color:#fff;position:relative;overflow:hidden;min-height:140px">
-      <div style="position:absolute;right:-10px;top:-10px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>
-      <div style="position:absolute;right:20px;bottom:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.06)"></div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-        <span style="font-size:17px;font-weight:700">Allow List</span>
+    <!-- ALLOW LIST COLUMN -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:0;border:1px solid #d0d3d8;border-radius:4px;overflow:hidden">
+      <!-- Header card -->
+      <div style="background:linear-gradient(160deg,#1a4fa0,#1a56a0 60%,#1340a0);padding:22px 24px;position:relative;overflow:hidden;min-height:160px">
+        <div style="position:absolute;right:16px;top:10px;display:flex;flex-direction:column;gap:8px;opacity:0.9">
+          <div style="width:54px;height:54px;border-radius:50%;border:3px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.15)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </div>
+          <div style="width:54px;height:54px;border-radius:50%;border:3px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.15)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div style="width:28px;height:28px;border-radius:50%;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <span style="font-size:20px;font-weight:700;color:#fff">Allow List</span>
+        </div>
+        <div style="font-size:13px;color:#fff;margin-bottom:5px;display:flex;align-items:center;gap:7px"><span style="color:#fbbf24;font-size:15px">★</span> Students can <u>only</u> access the few websites you allow</div>
+        <div style="font-size:13px;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:7px"><span style="color:#fbbf24;font-size:15px">★</span> Keep students focused on a quiz, test or assignment</div>
+        <button onclick="createNewScene('allow')" style="padding:10px 22px;background:#fff;color:#1a56a0;border:none;border-radius:4px;font-size:13px;font-weight:700;cursor:pointer">Create List</button>
       </div>
-      <div style="font-size:12px;opacity:0.85;margin-bottom:5px;display:flex;align-items:center;gap:6px">
-        <span style="color:#fbbf24">★</span> Students can <u>only</u> access the websites you allow
+      <!-- Sort bar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#fff;border-bottom:1px solid #e8eaed">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5f6368">
+          Sort by
+          <select onchange="sortScenes(this.value,'allow')" style="padding:4px 8px;border:1px solid #dadce0;border-radius:4px;font-size:12px;font-family:inherit;outline:none">
+            <option value="recent">Recently Used</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </div>
       </div>
-      <div style="font-size:12px;opacity:0.85;margin-bottom:16px;display:flex;align-items:center;gap:6px">
-        <span style="color:#fbbf24">★</span> Keep students focused on a quiz, test or assignment
-      </div>
-      <button onclick="createNewScene('allow')" style="padding:8px 18px;background:#fff;color:#1a56a0;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer">Create Allow List</button>
+      <!-- Allow list scenes -->
+      <div id="scenesListAllow" style="background:#fff"></div>
     </div>
 
   </div>
 
-  <!-- Scenes list -->
-  <div style="flex:1;overflow-y:auto;padding:0 24px 24px">
+  <!-- CREATE/EDIT SCENE MODAL (keep existing) -->
 
-    <!-- Sort + header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0 10px">
-      <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5f6368">
-        Sort by
-        <select onchange="sortScenes(this.value)" style="padding:5px 10px;border:1px solid #dadce0;border-radius:6px;font-size:12px;font-family:inherit;outline:none">
-          <option value="recent">Recently Used</option>
-          <option value="name">Name A–Z</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Scenes list -->
-    <div id="scenesList"></div>
-
-  </div>
-
-
-  </div><!-- /stab-scenes-content -->
+</div><!-- /stab-scenes-content -->
 
 
   <!-- Block Sites tab -->
@@ -773,7 +803,12 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
     <div class="modal-body">
       <div class="modal-screen" id="modalScreen">
         <img id="modalImg" src="" alt="" style="display:none">
-        <div class="no-sc" id="modalNoSc"><div class="ni">🖥️</div><div style="font-size:13px">No screenshot yet</div></div>
+        <div class="no-sc" id="modalNoSc" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%">
+          <svg id="modalOfflineIcon" width="100" height="100" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:16px;display:none"><g stroke="#5f6368" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="14" y1="8" x2="14" y2="16"/><line x1="20" y1="8" x2="20" y2="16"/><rect x="10" y="16" width="14" height="8" rx="2"/><line x1="17" y1="24" x2="20" y2="28"/><line x1="28" y1="20" x2="31" y2="24"/><rect x="24" y="24" width="14" height="8" rx="2"/><line x1="28" y1="32" x2="28" y2="40"/><line x1="34" y1="32" x2="34" y2="40"/></g></svg>
+          <div id="modalOfflineText" style="font-size:36px;font-weight:700;color:#5f6368;display:none;margin-top:16px">Student Offline</div>
+          <svg id="modalWaitIcon" width="52" height="52" viewBox="0 0 36 36" fill="none" style="margin-bottom:12px"><rect x="4" y="4" width="28" height="22" rx="2" stroke="#9aa0a6" stroke-width="2"/><line x1="14" y1="26" x2="22" y2="26" stroke="#9aa0a6" stroke-width="2"/><line x1="18" y1="26" x2="18" y2="30" stroke="#9aa0a6" stroke-width="2"/></svg>
+          <div id="modalWaitText" style="font-size:14px;color:#9aa0a6">No screenshot yet</div>
+        </div>
       </div>
       <div class="modal-panel">
         <div class="mpanel-tabs">
@@ -1063,6 +1098,8 @@ function wsSend(msg) {
 // ═══════════════════════════════════════════════════════════
 
 function updateStudents(list) {
+  // Init order for new students
+  (list||[]).forEach(function(s){ if(s && !tileOrder.includes(s.id)) tileOrder.push(s.id); });
   // Preserve known names for offline students
   var oldStudents = students;
   students = {};
@@ -1166,6 +1203,15 @@ function makeTile(s) {
   div.className = 'tile'+(s.isLocked?' locked':'')+(selected.has(s.id)?' selected':'');
   div.dataset.id = s.id;
 
+  // Use stored custom name first, fallback to last known name
+  // Persist the name if we got a real one
+  if (s.name && s.name !== 'Student' && s.name !== 'Offline' && s.name !== 'Unknown Student') {
+    if (!studentNames[s.id] || s.online !== false) {
+      studentNames[s.id] = s.name;
+      saveStudentNames();
+    }
+  }
+  var displayName = studentNames[s.id] || s.name || 'Student';
   var activeTab = (s.tabs||[]).find(function(t){return t.active;});
   var isOnline = s.online !== false && s.lastSeen && (Date.now() - s.lastSeen) < 60000;
   var isOffline = !isOnline;
@@ -1196,7 +1242,7 @@ function makeTile(s) {
         '<div class="tile-status-dot '+(isOffline?'offline':'online')+'"></div>'+
       '</div>'+
       // Student name
-      '<div class="tile-student-name">'+esc(s.name)+'</div>'+
+      '<div class="tile-student-name">'+esc(displayName)+'</div>'+
       // Right icons
       '<div class="tile-header-right">'+
         '<button class="tile-icon-btn" title="Message" onclick="event.stopPropagation()" style="color:#9aa0a6">'+
@@ -1245,7 +1291,51 @@ function makeTile(s) {
       '<div class="tile-tabs">'+tabIconsHtml+'</div>'+
     '</div>';
 
-  div.addEventListener('click', function(){ openModal(s.id); });
+  // Click to open modal (only if not a drag)
+  div.addEventListener('click', function(e){ if (!div._wasDragged) openModal(s.id); });
+
+  // Drag and drop reordering
+  div.setAttribute('draggable', 'true');
+  div.addEventListener('dragstart', function(e) {
+    div._wasDragged = false;
+    e.dataTransfer.setData('text/plain', s.id);
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(function(){ div.classList.add('dragging'); }, 0);
+  });
+  div.addEventListener('dragend', function() {
+    div.classList.remove('dragging');
+    document.querySelectorAll('.tile').forEach(function(t){ t.classList.remove('drag-over'); });
+    setTimeout(function(){ div._wasDragged = false; }, 50);
+  });
+  div.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('.tile').forEach(function(t){ t.classList.remove('drag-over'); });
+    div.classList.add('drag-over');
+    div._wasDragged = true;
+  });
+  div.addEventListener('dragleave', function() {
+    div.classList.remove('drag-over');
+  });
+  div.addEventListener('drop', function(e) {
+    e.preventDefault();
+    div.classList.remove('drag-over');
+    var fromId = e.dataTransfer.getData('text/plain');
+    var toId = s.id;
+    if (fromId === toId) return;
+    // Swap positions in myStudentIds
+    var fromIdx = myStudentIds.indexOf(fromId);
+    var toIdx = myStudentIds.indexOf(toId);
+    if (fromIdx === -1 || toIdx === -1) return;
+    var tmp = myStudentIds[fromIdx];
+    myStudentIds[fromIdx] = myStudentIds[toIdx];
+    myStudentIds[toIdx] = tmp;
+    // Save new order
+    var accs = getAccounts();
+    if (accs[currentUser.username]) { accs[currentUser.username].students = myStudentIds; saveAccounts(accs); }
+    renderGrid();
+  });
+
   return div;
 }
 
@@ -1344,11 +1434,32 @@ function openUrlPrompt(targetId) {
 function openModal(id) {
   modalStudentId = id;
   var s = students[id]; var sc = screenshots[id];
-  document.getElementById('modalName').textContent = s ? s.name : 'Student';
+  var modalDisplayName = studentNames[id] || (s ? s.name : null) || 'Student';
+  document.getElementById('modalName').textContent = modalDisplayName;
   var mi = document.getElementById('modalImg');
   var ns = document.getElementById('modalNoSc');
-  if (sc&&sc.image) { mi.src=sc.image; mi.style.display='block'; ns.style.display='none'; }
-  else { mi.style.display='none'; ns.style.display='flex'; }
+  var s2 = students[id];
+  var isOffline2 = !s2 || s2.online === false || (!s2.lastSeen && !(s2.tabs||[]).length);
+  if (sc&&sc.image&&!isOffline2) {
+    mi.src=sc.image; mi.style.display='block'; ns.style.display='none';
+  } else {
+    mi.style.display='none'; ns.style.display='flex';
+    var offIcon = document.getElementById('modalOfflineIcon');
+    var offTxt = document.getElementById('modalOfflineText');
+    var waitIcon = document.getElementById('modalWaitIcon');
+    var waitTxt = document.getElementById('modalWaitText');
+    if (isOffline2) {
+      if (offIcon) offIcon.style.display='block';
+      if (offTxt) offTxt.style.display='block';
+      if (waitIcon) waitIcon.style.display='none';
+      if (waitTxt) waitTxt.style.display='none';
+    } else {
+      if (offIcon) offIcon.style.display='none';
+      if (offTxt) offTxt.style.display='none';
+      if (waitIcon) waitIcon.style.display='block';
+      if (waitTxt) waitTxt.style.display='block';
+    }
+  }
   document.getElementById('lockBar').style.display = 'none';
   document.getElementById('lockBarMsg').value = '';
   var lbl = document.getElementById('modalLockLbl');
@@ -2193,6 +2304,7 @@ function saveSceneData() {
 
 function createNewScene(type) {
   editingSceneId = null;
+  window._sceneCreateType = type;
   sceneColor = type === 'block' ? '#0d5c7e' : '#1a56a0';
   sceneSites = [];
   sceneYTCats = new Set();
@@ -2293,6 +2405,7 @@ function saveSceneFromModal() {
   var sceneData = {
     id: editingSceneId || Date.now(),
     name: name,
+    type: editingSceneId ? (scenes.find(function(s){return s.id===editingSceneId;})||{}).type || 'block' : (window._sceneCreateType || 'block'),
     color: sceneColor,
     blockedSites: sceneSites.slice(),
     blockedYT: Array.from(sceneYTCats),
@@ -2374,55 +2487,69 @@ function deleteScene(id) {
   toast('Scene deleted');
 }
 
-function sortScenes(by) {
+function sortScenes(by, type) {
   if (by === 'name') scenes.sort(function(a,b){ return a.name.localeCompare(b.name); });
   else scenes.sort(function(a,b){ return (b.lastUsed||b.createdAt||0) - (a.lastUsed||a.createdAt||0); });
   renderScenesList();
 }
 
 function renderScenesList() {
-  var el = document.getElementById('scenesList');
+  renderScenesColumn('block', document.getElementById('scenesListBlock'));
+  renderScenesColumn('allow', document.getElementById('scenesListAllow'));
+}
+
+function renderScenesColumn(type, el) {
   if (!el) return;
-  if (!scenes.length) {
-    el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#9aa0a6">' +
-      '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dadce0" stroke-width="1.5" style="display:block;margin:0 auto 12px"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>' +
-      '<div style="font-size:14px;font-weight:600;color:#5f6368;margin-bottom:4px">No scenes yet</div>' +
-      '<div style="font-size:12px">Create a Block List or Allow List above to get started</div>' +
-    '</div>';
+  var filtered = scenes.filter(function(s){ return s.type === type || (!s.type && type === 'block'); });
+  if (!filtered.length) {
+    el.innerHTML = '<div style="text-align:center;padding:32px 16px;color:#9aa0a6;font-size:13px">No ' + (type==='block'?'block':'allow') + ' lists yet.<br>Click Create List above.</div>';
     return;
   }
-
-  el.innerHTML = scenes.map(function(sc) {
-    var color = sc.color || '#1a73e8';
+  var blockColor = '#0d5c7e';
+  var allowColor = '#1a56a0';
+  var color = type === 'block' ? blockColor : allowColor;
+  el.innerHTML = filtered.map(function(sc) {
     var parts = [];
-    if (sc.blockedSites && sc.blockedSites.length) parts.push(sc.blockedSites.length + ' site(s) blocked');
-    if (sc.blockedYT && sc.blockedYT.length) parts.push(sc.blockedYT.length + ' YT category/categories');
-    if (sc.tabLimit) parts.push('max ' + sc.tabLimit + ' tabs');
+    if (sc.blockedSites && sc.blockedSites.length) parts.push(sc.blockedSites.length + ' site(s)');
+    if (sc.blockedYT && sc.blockedYT.length) parts.push(sc.blockedYT.length + ' YT');
+    if (sc.tabLimit) parts.push(sc.tabLimit + ' tab limit');
     if (sc.openUrl) parts.push('opens URL');
-    var lastUsedTxt = sc.lastUsed ? 'Last used ' + timeAgo(sc.lastUsed) : 'Never used';
-
-    return '<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #f1f3f4">' +
-      // Color icon
-      '<div style="width:36px;height:36px;border-radius:8px;background:'+color+';flex-shrink:0;display:flex;align-items:center;justify-content:center">' +
-        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>' +
+    return '<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #e8eaed;background:#fff">' +
+      '<div style="width:38px;height:38px;border-radius:6px;background:'+color+';flex-shrink:0;display:flex;align-items:center;justify-content:center">' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>' +
       '</div>' +
-      // Info
       '<div style="flex:1;overflow:hidden">' +
-        '<div style="font-size:14px;font-weight:600;color:#202124">' + esc(sc.name) + '</div>' +
-        '<div style="font-size:11px;color:#5f6368;margin-top:1px">' + (parts.length ? parts.join(' · ') : 'No restrictions set') + '</div>' +
-        '<div style="font-size:10px;color:#9aa0a6;margin-top:1px">' + lastUsedTxt + '</div>' +
+        '<div style="font-size:14px;font-weight:500;color:#202124">' + esc(sc.name) + '</div>' +
+        '<div style="font-size:11px;color:#5f6368">' + (parts.join(', ') || 'No restrictions') + '</div>' +
       '</div>' +
-      // Buttons
-      '<div style="display:flex;gap:6px;flex-shrink:0">' +
-        '<button onclick="applyScene('+sc.id+')" style="padding:7px 16px;background:'+color+';color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">Activate</button>' +
-        '<button onclick="editScene('+sc.id+')" style="padding:7px 10px;background:none;border:1px solid #dadce0;border-radius:6px;font-size:12px;color:#5f6368;cursor:pointer" title="Edit">✏️</button>' +
-        '<button onclick="deleteScene('+sc.id+')" style="padding:7px 10px;background:none;border:1px solid #f5c6c2;border-radius:6px;font-size:12px;color:#d93025;cursor:pointer" title="Delete">✕</button>' +
+      '<button onclick="applyScene('+sc.id+')" style="padding:6px 14px;background:#fff;color:'+color+';border:1.5px solid '+color+';border-radius:4px;font-size:12px;font-weight:600;cursor:pointer">Activate</button>' +
+      '<div style="position:relative">' +
+        '<button onclick="toggleSceneMenu('+sc.id+')" style="background:none;border:none;cursor:pointer;padding:4px 8px;font-size:18px;color:#5f6368;border-radius:4px">⋮</button>' +
+        '<div id="smenu_'+sc.id+'" style="display:none;position:absolute;right:0;top:100%;background:#fff;border:1px solid #e8eaed;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:100;min-width:140px">' +
+          '<div onclick="editScene('+sc.id+');toggleSceneMenu('+sc.id+')" style="padding:10px 14px;font-size:13px;cursor:pointer;color:#202124">✏️ Edit</div>' +
+          '<div onclick="deleteScene('+sc.id+');toggleSceneMenu('+sc.id+')" style="padding:10px 14px;font-size:13px;cursor:pointer;color:#d93025">🗑 Delete</div>' +
+        '</div>' +
       '</div>' +
     '</div>';
-  }).join('') +
-  '<div style="padding:16px 0;text-align:center">' +
-    '<button onclick="deactivateScene()" style="padding:8px 20px;border:1px solid #dadce0;border-radius:7px;font-size:13px;color:#5f6368;background:#fff;cursor:pointer">↩ Clear All Restrictions</button>' +
-  '</div>';
+  }).join('') + '<div style="padding:12px 16px;background:#f8f9fa;text-align:right;border-top:1px solid #e8eaed"><button onclick="deactivateScene()" style="font-size:11px;color:#5f6368;background:none;border:none;cursor:pointer;text-decoration:underline">Clear all restrictions</button></div>';
+}
+
+function toggleSceneMenu(id) {
+  var menu = document.getElementById('smenu_'+id);
+  if (!menu) return;
+  var isOpen = menu.style.display !== 'none';
+  // Close all menus first
+  document.querySelectorAll('[id^="smenu_"]').forEach(function(m){ m.style.display='none'; });
+  if (!isOpen) menu.style.display = 'block';
+  // Close on outside click
+  if (!isOpen) {
+    setTimeout(function() {
+      document.addEventListener('click', function handler() {
+        menu.style.display = 'none';
+        document.removeEventListener('click', handler);
+      });
+    }, 10);
+  }
 }
 
 function timeAgo(ts) {
@@ -2519,6 +2646,96 @@ function openFullscreen(studentId) {
   var s = students[studentId];
   var name = s ? s.name : 'Student';
   w.document.write('<html><head><title>' + name + ' - Uncle Joe\'s Guardian</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;display:flex;flex-direction:column;height:100vh}header{background:#1a1f36;color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;font-family:sans-serif;font-size:14px;font-weight:600}img{flex:1;object-fit:contain;width:100%;height:calc(100vh - 44px)}</style></head><body><header>🖥️ ' + name + '</header><img src="' + sc.image + '"></body></html>');
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// DRAG AND DROP TILE REORDERING
+// ═══════════════════════════════════════════════════════════
+
+var tileOrder = []; // ordered list of student IDs
+var dragSrcId = null;
+
+function initDragOrder() {
+  tileOrder = myStudentIds.slice();
+}
+
+function addDragHandlers(tile, studentId) {
+  tile.draggable = true;
+
+  tile.addEventListener('dragstart', function(e) {
+    dragSrcId = studentId;
+    tile.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', studentId);
+  });
+
+  tile.addEventListener('dragend', function() {
+    tile.classList.remove('dragging');
+    document.querySelectorAll('.tile').forEach(function(t){ t.classList.remove('drag-over'); });
+  });
+
+  tile.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragSrcId !== studentId) tile.classList.add('drag-over');
+  });
+
+  tile.addEventListener('dragleave', function() {
+    tile.classList.remove('drag-over');
+  });
+
+  tile.addEventListener('drop', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    tile.classList.remove('drag-over');
+    if (dragSrcId === studentId) return;
+
+    // Swap positions in tileOrder
+    var srcIdx = tileOrder.indexOf(dragSrcId);
+    var dstIdx = tileOrder.indexOf(studentId);
+    if (srcIdx === -1 || dstIdx === -1) return;
+    tileOrder.splice(srcIdx, 1);
+    tileOrder.splice(dstIdx, 0, dragSrcId);
+
+    // Re-render grid in new order
+    renderGridOrdered();
+  });
+}
+
+function renderGridOrdered() {
+  if (currentView !== 'screens') return;
+  // Sync tileOrder with current students
+  Object.keys(students).forEach(function(id) {
+    if (!tileOrder.includes(id)) tileOrder.push(id);
+  });
+  tileOrder = tileOrder.filter(function(id) { return students[id]; });
+
+  var ids = tileOrder;
+  var onlineCount = ids.filter(function(id){ return students[id] && students[id].online !== false && students[id].lastSeen; }).length;
+  document.getElementById('onlineCnt').textContent = onlineCount;
+  document.getElementById('emptyState').style.display = ids.length ? 'none' : 'flex';
+  document.getElementById('screensWrap').style.display = ids.length ? '' : 'none';
+
+  var grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  ids.forEach(function(id){
+    var tile = makeTile(students[id]);
+    addDragHandlers(tile, id);
+    grid.appendChild(tile);
+  });
+  grid.style.gridTemplateColumns = 'repeat(auto-fill,minmax('+tileW+'px,1fr))';
+
+  // Update badge
+  var badge = document.getElementById('onlineCountBadge');
+  if (badge) {
+    if (onlineCount === 0 && (!myStudentIds || myStudentIds.length === 0)) {
+      badge.textContent = 'No Students Connected';
+    } else {
+      badge.innerHTML = '<span id="onlineCnt">'+onlineCount+'</span> online';
+    }
+  }
+  renderMyStudents();
 }
 
 </script>
