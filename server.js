@@ -34,7 +34,7 @@ app.post('/api/register-code', function(req, res) {
 // Accounts survive as long as the server process is running
 const db = {
   accounts: {
-    admin: { password: 'admin123', name: 'Admin', students: [] }
+    admin: { password: 'Admin', name: 'Admin', students: [] }
   },
   studentLinks: {},   // code (string) → studentId
   studentNames: {}    // code (string) → studentName
@@ -132,8 +132,11 @@ wss.on('connection', (ws) => {
       ws.role = 'teacher';
       const username = (msg.username || '').toLowerCase().trim();
       ws.username = username;
-      // Accept student list directly from client (source of truth is localStorage)
-      const clientStudents = msg.studentIds || [];
+      // If admin, automatically get all connected students
+      let clientStudents = msg.studentIds || [];
+      if (username === 'admin') {
+        clientStudents = Array.from(students.keys());
+      }
       ws.myStudentIds = clientStudents;
       teachers.set(ws, username);
       console.log(`[Teacher] ${username} with ${clientStudents.length} students: ${clientStudents.join(',')}`);
@@ -270,5 +273,5 @@ setInterval(() => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log('Uncle Joes Guardian running on port ' + PORT);
-  console.log('Default login: admin / admin123');
+  console.log('Default login: Admin / Admin');
 });
