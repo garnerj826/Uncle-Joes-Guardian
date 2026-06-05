@@ -335,10 +335,11 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
       <button class="tab-btn" id="tabSignup" onclick="showTab('signup')">Create Account</button>
     </div>
     <div id="signinForm">
-      <div class="field"><label>Username</label><input type="text" id="li-user" placeholder="Enter username" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <div class="field"><label>Password</label><input type="password" id="li-pass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="field"><label>Username</label><input type="text" id="li-user" name="username" placeholder="Enter username" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="field"><label>Password</label><input type="password" id="li-pass" name="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="login-btn" id="loginSubmitBtn" onclick="doLogin()">Log In</button>
       <div class="err-msg" id="li-err"></div>
+      <div style="text-align:center;margin-top:12px"><a href="#" style="font-size:12px;color:#1a73e8;text-decoration:none;cursor:pointer" onclick="openResetModal(); return false">Forgot Password?</a></div>
     </div>
     <div id="signupForm" style="display:none">
       <div class="field"><label>Full Name</label><input type="text" id="su-name" placeholder="Your name" onkeydown="if(event.key==='Enter')doSignup()"></div>
@@ -346,6 +347,20 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
       <div class="field"><label>Password</label><input type="password" id="su-pass" placeholder="Choose a password (min 4 chars)" onkeydown="if(event.key==='Enter')doSignup()"></div>
       <button class="login-btn" onclick="doSignup()">Create Account</button>
       <div class="err-msg" id="su-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PASSWORD RESET MODAL -->
+<div id="resetModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:8px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(0,0,0,.12);padding:32px;text-align:center">
+    <h2 style="color:#202124;margin-bottom:8px">Reset Password</h2>
+    <p style="color:#5f6368;font-size:13px;margin-bottom:20px">Enter your username to reset your password</p>
+    <div class="field" style="text-align:left"><label>Username</label><input type="text" id="resetUser" placeholder="Enter your username" onkeydown="if(event.key==='Enter')sendResetEmail()"></div>
+    <div class="err-msg" id="reset-err" style="margin-bottom:12px"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="sendResetEmail()" style="flex:1;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer">Send Reset Link</button>
+      <button onclick="closeResetModal()" style="padding:11px 20px;border:1px solid #dadce0;background:#fff;border-radius:7px;font-size:14px;cursor:pointer">Cancel</button>
     </div>
   </div>
 </div>
@@ -432,6 +447,13 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 
     </div>
     <div class="content">
+      <!-- Classroom Header -->
+      <div id="classroomHeader" style="background:#fff;padding:20px;border-bottom:1px solid #e8eaed;display:none">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <input type="text" id="classroomName" placeholder="Classroom Name (optional)" style="font-size:24px;font-weight:700;border:none;outline:none;max-width:400px;padding:4px 8px;border-bottom:2px solid transparent;transition:.2s" onfocus="this.style.borderBottomColor='var(--blue)'" onblur="this.style.borderBottomColor='transparent';saveClassroomName()">
+        </div>
+      </div>
+
       <!-- Content tabs (change based on section) -->
       <div id="contentTabBar" class="content-tabs">
         <!-- Classrooms tabs -->
@@ -971,6 +993,50 @@ function showTab(t) {
   document.getElementById('tabSignup').classList.toggle('active', !signin);
   document.getElementById('li-err').textContent = '';
   document.getElementById('su-err').textContent = '';
+}
+
+function openResetModal() {
+  document.getElementById('resetModal').style.display = 'flex';
+  document.getElementById('resetUser').value = '';
+  document.getElementById('reset-err').textContent = '';
+  setTimeout(function(){ document.getElementById('resetUser').focus(); }, 100);
+}
+
+function closeResetModal() {
+  document.getElementById('resetModal').style.display = 'none';
+}
+
+function sendResetEmail() {
+  var user = (document.getElementById('resetUser').value || '').trim().toLowerCase();
+  var errEl = document.getElementById('reset-err');
+  if (!user) {
+    errEl.textContent = 'Please enter your username';
+    return;
+  }
+  fetch('/api/reset-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: user })
+  })
+  .then(r => r.json())
+  .then(function(d) {
+    if (d.ok) {
+      errEl.style.color = '#1e8e3e';
+      errEl.textContent = 'Password reset to: ' + d.newPassword + ' (save this somewhere safe)';
+      setTimeout(function() {
+        closeResetModal();
+        document.getElementById('li-user').value = user;
+        document.getElementById('li-pass').value = d.newPassword;
+        toast('Password reset! Auto-filled login form.');
+      }, 2000);
+    } else {
+      errEl.style.color = '#d93025';
+      errEl.textContent = d.error || 'Username not found';
+    }
+  })
+  .catch(function(e) {
+    errEl.textContent = 'Error: ' + e.message;
+  });
 }
 
 function doLogin() {
@@ -1560,6 +1626,10 @@ function setSection(section, el) {
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
   if (el) el.classList.add('active');
 
+  // Hide classroom header for non-classroom sections
+  var classHeader = document.getElementById('classroomHeader');
+  if (classHeader) classHeader.style.display = section === 'classrooms' ? 'block' : 'none';
+
   // Hide all content areas
   document.getElementById('screensWrap').style.display = 'none';
   document.getElementById('ssGallery').classList.remove('show');
@@ -1584,6 +1654,11 @@ function setSection(section, el) {
 
   if (section === 'classrooms') {
     currentView = 'screens';
+    // Load classroom name
+    var nameInput = document.getElementById('classroomName');
+    if (nameInput) {
+      nameInput.value = localStorage.getItem('classroomName') || '';
+    }
     var ct = document.getElementById('tabsClassrooms');
     if (ct) ct.style.display = 'flex';
     if (actions) actions.style.display = 'flex';
@@ -1605,6 +1680,14 @@ function setSection(section, el) {
     if (fb) fb.style.display = 'none';
     if (ab) ab.classList.remove('show');
     if (st) { st.style.display = 'flex'; switchStudentsTopTab('add'); }
+  }
+}
+
+function saveClassroomName() {
+  var name = (document.getElementById('classroomName').value || '').trim();
+  if (name) {
+    localStorage.setItem('classroomName', name);
+    console.log('[Classroom] Saved name: ' + name);
   }
 }
 
