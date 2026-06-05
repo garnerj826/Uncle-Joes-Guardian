@@ -164,8 +164,9 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .tile-ctrl input{width:80px;accent-color:var(--blue)}
 
 /* GRID */
-.screens-wrap{flex:1;overflow-y:auto;padding:16px 20px}
-.screens-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.screens-wrap{flex:1;overflow-y:auto;padding:16px 20px;display:flex;gap:16px}
+.screens-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;flex:1}
+@media (max-width:1400px){.screens-grid{grid-template-columns:1fr}}
 
 /* EMPTY */
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:#9aa0a6;padding:60px}
@@ -206,6 +207,29 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .tab-dot{width:16px;height:16px;border-radius:0;background:#f1f3f4;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .tab-dot img{width:14px;height:14px;object-fit:contain}
 .tile-extra-tabs{font-size:10px;font-weight:600;color:#5f6368;background:#e8eaed;border-radius:0;padding:1px 4px;flex-shrink:0}
+
+/* STUDENT DETAIL PANEL */
+.student-detail-panel{width:320px;background:#fff;border-left:1px solid #e8eaed;display:flex;flex-direction:column;overflow:hidden}
+.student-detail-header{padding:16px;border-bottom:1px solid #e8eaed;display:flex;align-items:center;justify-content:space-between}
+.student-detail-title{font-size:14px;font-weight:600;color:#202124}
+.student-detail-close{background:none;border:none;cursor:pointer;font-size:20px;color:#5f6368}
+.activity-tabs{display:flex;gap:0;border-bottom:1px solid #e8eaed;padding:0;background:#f8f9fa}
+.activity-tab{flex:1;padding:12px;text-align:center;border-bottom:2px solid transparent;cursor:pointer;font-size:12px;font-weight:500;color:#5f6368;transition:.2s}
+.activity-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.activity-content{flex:1;overflow-y:auto;padding:12px}
+.activity-section{margin-bottom:16px}
+.activity-section-title{font-size:11px;font-weight:700;color:#5f6368;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.activity-item{display:flex;gap:8px;margin-bottom:12px;padding:8px;background:#f8f9fa;border-radius:4px}
+.activity-item-icon{width:24px;height:24px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px}
+.activity-item-info{flex:1;overflow:hidden}
+.activity-item-title{font-size:12px;font-weight:500;color:#202124;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px}
+.activity-item-url{font-size:11px;color:var(--blue);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.close-btn{padding:6px 12px;background:none;border:1px solid #dadce0;border-radius:4px;font-size:11px;color:#5f6368;cursor:pointer}
+.chat-input{padding:12px;border-top:1px solid #e8eaed;display:flex;gap:8px}
+.chat-input input{flex:1;border:1px solid #dadce0;border-radius:4px;padding:8px 12px;font-size:12px;font-family:inherit;outline:none}
+.chat-input input:focus{border-color:var(--blue)}
+.chat-send{background:var(--blue);color:#fff;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;font-size:12px;font-weight:600}
+
 /* Drag and drop */
 .tile{cursor:grab}
 .tile.dragging{opacity:.4;cursor:grabbing}
@@ -373,6 +397,14 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
       <span>Uncle <b>Joe's</b> Guardian</span>
     </div>
     <div class="live-badge"><div class="dot"></div>Live Session</div>
+
+    <!-- Breadcrumb Navigation -->
+    <div id="breadcrumb" style="display:none;margin-left:20px;font-size:13px;color:#5f6368;display:flex;align-items:center;gap:8px">
+      <a onclick="goBackToClasses()" style="color:var(--blue);cursor:pointer;text-decoration:none;font-weight:500">Classrooms</a>
+      <span>›</span>
+      <span id="currentClassName" style="color:#202124;font-weight:500"></span>
+    </div>
+
     <div class="topbar-right">
       <div class="conn-badge" id="connBadge"><div class="dot"></div><span id="connTxt">Disconnected</span></div>
       <div style="position:relative">
@@ -508,8 +540,65 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         <h3>No Students Connected</h3>
         <p>Add students using their 5-digit code from the extension, then they'll appear here when online.</p>
       </div>
+
+      <!-- Classes Selection View -->
+      <div id="classesView" style="display:none;flex:1;overflow-y:auto;padding:40px;background:#f8f9fa">
+        <div style="max-width:900px;margin:0 auto">
+          <h1 style="font-size:28px;font-weight:700;color:#202124;margin-bottom:8px">My Classes</h1>
+          <p style="color:#5f6368;margin-bottom:32px">Select a class to manage students and view activity</p>
+
+          <div id="classList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:32px"></div>
+
+          <button onclick="openNewClassModal()" style="padding:12px 24px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">+ Create New Class</button>
+        </div>
+      </div>
+
+      <!-- New Class Modal -->
+      <div id="newClassModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center">
+        <div style="background:#fff;border-radius:8px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(0,0,0,.12);padding:32px">
+          <h2 style="color:#202124;margin-bottom:8px">Create Class</h2>
+          <p style="color:#5f6368;font-size:13px;margin-bottom:20px">Give your class a name</p>
+          <div class="field" style="text-align:left;margin-bottom:16px"><label>Class Name</label><input type="text" id="classNameInput" placeholder="e.g., Biology 101" onkeydown="if(event.key==='Enter')createNewClass()"></div>
+          <div class="err-msg" id="class-err" style="margin-bottom:12px;text-align:left"></div>
+          <div style="display:flex;gap:10px">
+            <button onclick="createNewClass()" style="flex:1;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer">Create</button>
+            <button onclick="closeNewClassModal()" style="padding:11px 20px;border:1px solid #dadce0;background:#fff;border-radius:7px;font-size:14px;cursor:pointer">Cancel</button>
+          </div>
+        </div>
+      </div>
+
       <div class="screens-wrap" id="screensWrap" style="display:none">
         <div class="screens-grid" id="grid"></div>
+        <!-- Student Detail Panel -->
+        <div id="studentDetailPanel" class="student-detail-panel" style="display:none">
+          <div class="student-detail-header">
+            <div class="student-detail-title" id="detailStudentName">Student Name</div>
+            <button class="student-detail-close" onclick="closeStudentDetail()">✕</button>
+          </div>
+          <div class="activity-tabs">
+            <div class="activity-tab active" onclick="switchActivityTab('activity')">Student Activity</div>
+            <div class="activity-tab" onclick="switchActivityTab('chat')">Chat</div>
+          </div>
+          <div id="activityContent" class="activity-content">
+            <div id="studentActivityView">
+              <div class="activity-section">
+                <div class="activity-section-title">Active Tab</div>
+                <div id="activeTabInfo"></div>
+              </div>
+              <div class="activity-section">
+                <div class="activity-section-title">Other Tabs</div>
+                <div id="otherTabsInfo"></div>
+              </div>
+            </div>
+            <div id="chatView" style="display:none;display:flex;flex-direction:column">
+              <div id="chatMessages" style="flex:1;overflow-y:auto;padding:12px 0"></div>
+            </div>
+          </div>
+          <div id="chatInputSection" class="chat-input" style="display:none">
+            <input type="text" id="chatInput" placeholder="Send a message..." onkeydown="if(event.key==='Enter')sendStudentChat()">
+            <button class="chat-send" onclick="sendStudentChat()">Send</button>
+          </div>
+        </div>
       </div>
       <!-- TIMELINES VIEW -->
       <div id="timelinesView" style="display:none;flex-direction:column;flex:1;overflow:hidden">
@@ -1039,6 +1128,104 @@ function sendResetEmail() {
   });
 }
 
+// ── CLASS MANAGEMENT ──
+var currentClass = null;
+
+function loadAndShowClasses() {
+  var classes = JSON.parse(localStorage.getItem('userClasses') || '[]');
+  currentClass = localStorage.getItem('selectedClass') || null;
+
+  // Update breadcrumb if a class is selected
+  if (currentClass) {
+    var selectedClass = classes.find(function(c) { return c.id === currentClass; });
+    if (selectedClass) {
+      document.getElementById('currentClassName').textContent = selectedClass.name;
+      document.getElementById('breadcrumb').style.display = 'flex';
+    }
+  } else {
+    document.getElementById('breadcrumb').style.display = 'none';
+  }
+
+  var listEl = document.getElementById('classList');
+  if (classes.length === 0) {
+    listEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9aa0a6"><div style="font-size:48px;margin-bottom:16px">📚</div><p>No classes yet. Create one to get started!</p></div>';
+  } else {
+    listEl.innerHTML = classes.map(function(cls) {
+      var studentCount = (cls.studentCount || 0);
+      return '<div onclick="selectClass(\'' + cls.id + '\')" style="background:#fff;border-radius:8px;padding:20px;cursor:pointer;border:2px solid ' + (currentClass === cls.id ? 'var(--blue)' : '#e8eaed') + ';transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.12)"><div style="font-size:18px;font-weight:600;color:#202124;margin-bottom:8px">' + esc(cls.name) + '</div><div style="font-size:13px;color:#5f6368">' + studentCount + ' student' + (studentCount !== 1 ? 's' : '') + '</div></div>';
+    }).join('');
+  }
+  document.getElementById('classesView').style.display = 'flex';
+}
+
+function selectClass(classId) {
+  localStorage.setItem('selectedClass', classId);
+  currentClass = classId;
+
+  // Get the class name and update breadcrumb
+  var classes = JSON.parse(localStorage.getItem('userClasses') || '[]');
+  var selectedClass = classes.find(function(c) { return c.id === classId; });
+  if (selectedClass) {
+    document.getElementById('currentClassName').textContent = selectedClass.name;
+    document.getElementById('breadcrumb').style.display = 'flex';
+  }
+
+  // Update UI to show selected
+  loadAndShowClasses();
+  // Go to classrooms view
+  setTimeout(function() {
+    setSection('classrooms', document.getElementById('navClassrooms'));
+  }, 200);
+}
+
+function goBackToClasses() {
+  currentClass = null;
+  localStorage.removeItem('selectedClass');
+  document.getElementById('breadcrumb').style.display = 'none';
+  loadAndShowClasses();
+}
+
+function openNewClassModal() {
+  document.getElementById('newClassModal').style.display = 'flex';
+  document.getElementById('classNameInput').value = '';
+  document.getElementById('class-err').textContent = '';
+  setTimeout(function() { document.getElementById('classNameInput').focus(); }, 100);
+}
+
+function closeNewClassModal() {
+  document.getElementById('newClassModal').style.display = 'none';
+}
+
+function createNewClass() {
+  var name = (document.getElementById('classNameInput').value || '').trim();
+  var errEl = document.getElementById('class-err');
+  errEl.textContent = '';
+
+  if (!name) {
+    errEl.textContent = 'Please enter a class name';
+    return;
+  }
+
+  var classes = JSON.parse(localStorage.getItem('userClasses') || '[]');
+  var newClass = {
+    id: Date.now().toString(),
+    name: name,
+    createdAt: new Date().toISOString(),
+    studentCount: 0
+  };
+  classes.push(newClass);
+  localStorage.setItem('userClasses', JSON.stringify(classes));
+
+  closeNewClassModal();
+  loadAndShowClasses();
+  selectClass(newClass.id);
+  toast('Class created: ' + name);
+}
+
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+}
+
 function doLogin() {
   var user = (document.getElementById('li-user').value || '').trim().toLowerCase();
   var pass = document.getElementById('li-pass').value || '';
@@ -1064,7 +1251,7 @@ function doLogin() {
       document.getElementById('userAvatar').textContent = (currentUser.name || 'U')[0].toUpperCase();
       var sa = document.getElementById('sidebarAvatar');
       if (sa) sa.textContent = (currentUser.name || 'U')[0].toUpperCase();
-      setSection('classrooms', document.getElementById('navClassrooms'));
+      loadAndShowClasses();
       if (btn) { btn.disabled = false; btn.innerHTML = 'Log In'; }
       connectWS();
     }, 3000);
@@ -1278,6 +1465,10 @@ function makeTile(s) {
   var div = document.createElement('div');
   div.className = 'tile'+(s.isLocked?' locked':'')+(selected.has(s.id)?' selected':'');
   div.dataset.id = s.id;
+  div.onclick = function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.closest('button')) return;
+    openStudentDetail(s.id);
+  };
 
   // Use stored custom name first, fallback to last known name
   // Persist the name if we got a real one
@@ -1443,6 +1634,102 @@ function selectAll(checked) {
     var chk = t.querySelector('.tile-chk'); if(chk) chk.checked = checked;
   });
   updateActionBar();
+}
+
+// ═══════════════════════════════════════════════════════════
+// STUDENT DETAIL PANEL
+// ═══════════════════════════════════════════════════════════
+
+var currentDetailStudent = null;
+
+function openStudentDetail(studentId) {
+  currentDetailStudent = studentId;
+  var s = students[studentId];
+  if (!s) return;
+
+  document.getElementById('detailStudentName').textContent = s.name || 'Student';
+  document.getElementById('studentDetailPanel').style.display = 'flex';
+  switchActivityTab('activity');
+  updateStudentActivity();
+}
+
+function closeStudentDetail() {
+  currentDetailStudent = null;
+  document.getElementById('studentDetailPanel').style.display = 'none';
+}
+
+function switchActivityTab(tab) {
+  document.querySelectorAll('.activity-tab').forEach(function(t) {
+    t.classList.remove('active');
+  });
+  document.querySelector('[onclick*="switchActivityTab(\'' + tab + '\')"]').classList.add('active');
+
+  if (tab === 'activity') {
+    document.getElementById('studentActivityView').style.display = 'block';
+    document.getElementById('chatView').style.display = 'none';
+    document.getElementById('chatInputSection').style.display = 'none';
+  } else {
+    document.getElementById('studentActivityView').style.display = 'none';
+    document.getElementById('chatView').style.display = 'flex';
+    document.getElementById('chatInputSection').style.display = 'flex';
+  }
+}
+
+function updateStudentActivity() {
+  var s = students[currentDetailStudent];
+  if (!s) return;
+
+  var activeTabEl = document.getElementById('activeTabInfo');
+  if (s.tabs && s.tabs.length > 0) {
+    var activeTab = s.tabs[0];
+    activeTabEl.innerHTML = '<div class="activity-item">' +
+      '<div class="activity-item-icon" style="background:#f1f3f4;color:#5f6368">📄</div>' +
+      '<div class="activity-item-info">' +
+        '<div class="activity-item-title">' + esc(activeTab.title || 'Untitled') + '</div>' +
+        '<div class="activity-item-url">' + esc(activeTab.url || '') + '</div>' +
+      '</div>' +
+      '<button class="close-btn" onclick="closeTab(' + currentDetailStudent + ', 0)">Close</button>' +
+    '</div>';
+  } else {
+    activeTabEl.innerHTML = '<div style="color:#9aa0a6;font-size:12px">No active tabs</div>';
+  }
+
+  var otherTabsEl = document.getElementById('otherTabsInfo');
+  if (s.tabs && s.tabs.length > 1) {
+    otherTabsEl.innerHTML = '<div style="font-size:11px;color:#5f6368;margin-bottom:8px">' + (s.tabs.length - 1) + ' Other Tabs</div>' +
+      s.tabs.slice(1).map(function(tab, idx) {
+        return '<div class="activity-item">' +
+          '<div class="activity-item-icon" style="background:#f1f3f4;color:#5f6368">📄</div>' +
+          '<div class="activity-item-info">' +
+            '<div class="activity-item-title">' + esc(tab.title || 'Untitled') + '</div>' +
+            '<div class="activity-item-url">' + esc(tab.url || '') + '</div>' +
+          '</div>' +
+          '<button class="close-btn" onclick="closeTab(' + currentDetailStudent + ', ' + (idx + 1) + ')">Close</button>' +
+        '</div>';
+      }).join('');
+  } else {
+    otherTabsEl.innerHTML = '';
+  }
+}
+
+function closeTab(studentId, tabIndex) {
+  var s = students[studentId];
+  if (s && s.tabs) {
+    s.tabs.splice(tabIndex, 1);
+    updateStudentActivity();
+  }
+}
+
+function sendStudentChat() {
+  var input = document.getElementById('chatInput');
+  var msg = input.value.trim();
+  if (!msg) return;
+
+  var msgs = document.getElementById('chatMessages');
+  msgs.innerHTML += '<div style="padding:8px;text-align:right;color:var(--blue);font-size:12px">' + esc(msg) + '</div>';
+  msgs.scrollTop = msgs.scrollHeight;
+  input.value = '';
+  toast('Message sent to ' + (students[currentDetailStudent]?.name || 'student'));
 }
 
 function clearSel() {
@@ -1626,9 +1913,17 @@ function setSection(section, el) {
   document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
   if (el) el.classList.add('active');
 
+  // Hide classes view unless on classrooms with no class selected
+  var classesView = document.getElementById('classesView');
+  if (classesView) classesView.style.display = 'none';
+
+  // Show/hide breadcrumb based on section
+  var breadcrumb = document.getElementById('breadcrumb');
+  if (breadcrumb) breadcrumb.style.display = (section === 'classrooms' && currentClass) ? 'flex' : 'none';
+
   // Hide classroom header for non-classroom sections
   var classHeader = document.getElementById('classroomHeader');
-  if (classHeader) classHeader.style.display = section === 'classrooms' ? 'block' : 'none';
+  if (classHeader) classHeader.style.display = section === 'classrooms' && currentClass ? 'block' : 'none';
 
   // Hide all content areas
   document.getElementById('screensWrap').style.display = 'none';
