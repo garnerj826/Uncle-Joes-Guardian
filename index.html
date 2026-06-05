@@ -1451,6 +1451,8 @@ function handleSS(msg) {
 function renderGrid() {
   // Never render grid when not on screens/screenshots view
   if (currentView !== 'screens' && currentView !== 'screenshots') return;
+  // Never show screens until a class has been selected
+  if (!currentClass) return;
   var ids = Object.keys(students);
   var onlineCount = ids.filter(function(id){ return students[id] && students[id].online !== false; }).length;
   document.getElementById('onlineCnt').textContent = onlineCount;
