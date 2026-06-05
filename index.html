@@ -142,6 +142,19 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .chat-send-btn{width:36px;height:36px;border-radius:50%;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .chat-send-btn:hover{background:var(--blue-dark)}
 .chat-empty{text-align:center;color:#9aa0a6;font-size:12px;padding:30px 10px;margin:auto}
+/* NOTIFICATION BANNER */
+#notifBanner{position:fixed;top:50px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.notif{background:#fff;border-radius:0;box-shadow:0 4px 20px rgba(0,0,0,.18);padding:14px 18px;min-width:280px;max-width:360px;display:flex;gap:12px;align-items:flex-start;border-left:4px solid var(--blue);animation:slideIn .3s cubic-bezier(.22,1,.36,1);pointer-events:all}
+.notif.leaving{animation:slideOut .3s cubic-bezier(.55,0,1,.45) forwards}
+.notif.green{border-color:var(--green)}
+.notif.red{border-color:var(--red)}
+.notif.blue{border-color:var(--blue)}
+.notif-title{font-size:13px;font-weight:700;color:#202124;margin-bottom:3px}
+.notif-body{font-size:12px;color:#5f6368;word-break:break-word}
+.notif-close{margin-left:auto;background:none;border:none;cursor:pointer;font-size:16px;color:#9aa0a6;flex-shrink:0;line-height:1;padding:0}
+@keyframes slideIn{from{transform:translateX(calc(100% + 32px));opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(calc(100% + 32px));opacity:0}}
+
 /* Sign-in spinner */
 @keyframes spin{to{transform:rotate(360deg)}}
 .signin-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;margin-right:7px}
@@ -164,9 +177,8 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .tile-ctrl input{width:80px;accent-color:var(--blue)}
 
 /* GRID */
-.screens-wrap{flex:1;overflow-y:auto;padding:16px 20px;display:flex;gap:16px}
-.screens-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;flex:1}
-@media (max-width:1400px){.screens-grid{grid-template-columns:1fr}}
+.screens-wrap{flex:1;overflow-y:auto;padding:16px 20px}
+.screens-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 
 /* EMPTY */
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;color:#9aa0a6;padding:60px}
@@ -175,7 +187,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 .empty p{font-size:13px;text-align:center;max-width:320px;line-height:1.6}
 
 /* STUDENT TILE */
-.tile{background:#fff;border:1px solid #e8eaed;border-radius:0;overflow:hidden;cursor:grab;transition:box-shadow .15s,border-color .15s;position:relative;display:flex;flex-direction:column}
+.tile{background:#fff;border:1px solid #e8eaed;border-radius:0;overflow:hidden;cursor:pointer;transition:box-shadow .15s,border-color .15s;position:relative;display:flex;flex-direction:column;max-height:320px}
 .tile:hover{box-shadow:0 2px 10px rgba(0,0,0,.1);border-color:#bdc1c6}
 .tile.locked{border-color:#d93025}
 .tile.selected{border-color:var(--blue);box-shadow:0 0 0 2px rgba(26,115,232,.2)}
@@ -427,6 +439,9 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
   </div>
 </div>
 
+<!-- NOTIFICATION CONTAINER -->
+<div id="notifBanner"></div>
+
 <!-- APP -->
 <div id="app">
   <div class="topbar">
@@ -487,6 +502,32 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
       <div class="conn-badge-sm" id="connBadgeSm"><div class="dot"></div><span id="connTxtSm">Disconnected</span></div>
       <div style="position:relative">
         <div class="avatar" id="userAvatarSm" onclick="toggleUserMenu()" style="cursor:pointer;width:28px;height:28px;font-size:11px" title="Account">J</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANNOUNCEMENT MODAL -->
+  <div id="announcementModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:3000;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:0;padding:28px 32px;width:420px;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:6px">Make Announcement</h3>
+      <p style="font-size:13px;color:#5f6368;margin-bottom:16px">This message will appear as a notification on all student screens.</p>
+      <div class="field"><label>Message</label><textarea id="announcementText" rows="3" placeholder="Type your announcement..." style="width:100%;padding:9px 12px;border:1.5px solid #dadce0;border-radius:0;font-size:14px;font-family:inherit;outline:none;resize:vertical" onkeydown="if(event.key==='Enter'&&event.ctrlKey)sendAnnouncement()"></textarea></div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button onclick="sendAnnouncement()" style="flex:1;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:0;font-size:13px;font-weight:600;cursor:pointer">Send to All Students</button>
+        <button onclick="document.getElementById('announcementModal').style.display='none'" style="padding:10px 16px;border:1px solid #dadce0;background:#fff;border-radius:0;font-size:13px;cursor:pointer">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPEN TAB MODAL -->
+  <div id="openTabModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:3000;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:0;padding:28px 32px;width:420px;box-shadow:0 8px 32px rgba(0,0,0,.18)">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:6px">Open Tab</h3>
+      <p style="font-size:13px;color:#5f6368;margin-bottom:16px">Opens this URL on all connected student devices.</p>
+      <div class="field"><label>URL</label><input type="url" id="openTabUrl" placeholder="https://..." style="width:100%;padding:9px 12px;border:1.5px solid #dadce0;border-radius:0;font-size:14px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')sendOpenTab()"></div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button onclick="sendOpenTab()" style="flex:1;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:0;font-size:13px;font-weight:600;cursor:pointer">Open on All Devices</button>
+        <button onclick="document.getElementById('openTabModal').style.display='none'" style="padding:10px 16px;border:1px solid #dadce0;background:#fff;border-radius:0;font-size:13px;cursor:pointer">Cancel</button>
       </div>
     </div>
   </div>
@@ -621,7 +662,7 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         </button>
         <button class="gbtn" onclick="unlockAllScreens()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 0 9.9-1"/></svg>
-          Unlock All
+          Unlock All Screens
         </button>
       </div>
 
@@ -659,36 +700,6 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
 
       <div class="screens-wrap" id="screensWrap" style="display:none">
         <div class="screens-grid" id="grid"></div>
-        <!-- Student Detail Panel -->
-        <div id="studentDetailPanel" class="student-detail-panel" style="display:none">
-          <div class="student-detail-header">
-            <div class="student-detail-title" id="detailStudentName">Student Name</div>
-            <button class="student-detail-close" onclick="closeStudentDetail()">✕</button>
-          </div>
-          <div class="activity-tabs">
-            <div class="activity-tab active" onclick="switchActivityTab('activity')">Student Activity</div>
-            <div class="activity-tab" onclick="switchActivityTab('chat')">Chat</div>
-          </div>
-          <div id="activityContent" class="activity-content">
-            <div id="studentActivityView">
-              <div class="activity-section">
-                <div class="activity-section-title">Active Tab</div>
-                <div id="activeTabInfo"></div>
-              </div>
-              <div class="activity-section">
-                <div class="activity-section-title">Other Tabs</div>
-                <div id="otherTabsInfo"></div>
-              </div>
-            </div>
-            <div id="chatView" style="display:none;display:flex;flex-direction:column">
-              <div id="chatMessages" style="flex:1;overflow-y:auto;padding:12px 0"></div>
-            </div>
-          </div>
-          <div id="chatInputSection" class="chat-input" style="display:none">
-            <input type="text" id="chatInput" placeholder="Send a message..." onkeydown="if(event.key==='Enter')sendStudentChat()">
-            <button class="chat-send" onclick="sendStudentChat()">Send</button>
-          </div>
-        </div>
       </div>
       <!-- TIMELINES VIEW -->
       <div id="timelinesView" style="display:none;flex-direction:column;flex:1;overflow:hidden">
@@ -930,24 +941,21 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
   </div>
 
   <!-- LOCK SCREEN MESSAGE MODAL -->
-  <div id="lockScreenModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:600;align-items:center;justify-content:center">
-    <div style="background:#fff;border-radius:8px;width:100%;max-width:480px;box-shadow:0 4px 24px rgba(0,0,0,.12)">
-      <div style="padding:20px 24px;border-bottom:1px solid #e8eaed;display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div style="font-size:16px;font-weight:700;color:#202124">Lock Screen</div>
-          <div style="font-size:12px;color:#5f6368;margin-top:2px">Enter a message to display</div>
-        </div>
-        <button onclick="closeLockScreenModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#5f6368;padding:2px 8px">✕</button>
+  <div id="lockScreenModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:600;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:0;width:360px;box-shadow:0 4px 24px rgba(0,0,0,.18)">
+      <div style="padding:16px 20px;border-bottom:1px solid #e8eaed;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:15px;font-weight:700;color:#202124">🔒 Lock/Unlock Screens</div>
+        <button onclick="closeLockScreenModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#5f6368;padding:2px 6px">✕</button>
       </div>
-      <div style="padding:20px 24px">
-        <label style="display:block;font-size:12px;font-weight:700;color:#5f6368;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Message to Display</label>
-        <textarea id="lockMessageInput" placeholder="e.g., 'Stop working. Time for instructions.'"
-          style="width:100%;padding:10px 12px;border:1.5px solid #dadce0;border-radius:7px;font-size:14px;font-family:inherit;outline:none;resize:vertical;min-height:80px"
+      <div style="padding:16px 20px">
+        <label style="display:block;font-size:11px;font-weight:700;color:#5f6368;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Lock Message</label>
+        <textarea id="lockMessageInput" placeholder="e.g., Stop working — time for instructions."
+          style="width:100%;padding:9px 12px;border:1.5px solid #dadce0;border-radius:0;font-size:13px;font-family:inherit;outline:none;resize:none;height:72px"
           onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='#dadce0'"></textarea>
-
-        <div style="margin-top:20px;display:flex;gap:10px">
-          <button onclick="lockAllScreens()" style="flex:1;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer">Lock All</button>
-          <button onclick="closeLockScreenModal()" style="padding:11px 20px;border:1px solid #dadce0;background:#fff;border-radius:7px;font-size:14px;cursor:pointer">Cancel</button>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button onclick="lockAllScreens()" style="flex:1;padding:10px;background:#d93025;color:#fff;border:none;border-radius:0;font-size:13px;font-weight:600;cursor:pointer">🔒 Lock All</button>
+          <button onclick="unlockAllScreens();closeLockScreenModal()" style="flex:1;padding:10px;background:var(--green);color:#fff;border:none;border-radius:0;font-size:13px;font-weight:600;cursor:pointer">🔓 Unlock All</button>
+          <button onclick="closeLockScreenModal()" style="padding:10px 14px;border:1px solid #dadce0;background:#fff;border-radius:0;font-size:13px;cursor:pointer">Cancel</button>
         </div>
       </div>
     </div>
@@ -1553,7 +1561,7 @@ function makeTile(s) {
   div.dataset.id = s.id;
   div.onclick = function(e) {
     if (e.target.tagName === 'INPUT' || e.target.closest('button')) return;
-    openStudentDetail(s.id);
+    openModal(s.id);
   };
 
   // Use stored custom name first, fallback to last known name
@@ -2137,12 +2145,33 @@ function clearTimer() {
 }
 
 // ── Announcement Modal ──
+function dismissNotif(n) {
+  n.classList.add('leaving');
+  setTimeout(function(){ if (n.parentElement) n.remove(); }, 300);
+}
+
+function showNotification(title, body, type) {
+  var container = document.getElementById('notifBanner');
+  var n = document.createElement('div');
+  n.className = 'notif ' + (type || 'blue');
+  n.innerHTML = '<div style="flex:1"><div class="notif-title">' + title + '</div><div class="notif-body">' + (body || '') + '</div></div><button class="notif-close">✕</button>';
+  n.querySelector('.notif-close').onclick = function(){ dismissNotif(n); };
+  container.appendChild(n);
+  setTimeout(function(){ dismissNotif(n); }, 5000);
+}
+
 function openAnnouncementModal() {
-  var msg = prompt('Enter your announcement message:');
-  if (msg && msg.trim()) {
-    wsSend({ type: 'TEACHER_COMMAND', command: 'SHOW_ANNOUNCEMENT', targetId: 'all', payload: { message: msg.trim() } });
-    toast('Announcement sent!');
-  }
+  document.getElementById('announcementText').value = '';
+  document.getElementById('announcementModal').style.display = 'flex';
+  setTimeout(function(){ document.getElementById('announcementText').focus(); }, 100);
+}
+
+function sendAnnouncement() {
+  var msg = (document.getElementById('announcementText').value || '').trim();
+  if (!msg) { toast('Please enter a message'); return; }
+  wsSend({ type: 'TEACHER_COMMAND', command: 'SHOW_ANNOUNCEMENT', targetId: 'all', payload: { message: msg } });
+  document.getElementById('announcementModal').style.display = 'none';
+  showNotification('📢 Announcement sent', msg, 'blue');
 }
 
 function navItemClick(el) {
@@ -2904,6 +2933,7 @@ function closeSceneModal() {
 }
 
 function openLockScreenModal() {
+  if (currentView !== 'screens') return;
   document.getElementById('lockMessageInput').value = '';
   document.getElementById('lockScreenModal').style.display = 'flex';
   setTimeout(function(){ document.getElementById('lockMessageInput').focus(); }, 100);
@@ -2922,16 +2952,27 @@ function lockAllScreens() {
   // Send LOCK_SCREEN command to all students with message
   wsSend({type:'TEACHER_COMMAND', command:'LOCK_SCREEN', targetId:'all', payload:{message:message}});
   closeLockScreenModal();
-  toast('Screen locked with message');
+  showNotification('🔒 Screens Locked', message, 'red');
 }
 
 function unlockAllScreens() {
   wsSend({type:'TEACHER_COMMAND', command:'UNLOCK_SCREEN', targetId:'all', payload:{}});
-  toast('All screens unlocked');
+  showNotification('🔓 Screens Unlocked', 'All student screens have been unlocked.', 'green');
 }
 
 function openNewTab() {
-  toast('Open Tab feature coming soon');
+  document.getElementById('openTabUrl').value = '';
+  document.getElementById('openTabModal').style.display = 'flex';
+  setTimeout(function(){ document.getElementById('openTabUrl').focus(); }, 100);
+}
+
+function sendOpenTab() {
+  var url = (document.getElementById('openTabUrl').value || '').trim();
+  if (!url) { toast('Please enter a URL'); return; }
+  if (!url.startsWith('http')) url = 'https://' + url;
+  wsSend({type:'TEACHER_COMMAND', command:'OPEN_TAB', targetId:'all', payload:{url:url}});
+  document.getElementById('openTabModal').style.display = 'none';
+  showNotification('🔗 Tab Opened', url, 'blue');
 }
 
 function selectSceneColor(el, color) {
