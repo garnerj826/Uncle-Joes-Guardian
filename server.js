@@ -3,6 +3,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
@@ -29,16 +30,39 @@ app.post('/api/register-code', function(req, res) {
   } catch(e) { res.json({ ok: false }); }
 });
 
-// ── In-memory database (persists while server runs) ──────────────
-// On Railway, file system may be read-only so we keep everything in memory
-// Accounts survive as long as the server process is running
-const db = {
-  accounts: {
-    admin: { password: 'Admin', name: 'Admin', students: [] }
-  },
-  studentLinks: {},   // code (string) → studentId
-  studentNames: {}    // code (string) → studentName
-};
+// ── Database with file persistence ──────────────
+// Accounts are saved to a JSON file so they persist across server restarts
+const dbFile = path.join(__dirname, 'accounts.json');
+
+function loadDatabase() {
+  try {
+    if (fs.existsSync(dbFile)) {
+      const data = fs.readFileSync(dbFile, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch(e) {
+    console.error('Error loading database:', e.message);
+  }
+  // Default database if file doesn't exist
+  return {
+    accounts: {
+      admin: { password: 'Admin', name: 'Admin', students: [] }
+    },
+    studentLinks: {},
+    studentNames: {}
+  };
+}
+
+function saveDatabase() {
+  try {
+    fs.writeFileSync(dbFile, JSON.stringify(db, null, 2), 'utf8');
+    console.log('[DB] Accounts saved to disk');
+  } catch(e) {
+    console.error('Error saving database:', e.message);
+  }
+}
+
+const db = loadDatabase();
 
 // ── REST API ─────────────────────────────────────────────────────
 
@@ -66,10 +90,30 @@ app.post('/api/register', (req, res) => {
     const key = username.toLowerCase().trim();
     if (db.accounts[key]) return res.json({ ok: false, error: 'That username is already taken' });
     db.accounts[key] = { password, name: name.trim(), students: [] };
+    saveDatabase();
     console.log('[+] New account:', key);
     res.json({ ok: true });
   } catch(e) {
     console.error('Register error:', e);
+    res.json({ ok: false, error: 'Server error' });
+  }
+});
+
+app.post('/api/reset-password', (req, res) => {
+  try {
+    const { username } = req.body;
+    if (!username) return res.json({ ok: false, error: 'Username required' });
+    const key = username.toLowerCase().trim();
+    const acc = db.accounts[key];
+    if (!acc) return res.json({ ok: false, error: 'Username not found' });
+    // Generate random 8-character password
+    const newPassword = Math.random().toString(36).substring(2, 10);
+    acc.password = newPassword;
+    saveDatabase();
+    console.log('[Password Reset] ' + key + ' → ' + newPassword);
+    res.json({ ok: true, newPassword: newPassword });
+  } catch(e) {
+    console.error('Reset password error:', e);
     res.json({ ok: false, error: 'Server error' });
   }
 });
