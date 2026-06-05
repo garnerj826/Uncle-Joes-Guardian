@@ -553,30 +553,6 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
     </div>
     <div class="content">
       <!-- Guide Bar (GoGuardian-style blue action bar) -->
-      <div id="guideBar">
-        <span class="guide-label">Choose an action:</span>
-        <button class="gbtn" onclick="openAnnouncementModal()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          Make Announcement
-        </button>
-        <button class="gbtn" onclick="openNewTab()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Open Tab
-        </button>
-        <button class="gbtn" onclick="openLockScreenModal()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          Lock/Unlock Device
-        </button>
-        <button class="gbtn" onclick="cmdAll('CLOSE_ALL_TABS')">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          Close All Tabs
-        </button>
-        <button class="gbtn" onclick="unlockAllScreens()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 0 9.9-1"/></svg>
-          Unlock All
-        </button>
-      </div>
-
       <!-- Content tabs (change based on section) -->
       <div id="contentTabBar" class="content-tabs">
         <!-- Classrooms tabs -->
@@ -623,6 +599,32 @@ body{font-family:'Inter',sans-serif;background:#f8f9fa;color:#202124;height:100v
         <div class="tile-ctrl">Tile: <input type="range" min="160" max="340" value="220" oninput="setTile(this.value)"></div>
         <div class="filter-count" id="onlineCountBadge"><span id="onlineCnt">0</span> online</div>
       </div>
+
+      <!-- Guide Bar: shown below filter bar, only on Screens tab -->
+      <div id="guideBar">
+        <span class="guide-label">Choose an action:</span>
+        <button class="gbtn" onclick="openAnnouncementModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Make Announcement
+        </button>
+        <button class="gbtn" onclick="openNewTab()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Open Tab
+        </button>
+        <button class="gbtn" onclick="openLockScreenModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Lock/Unlock Device
+        </button>
+        <button class="gbtn" onclick="cmdAll('CLOSE_ALL_TABS')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Close All Tabs
+        </button>
+        <button class="gbtn" onclick="unlockAllScreens()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 0 9.9-1"/></svg>
+          Unlock All
+        </button>
+      </div>
+
       <div id="emptyState" class="empty">
         <div class="empty-icon"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#dadce0" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
         <h3>No Students Connected</h3>
@@ -1223,17 +1225,6 @@ function loadAndShowClasses() {
   var classes = JSON.parse(localStorage.getItem('userClasses') || '[]');
   currentClass = localStorage.getItem('selectedClass') || null;
 
-  // Update breadcrumb if a class is selected
-  if (currentClass) {
-    var selectedClass = classes.find(function(c) { return c.id === currentClass; });
-    if (selectedClass) {
-      document.getElementById('currentClassName').textContent = selectedClass.name;
-      document.getElementById('breadcrumb').style.display = 'flex';
-    }
-  } else {
-    document.getElementById('breadcrumb').style.display = 'none';
-  }
-
   var listEl = document.getElementById('classList');
   if (classes.length === 0) {
     listEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#9aa0a6"><div style="font-size:48px;margin-bottom:16px">📚</div><p>No classes yet. Create one to get started!</p></div>';
@@ -1243,11 +1234,10 @@ function loadAndShowClasses() {
       return '<div onclick="selectClass(\'' + cls.id + '\')" class="class-box ' + (currentClass === cls.id ? 'selected' : '') + '"><div class="class-box-header"><div class="class-box-name">' + esc(cls.name) + '</div></div><div class="class-box-content"><div class="class-box-count">' + studentCount + ' student' + (studentCount !== 1 ? 's' : '') + '</div><div class="class-box-icon">📚</div></div></div>';
     }).join('');
   }
-  // Show classes view and hide everything else
+
+  // Show classes view, hide everything else
   document.getElementById('classesView').style.display = 'flex';
   document.getElementById('emptyState').style.display = 'none';
-
-  // Hide all other UI elements when showing classes
   document.getElementById('contentTabBar').style.display = 'none';
   document.getElementById('filterBar').style.display = 'none';
   document.getElementById('actionBar').classList.remove('show');
@@ -1259,21 +1249,8 @@ function loadAndShowClasses() {
 function selectClass(classId) {
   localStorage.setItem('selectedClass', classId);
   currentClass = classId;
-
-  // Get the class name and update breadcrumb
-  var classes = JSON.parse(localStorage.getItem('userClasses') || '[]');
-  var selectedClass = classes.find(function(c) { return c.id === classId; });
-  if (selectedClass) {
-    document.getElementById('currentClassName').textContent = selectedClass.name;
-    document.getElementById('breadcrumb').style.display = 'flex';
-  }
-
-  // Update UI to show selected
-  loadAndShowClasses();
-  // Go to classrooms view
-  setTimeout(function() {
-    setSection('classrooms', document.getElementById('navClassrooms'));
-  }, 200);
+  // Go straight to classrooms view — setSection handles the topbar + screens
+  setSection('classrooms', document.getElementById('navClassrooms'));
 }
 
 function goBackToClasses() {
@@ -1347,10 +1324,13 @@ function doLogin() {
     setTimeout(function() {
       document.getElementById('loginPage').style.display = 'none';
       document.getElementById('app').classList.add('show');
-      document.getElementById('userAvatar').textContent = (currentUser.name || 'U')[0].toUpperCase();
+      var initials = (currentUser.name || 'U')[0].toUpperCase();
+      document.getElementById('userAvatar').textContent = initials;
       var sa = document.getElementById('sidebarAvatar');
-      if (sa) sa.textContent = (currentUser.name || 'U')[0].toUpperCase();
-      loadAndShowClasses();
+      if (sa) sa.textContent = initials;
+      var sm = document.getElementById('userAvatarSm');
+      if (sm) sm.textContent = initials;
+      setSection('classrooms', document.getElementById('navClassrooms'));
       if (btn) { btn.disabled = false; btn.innerHTML = 'Log In'; }
       connectWS();
     }, 3000);
@@ -2084,9 +2064,8 @@ function setSection(section, el) {
       loadAndShowClasses();
     } else {
       currentView = 'screens';
-      // Show content tabs and guide bar
+      // Show content tabs
       document.getElementById('contentTabBar').style.display = 'flex';
-      if (gb) gb.classList.add('show');
       var ct = document.getElementById('tabsClassrooms');
       if (ct) ct.style.display = 'flex';
       if (actions) actions.style.display = 'flex';
@@ -2113,7 +2092,8 @@ function setSection(section, el) {
 }
 
 function saveClassroomName() {
-  var name = (document.getElementById('classroomName').value || '').trim();
+  var el = document.getElementById('classroomName');
+  var name = (el ? el.value : '').trim();
   if (!name || !currentClass) return;
   // Update the class name in the class list
   var classes = JSON.parse(localStorage.getItem('userClasses') || '[]');
@@ -2122,8 +2102,9 @@ function saveClassroomName() {
     cls.name = name;
     localStorage.setItem('userClasses', JSON.stringify(classes));
   }
-  // Update breadcrumb display
-  document.getElementById('currentClassName').textContent = name;
+  // Update session topbar name
+  var scn = document.getElementById('sessionClassName');
+  if (scn) scn.textContent = name;
 }
 
 // ── Session Timer ──
@@ -2340,6 +2321,9 @@ function switchToScreenshots() {
   document.getElementById('screensWrap').style.display = 'none';
   document.getElementById('emptyState').style.display = 'none';
   document.getElementById('ssGallery').classList.add('show');
+  // Hide guide bar on non-Screens tabs
+  var gb = document.getElementById('guideBar');
+  if (gb) gb.classList.remove('show');
   var tl = document.getElementById('timelinesView');
   if (tl) tl.style.display = 'none';
   var tlTab = document.getElementById('timelinesTab');
@@ -2360,6 +2344,9 @@ function switchToScreens() {
   if (tl) tl.style.display = 'none';
   var tlTab = document.getElementById('timelinesTab');
   if (tlTab) tlTab.classList.remove('active');
+  // Show guide bar only on Screens tab
+  var gb = document.getElementById('guideBar');
+  if (gb) gb.classList.add('show');
   // Update sidebar sub-item
   document.querySelectorAll('.nav-sub-item').forEach(function(n){ n.classList.remove('active'); });
   var scSub = document.getElementById('nav-screens');
@@ -2771,6 +2758,9 @@ function switchToTimelines() {
   document.getElementById('ssGallery').classList.remove('show');
   document.getElementById('emptyState').style.display = 'none';
   document.getElementById('timelinesView').style.display = 'flex';
+  // Hide guide bar on non-Screens tabs
+  var gb = document.getElementById('guideBar');
+  if (gb) gb.classList.remove('show');
   // Populate student dropdown
   var sel = document.getElementById('tlStudentSelect');
   var prev = sel.value;
